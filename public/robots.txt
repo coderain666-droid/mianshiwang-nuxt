@@ -1,48 +1,15 @@
-# 全局规则 - 适用于所有搜索引擎
 User-agent: *
 Allow: /
 
-# 禁止访问管理后台和API
+# Block internal paths (if any in future)
 Disallow: /admin/
-Disallow: /api/
 Disallow: /private/
 Disallow: /temp/
 
-# 禁止访问开发相关文件
-Disallow: /.git/
-Disallow: /node_modules/
-Disallow: /src/
-Disallow: /*.js$
-Disallow: /*.css$
-Disallow: /*.map$
-
-# 允许访问静态资源
+# Allow common static assets
 Allow: /assets/
 Allow: /images/
 Allow: /favicon.ico
-Allow: /resume/
 
-# 百度爬虫特定规则
-User-agent: Baiduspider
-Allow: /
-Crawl-delay: 1
-
-# 必应爬虫特定规则
-User-agent: Bingbot
-Allow: /
-Crawl-delay: 1
-
-# 谷歌爬虫特定规则
-User-agent: Googlebot
-Allow: /
-Crawl-delay: 0.5
-
-# 谷歌图片爬虫
-User-agent: Googlebot-Image
-Allow: /resume/
-Allow: /assets/imgs/
-Allow: /images/
-Allow: /favicon.ico
-
-# 网站地图
-Sitemap: https://resume.lgdsunday.club/sitemap.xml
+# Sitemap location
+Sitemap: http://localhost:3000/sitemap.xml

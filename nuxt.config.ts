@@ -1,6 +1,7 @@
 // nuxt.config.ts
 import * as path from 'path'
 import { defineNuxtConfig } from 'nuxt/config'
+import { SEO, jsonLdWebsite, jsonLdOrganization } from './app/constants/seo'
 
 const useLightningCSS = true
 
@@ -16,24 +17,45 @@ export default defineNuxtConfig({
 		host: '0.0.0.0'
 	},
 
-
-	// —— 站点基础信息（模板占位）——
-	site: {
-		url: 'http://localhost:3000',
-		name: '面试汪',
-		description: '一个精简的 Nuxt 3 项目基础框架'
-	},
+	// 站点基础信息由 app/constants/seo.ts 统一管理
 
 	// —— 全局 <head> ——（精简且规范）
 	app: {
 		head: {
-			title: '面试汪',
+			title: SEO.defaultTitle,
 			htmlAttrs: { lang: 'zh-CN' },
 			meta: [
 				{ name: 'viewport', content: 'width=device-width, initial-scale=1' },
-				{ name: 'description', content: '基于 Nuxt 3 的基础项目模板' }
+				{ name: 'description', content: SEO.defaultDescription },
+				{ name: 'keywords', content: SEO.defaultKeywords },
+				{ name: 'robots', content: 'index,follow' },
+				{ property: 'og:type', content: 'website' },
+				{ property: 'og:title', content: SEO.defaultTitle },
+				{ property: 'og:description', content: SEO.defaultDescription },
+				{ property: 'og:url', content: SEO.siteUrl },
+				{ property: 'og:image', content: SEO.ogImage },
+				{ property: 'og:locale', content: 'zh_CN' },
+				{ name: 'twitter:card', content: SEO.twitterCard },
+				{ name: 'twitter:title', content: SEO.defaultTitle },
+				{ name: 'twitter:description', content: SEO.defaultDescription },
+				{ name: 'twitter:image', content: SEO.ogImage },
+				{ name: 'application-name', content: '面试汪' },
+				{ name: 'apple-mobile-web-app-title', content: '面试汪' }
 			],
-			link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
+			link: [
+				{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+				{ rel: 'canonical', href: SEO.siteUrl }
+			],
+			script: [
+				{
+					type: 'application/ld+json',
+					innerHTML: JSON.stringify(jsonLdWebsite(SEO))
+				},
+				{
+					type: 'application/ld+json',
+					innerHTML: JSON.stringify(jsonLdOrganization(SEO))
+				}
+			]
 		}
 	},
 
