@@ -8,14 +8,14 @@ export default defineNuxtConfig({
 	// 源码目录
 	srcDir: 'app',
 
+	// 兼容性日期（用于 Nitro/平台兼容提示）
+	compatibilityDate: '2025-11-11',
+
 	// 开发服务器：绑定到 0.0.0.0 以便局域网访问
 	devServer: {
 		host: '0.0.0.0'
 	},
-	// 禁用 Google 字体
-	ui: {
-		fonts: false
-	},
+
 
 	// —— 站点基础信息（模板占位）——
 	site: {
@@ -43,7 +43,7 @@ export default defineNuxtConfig({
 	},
 
 	// —— 模块（保留基础依赖）——
-	modules: ['@pinia/nuxt', '@nuxt/devtools', '@nuxtjs/tailwindcss'],
+	modules: ['@pinia/nuxt', '@nuxt/devtools', ['@nuxt/ui', { fonts: false }]],
 
 	// —— 模板不内置 sitemap/robots ——
 
