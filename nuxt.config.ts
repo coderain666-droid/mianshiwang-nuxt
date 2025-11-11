@@ -12,18 +12,22 @@ export default defineNuxtConfig({
 	devServer: {
 		host: '0.0.0.0'
 	},
+	// 禁用 Google 字体
+	ui: {
+		fonts: false
+	},
 
 	// —— 站点基础信息（模板占位）——
 	site: {
 		url: 'http://localhost:3000',
-		name: 'Nuxt 基础模板',
+		name: '面试汪',
 		description: '一个精简的 Nuxt 3 项目基础框架'
 	},
 
 	// —— 全局 <head> ——（精简且规范）
 	app: {
 		head: {
-			title: 'Nuxt 基础模板',
+			title: '面试汪',
 			htmlAttrs: { lang: 'zh-CN' },
 			meta: [
 				{ name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -70,7 +74,7 @@ export default defineNuxtConfig({
 		resolve: {
 			alias: { '@': path.resolve(__dirname, './app') }
 		},
-		optimizeDeps: { include: ['vue', 'vue-router', 'pinia', 'element-plus'] },
+		optimizeDeps: { include: ['vue', 'vue-router', 'pinia'] },
 		build: {
 			minify: 'esbuild',
 			cssMinify: useLightningCSS ? 'lightningcss' : 'esbuild',
