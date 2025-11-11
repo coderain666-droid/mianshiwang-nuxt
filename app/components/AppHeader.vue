@@ -4,7 +4,7 @@
 	>
 		<div class="container px-4 py-3 flex items-center justify-between">
 			<div class="flex items-center gap-2">
-				<ww-svg-icon name="hero" class="h-6 w-6 rounded"></ww-svg-icon>
+				<ww-svg-icon name="hero" class="h-6 w-6"></ww-svg-icon>
 				<NuxtLink to="/" class="font-semibold text-neutral-900"
 					>面试汪</NuxtLink
 				>
