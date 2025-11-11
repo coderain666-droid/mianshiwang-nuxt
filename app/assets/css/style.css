@@ -1,2 +1,84 @@
 @import "tailwindcss";
 @import "@nuxt/ui";
+
+/* 设计系统主题令牌（Tailwind v4 @theme） */
+@theme {
+  --color-primary: #2563EB;
+  /* 品牌主色：沉稳蓝 */
+  --color-accent: #10B981;
+  /* 强调色：薄荷绿 */
+  --color-danger: #EF4444;
+  /* 错误态 */
+  --color-warning: #F59E0B;
+  /* 警示态 */
+
+  --color-text: #1A1A1A;
+  /* 主文本 */
+  --color-muted: #4B5563;
+  /* 次文本 */
+  --color-subtle: #6B7280;
+  /* 辅助文本 */
+  --color-border: #E5E7EB;
+  /* 边框 */
+  --color-bg: #F8FAFC;
+  /* 背景 */
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* 全局排版与可用性基础 */
+html {
+  color-scheme: light;
+}
+
+body {
+  color: var(--color-text);
+  background: var(--color-bg);
+  font-family: 'Inter', 'Noto Sans SC', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 组件基调 */
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-md);
+}
+
+.card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 深色模式（可选） */
+/* @media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background: #0B1220;
+    color: #E5E7EB;
+  }
+} */

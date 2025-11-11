@@ -1,5 +1,6 @@
 // nuxt.config.ts
 import * as path from 'path'
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import { defineNuxtConfig } from 'nuxt/config'
 import { SEO, jsonLdWebsite, jsonLdOrganization } from './app/constants/seo'
 
@@ -66,12 +67,6 @@ export default defineNuxtConfig({
 
 	// —— 模块（保留基础依赖）——
 	modules: ['@pinia/nuxt', '@nuxt/devtools', ['@nuxt/ui', { fonts: false }]],
-
-	// —— 模板不内置 sitemap/robots ——
-
-	// —— 不加载业务插件 ——
-	plugins: [],
-
 	// —— 资源与样式 ——（注意不要让 body/html 首帧 opacity: 0）
 	css: ['~/assets/css/style.css'],
 
@@ -91,7 +86,12 @@ export default defineNuxtConfig({
 
 	// —— Vite 构建优化（精简） ——
 	vite: {
-		plugins: [],
+		plugins: [
+			createSvgIconsPlugin({
+				iconDirs: [path.resolve(process.cwd(), 'app/assets/icons')],
+				symbolId: 'icon-[name]'
+			})
+		],
 		esbuild: { drop: ['console', 'debugger'] },
 		resolve: {
 			alias: { '@': path.resolve(__dirname, './app') }

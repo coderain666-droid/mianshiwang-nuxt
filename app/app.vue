@@ -1,7 +1,7 @@
 <template>
-  <UApp>
-    <NuxtPage />
-  </UApp>
-</template>
+	<NuxtLayout>
+		<NuxtPage />
+	</NuxtLayout>
+  </template>
 
 <script setup></script>
