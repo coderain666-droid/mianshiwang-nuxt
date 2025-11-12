@@ -14,6 +14,13 @@
 				>
 			</div>
 			<nav class="hidden md:flex items-center gap-6 text-sm text-neutral-600">
+				<!-- 在新的标签页打开 -->
+				<NuxtLink
+					to="https://resume.lgdsunday.club/"
+					class="hover:text-neutral-900 transition-colors"
+					target="_blank"
+					>简历制作</NuxtLink
+				>
 				<NuxtLink
 					to="/#features"
 					class="hover:text-neutral-900 transition-colors"
@@ -33,7 +40,9 @@
 			</nav>
 			<div class="flex items-center gap-2">
 				<UButton color="gray" variant="ghost" to="/login">登录</UButton>
-				<UButton color="primary" to="/start">立即试用</UButton>
+				<UButton color="primary" class="text-white" to="/start"
+					>立即试用</UButton
+				>
 			</div>
 		</div>
 	</header>
