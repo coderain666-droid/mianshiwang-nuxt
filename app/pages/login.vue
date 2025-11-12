@@ -9,10 +9,28 @@
 
 		<div class="relative">
 			<div class="container px-4">
+				<div class="mb-12 flex items-center justify-between text-white/80">
+					<NuxtLink
+						to="/"
+						class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium transition hover:bg-white/10"
+					>
+						<UIcon name="i-heroicons-arrow-left" />
+						返回面试汪
+					</NuxtLink>
+					<div
+						class="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs md:flex"
+					>
+						<UIcon name="i-heroicons-shield-check" class="text-emerald-300" />
+						<span>微信官方授权 · 安全登录</span>
+					</div>
+				</div>
 				<div
-					class="grid items-center gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]"
+					class="grid items-start gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]"
 				>
-					<LoginPitch />
+					<div class="flex flex-col gap-8">
+						<LoginPitch />
+						<LoginFlowCard />
+					</div>
 					<div class="relative">
 						<div
 							class="absolute -top-6 -left-8 hidden h-24 w-24 rounded-full border border-white/10 lg:block"
@@ -33,6 +51,10 @@
 
 <script setup lang="ts">
 import { useHead, useSeoMeta, useToast } from '#imports'
+
+definePageMeta({
+	layout: 'auth'
+})
 
 useHead({
 	title: '登录面试汪 - AI 面试平台',
@@ -68,6 +90,6 @@ const handleQrRefresh = () => {
 
 <style scoped>
 section {
-	min-height: calc(100vh - 76px);
+	min-height: 100vh;
 }
 </style>
