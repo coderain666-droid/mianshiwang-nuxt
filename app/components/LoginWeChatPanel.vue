@@ -112,8 +112,13 @@
 		</div>
 
 		<div class="mt-8 flex items-start gap-2 text-xs text-neutral-500">
-			<UCheckbox v-model="agree" name="agreement" aria-label="同意协议" />
-			<p>
+			<UCheckbox
+				v-model="agree"
+				name="agreement"
+				color="success"
+				aria-label="同意协议"
+			/>
+			<p class="leading-[20px]">
 				继续登录即表示你已阅读并同意
 				<NuxtLink to="/terms" class="text-primary hover:underline"
 					>《服务协议》</NuxtLink

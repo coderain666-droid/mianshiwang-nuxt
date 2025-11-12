@@ -2,16 +2,22 @@
 	<section
 		class="rounded-3xl border border-white/10 bg-white/5 p-6 text-white/80 shadow-[0px_30px_80px_rgba(15,23,42,0.35)] backdrop-blur-md"
 	>
-		<div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+		<div
+			class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+		>
 			<div class="flex items-center gap-3">
 				<div
-					class="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner shadow-primary/20"
+					class="inline-flex p-2 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-inner shadow-primary/20"
 				>
 					<UIcon name="i-heroicons-map" class="h-6 w-6" />
 				</div>
 				<div>
-					<p class="text-xs uppercase tracking-[0.2em] text-white/50">极简流程</p>
-					<h2 class="text-lg font-semibold text-white">3 步开启你的 AI 面试训练</h2>
+					<p class="text-xs uppercase tracking-[0.2em] text-white/50">
+						极简流程
+					</p>
+					<h2 class="text-lg font-semibold text-white">
+						3 步完成你的 AI 面试训练
+					</h2>
 				</div>
 			</div>
 			<p class="text-sm text-white/70 md:max-w-xs lg:max-w-sm">
@@ -34,7 +40,9 @@
 				</div>
 				<div>
 					<h3 class="text-sm font-medium text-white">{{ step.title }}</h3>
-					<p class="mt-1 text-xs leading-relaxed text-white/70">{{ step.description }}</p>
+					<p class="mt-1 text-xs leading-relaxed text-white/70">
+						{{ step.description }}
+					</p>
 				</div>
 			</div>
 		</div>
@@ -62,5 +70,3 @@ const steps = [
 </script>
 
 <style scoped></style>
-
-

@@ -1,12 +1,6 @@
 <template>
 	<div class="space-y-8">
 		<div class="space-y-3">
-			<span
-				class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-neutral-900/80 px-3 py-1 text-xs font-medium text-white/80 shadow-sm backdrop-blur"
-			>
-				<UIcon name="i-heroicons-sparkles" class="text-amber-300" />
-				AI 面试加速计划
-			</span>
 			<h1 class="text-white text-3xl md:text-4xl font-semibold">
 				欢迎回来！<br />
 				继续你的 AI 面试训练
@@ -16,7 +10,7 @@
 			</p>
 		</div>
 
-		<ul class="grid gap-4 sm:grid-cols-2 text-sm text-white/80">
+		<!-- <ul class="grid gap-4 sm:grid-cols-2 text-sm text-white/80">
 			<li class="flex items-start gap-3">
 				<div
 					class="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-white"
@@ -61,7 +55,7 @@
 					<p class="text-white/70">微信扫码即可登录，秒级同步。</p>
 				</div>
 			</li>
-		</ul>
+		</ul> -->
 	</div>
 </template>
 

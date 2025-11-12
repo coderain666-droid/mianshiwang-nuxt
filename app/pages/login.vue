@@ -1,5 +1,5 @@
 <template>
-	<section class="relative overflow-hidden py-16 sm:py-20">
+	<section class="h-screen relative overflow-hidden py-16 sm:py-20">
 		<div
 			class="pointer-events-none absolute inset-0 bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800"
 		></div>
@@ -8,7 +8,7 @@
 		</div>
 
 		<div class="relative">
-			<div class="container px-4">
+			<div class="container">
 				<div class="mb-12 flex items-center justify-between text-white/80">
 					<NuxtLink
 						to="/"
@@ -88,8 +88,4 @@ const handleQrRefresh = () => {
 }
 </script>
 
-<style scoped>
-section {
-	min-height: 100vh;
-}
-</style>
+<style scoped></style>
