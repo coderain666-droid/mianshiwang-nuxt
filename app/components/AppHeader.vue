@@ -1,6 +1,9 @@
 <template>
 	<header
-		class="w-full border-b border-gray-200 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/50"
+		:class="[
+			'w-full sticky top-0 z-50 border-b border-gray-200 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/50',
+			scrolled ? 'shadow-sm bg-white/80 backdrop-blur' : ''
+		]"
 	>
 		<div class="container px-4 py-3 flex items-center justify-between">
 			<div class="flex items-center gap-2">
@@ -23,10 +26,22 @@
 				>
 				<NuxtLink
 					to="/#features"
-					class="hover:text-neutral-900 transition-colors"
+					:class="[
+						'transition-colors',
+						activeNav === 'features'
+							? 'text-neutral-900 font-bold'
+							: 'hover:text-neutral-900'
+					]"
 					>功能</NuxtLink
 				>
-				<NuxtLink to="/#steps" class="hover:text-neutral-900 transition-colors"
+				<NuxtLink
+					to="/#steps"
+					:class="[
+						'transition-colors',
+						activeNav === 'steps'
+							? 'text-neutral-900 font-bold'
+							: 'hover:text-neutral-900'
+					]"
 					>流程</NuxtLink
 				>
 				<NuxtLink to="/#faq" class="hover:text-neutral-900 transition-colors"
@@ -48,6 +63,49 @@
 	</header>
 </template>
 
-<script setup></script>
+<script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue'
+
+const scrolled = ref(false)
+const activeNav = ref<'features' | 'steps' | null>(null)
+
+onMounted(() => {
+	// 头部滚动阴影
+	const onScroll = () => {
+		scrolled.value = window.scrollY > 8
+	}
+	onScroll()
+	window.addEventListener('scroll', onScroll, { passive: true })
+
+	// 滚动高亮逻辑（首页锚点）
+	let observer: IntersectionObserver | null = null
+	const features = document.getElementById('features')
+	const steps = document.getElementById('steps')
+	const targets = [features, steps].filter(Boolean) as Element[]
+	if (targets.length) {
+		observer = new IntersectionObserver(
+			(entries) => {
+				const visible = entries
+					.filter((e) => e.isIntersecting)
+					.sort(
+						(a, b) => (b.intersectionRatio || 0) - (a.intersectionRatio || 0)
+					)[0]
+				if (visible) {
+					const id = (visible.target as HTMLElement).id
+					if (id === 'features') activeNav.value = 'features'
+					else if (id === 'steps') activeNav.value = 'steps'
+				}
+			},
+			{ rootMargin: '0px 0px -40% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] }
+		)
+		targets.forEach((t) => observer!.observe(t))
+	}
+
+	onUnmounted(() => {
+		window.removeEventListener('scroll', onScroll)
+		if (observer) observer.disconnect()
+	})
+})
+</script>
 
 <style scoped></style>

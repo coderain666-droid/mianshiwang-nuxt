@@ -10,6 +10,7 @@
 					<p>© {{ new Date().getFullYear() }} 面试汪 · AI 面试平台</p>
 				</div>
 			</footer>
+			<BackToTop />
 		</div>
 	</UApp>
 	</template>
