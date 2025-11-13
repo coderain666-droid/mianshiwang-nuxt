@@ -1,5 +1,6 @@
 <template>
 	<section class="h-screen relative overflow-hidden py-16 sm:py-20">
+		<!-- 以下为纯 UI 美化部分 -->
 		<div
 			class="pointer-events-none absolute inset-0 bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800"
 		></div>
@@ -21,7 +22,7 @@
 		<div class="absolute inset-x-0 top-24 flex justify-center blur-3xl">
 			<div class="h-64 w-[480px] rounded-full bg-primary/20"></div>
 		</div>
-
+		<!-- 以上为纯 UI 美化部分 -->
 		<div class="relative">
 			<div class="container">
 				<div class="mb-12 flex items-center justify-between text-white/80">

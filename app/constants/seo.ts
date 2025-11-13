@@ -1,5 +1,5 @@
 export const SEO = {
-	siteUrl: 'http://localhost:3000',
+	siteUrl: 'https://interview.lgdsunday.club/',
 	siteName: '面试汪',
 	defaultTitle: '面试汪 - AI 面试平台',
 	defaultDescription:
