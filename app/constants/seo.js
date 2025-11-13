@@ -10,7 +10,7 @@ export const SEO = {
 	twitterCard: 'summary_large_image'
 }
 
-const absoluteUrl = (base: string, path: string) =>
+const absoluteUrl = (base, path) =>
 	path.startsWith('http') ? path : `${base}${path}`
 
 export const jsonLdWebsite = (seo = SEO) => ({

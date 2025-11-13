@@ -65,7 +65,7 @@
 	</section>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { useHead, useSeoMeta, useToast } from '#imports'
 
 definePageMeta({

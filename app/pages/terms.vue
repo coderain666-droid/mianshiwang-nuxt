@@ -91,7 +91,7 @@
 	</section>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { SEO } from '@/constants/seo'
 import { useHead } from 'nuxt/app'
 

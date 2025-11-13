@@ -12,7 +12,7 @@
 	</Transition>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { onMounted, onBeforeUnmount, ref } from 'vue'
 
 const visible = ref(false)

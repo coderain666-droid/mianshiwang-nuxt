@@ -49,7 +49,7 @@
 	</section>
 </template>
 
-<script setup lang="ts">
+<script setup>
 const steps = [
 	{
 		title: '选择岗位与目标',
@@ -66,7 +66,7 @@ const steps = [
 		description: '生成能力雷达、风险点与改进建议，支持导出练习计划。',
 		icon: 'i-heroicons-presentation-chart-bar'
 	}
-] as const
+] 
 </script>
 
 <style scoped></style>

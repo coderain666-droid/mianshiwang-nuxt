@@ -132,15 +132,12 @@
 	</div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 
-const emit = defineEmits<{
-	(event: 'requestQuickLogin'): void
-	(event: 'refreshQr'): void
-}>()
+const emit = defineEmits(['requestQuickLogin', 'refreshQr'])
 
-const activeMethod = ref<'scan' | 'quick'>('scan')
+const activeMethod = ref('scan')
 const countdown = ref(120)
 const qrSeed = ref(Date.now())
 const agree = ref(true)
@@ -152,7 +149,7 @@ const qrCodeUrl = computed(
 
 const isExpired = computed(() => countdown.value <= 0)
 
-let timer: number | null = null
+let timer = null
 
 const startTimer = () => {
 	if (timer) {

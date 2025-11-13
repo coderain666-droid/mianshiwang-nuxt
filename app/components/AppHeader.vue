@@ -63,11 +63,11 @@
 	</header>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
 
 const scrolled = ref(false)
-const activeNav = ref<'features' | 'steps' | null>(null)
+const activeNav = ref(null)
 
 onMounted(() => {
 	// 头部滚动阴影
@@ -78,10 +78,10 @@ onMounted(() => {
 	window.addEventListener('scroll', onScroll, { passive: true })
 
 	// 滚动高亮逻辑（首页锚点）
-	let observer: IntersectionObserver | null = null
+	let observer = null
 	const features = document.getElementById('features')
 	const steps = document.getElementById('steps')
-	const targets = [features, steps].filter(Boolean) as Element[]
+	const targets = [features, steps].filter(Boolean)
 	if (targets.length) {
 		observer = new IntersectionObserver(
 			(entries) => {
@@ -91,14 +91,14 @@ onMounted(() => {
 						(a, b) => (b.intersectionRatio || 0) - (a.intersectionRatio || 0)
 					)[0]
 				if (visible) {
-					const id = (visible.target as HTMLElement).id
+					const id = visible.target.id
 					if (id === 'features') activeNav.value = 'features'
 					else if (id === 'steps') activeNav.value = 'steps'
 				}
 			},
 			{ rootMargin: '0px 0px -40% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] }
 		)
-		targets.forEach((t) => observer!.observe(t))
+		if (observer) targets.forEach((t) => observer.observe(t))
 	}
 
 	onUnmounted(() => {
