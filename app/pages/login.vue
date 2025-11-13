@@ -3,6 +3,21 @@
 		<div
 			class="pointer-events-none absolute inset-0 bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800"
 		></div>
+		<div class="absolute inset-0 pointer-events-none">
+			<div class="sci-fi-layer">
+				<span class="orb orb-1"></span>
+				<span class="orb orb-2"></span>
+				<span class="orb orb-3"></span>
+
+				<span class="beam beam-1"></span>
+				<span class="beam beam-2"></span>
+
+				<span class="bubble bubble-1"></span>
+				<span class="bubble bubble-2"></span>
+				<span class="bubble bubble-3"></span>
+				<span class="bubble bubble-4"></span>
+			</div>
+		</div>
 		<div class="absolute inset-x-0 top-24 flex justify-center blur-3xl">
 			<div class="h-64 w-[480px] rounded-full bg-primary/20"></div>
 		</div>
@@ -88,4 +103,205 @@ const handleQrRefresh = () => {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.sci-fi-layer {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+}
+
+.orb {
+	position: absolute;
+	border-radius: 9999px;
+	filter: blur(40px);
+	mix-blend-mode: screen;
+	background: radial-gradient(
+		circle at 30% 30%,
+		rgba(92, 187, 255, 0.3),
+		rgba(15, 23, 42, 0)
+	);
+	animation: orbPulse 12s ease-in-out infinite alternate;
+}
+
+.orb-1 {
+	width: 44rem;
+	height: 44rem;
+	top: -12rem;
+	right: -10rem;
+	background: radial-gradient(
+		circle at 30% 30%,
+		rgba(136, 108, 255, 0.5),
+		rgba(15, 23, 42, 0)
+	);
+	animation-delay: -3s;
+}
+
+.orb-2 {
+	width: 32rem;
+	height: 32rem;
+	bottom: -14rem;
+	left: -10rem;
+	background: radial-gradient(
+		circle at 40% 40%,
+		rgba(78, 225, 255, 0.45),
+		rgba(15, 23, 42, 0)
+	);
+	animation-delay: -6s;
+}
+
+.orb-3 {
+	width: 28rem;
+	height: 28rem;
+	top: 30%;
+	left: 30%;
+	background: radial-gradient(
+		circle at 70% 70%,
+		rgba(244, 114, 182, 0.3),
+		rgba(15, 23, 42, 0)
+	);
+	animation-delay: -1s;
+}
+
+.beam {
+	position: absolute;
+	inset: -20%;
+	background: radial-gradient(
+		circle at center,
+		rgba(125, 211, 252, 0.08),
+		rgba(15, 23, 42, 0)
+	);
+	filter: blur(60px);
+	mix-blend-mode: screen;
+	animation: beamSweep 18s ease-in-out infinite;
+}
+
+.beam-1 {
+	transform: rotate(12deg);
+	animation-delay: -4s;
+}
+
+.beam-2 {
+	transform: rotate(-18deg);
+	animation-delay: -10s;
+}
+
+.bubble {
+	position: absolute;
+	border-radius: 9999px;
+	border: 1px solid rgba(148, 163, 184, 0.18);
+	background: linear-gradient(
+			120deg,
+			rgba(226, 232, 240, 0.08),
+			rgba(148, 163, 184, 0.02),
+			rgba(248, 250, 252, 0.08)
+		),
+		radial-gradient(
+			circle at top left,
+			rgba(148, 163, 184, 0.2),
+			rgba(15, 23, 42, 0.02)
+		);
+	box-shadow: 0 0 35px rgba(56, 189, 248, 0.12),
+		inset 0 0 25px rgba(59, 130, 246, 0.06);
+	backdrop-filter: blur(10px);
+	animation: bubbleFloat 16s ease-in-out infinite,
+		bubbleDrift 22s linear infinite;
+}
+
+.bubble::after {
+	content: '';
+	position: absolute;
+	inset: 18%;
+	border-radius: 9999px;
+	background: radial-gradient(
+		circle at top,
+		rgba(255, 255, 255, 0.35),
+		rgba(148, 163, 184, 0)
+	);
+	filter: blur(8px);
+	opacity: 0.6;
+}
+
+.bubble-1 {
+	width: 12rem;
+	height: 12rem;
+	top: 12%;
+	left: 12%;
+	animation-delay: -12s;
+}
+
+.bubble-2 {
+	width: 9rem;
+	height: 9rem;
+	top: 42%;
+	right: 10%;
+	animation-delay: -6s;
+}
+
+.bubble-3 {
+	width: 7rem;
+	height: 7rem;
+	bottom: 18%;
+	left: 20%;
+	animation-delay: -18s;
+}
+
+.bubble-4 {
+	width: 6rem;
+	height: 6rem;
+	bottom: 15%;
+	right: 28%;
+	animation-delay: -9s;
+}
+
+@keyframes orbPulse {
+	0% {
+		transform: scale(0.92) translate3d(0, 0, 0);
+		opacity: 0.65;
+	}
+	50% {
+		transform: scale(1.05) translate3d(2%, -2%, 0);
+		opacity: 0.9;
+	}
+	100% {
+		transform: scale(0.96) translate3d(-2%, 2%, 0);
+		opacity: 0.7;
+	}
+}
+
+@keyframes beamSweep {
+	0%,
+	100% {
+		transform: rotate(8deg) translate3d(-6%, -4%, 0);
+		opacity: 0.35;
+	}
+	50% {
+		transform: rotate(-6deg) translate3d(6%, 4%, 0);
+		opacity: 0.55;
+	}
+}
+
+@keyframes bubbleFloat {
+	0%,
+	100% {
+		transform: translate3d(0, 0, 0) scale(1);
+	}
+	50% {
+		transform: translate3d(0, -18px, 0) scale(1.02);
+	}
+}
+
+@keyframes bubbleDrift {
+	0% {
+		transform: rotate(0deg) translateX(0);
+		opacity: 0.65;
+	}
+	50% {
+		transform: rotate(1deg) translateX(12px);
+		opacity: 0.85;
+	}
+	100% {
+		transform: rotate(0deg) translateX(0);
+		opacity: 0.65;
+	}
+}
+</style>
