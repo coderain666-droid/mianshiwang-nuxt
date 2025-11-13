@@ -10,14 +10,14 @@
 			<div class="mt-10 grid md:grid-cols-3 gap-6">
 				<div class="card p-6 bg-white">
 					<div class="text-xs text-neutral-500">Step 1</div>
-					<h3 class="mt-1 font-medium text-neutral-900">选择职业与目标</h3>
+					<h3 class="mt-1 font-medium text-neutral-900">选择岗位与目标</h3>
 					<p class="mt-2 text-sm text-neutral-600">
-						选择岗位、级别与公司偏好，导入简历获得个性化题集。
+						设置目标岗位/公司，并导入简历，系统自动生成专属题集。
 					</p>
 				</div>
 				<div class="card p-6 bg-white">
 					<div class="text-xs text-neutral-500">Step 2</div>
-					<h3 class="mt-1 font-medium text-neutral-900">开始多人面试</h3>
+					<h3 class="mt-1 font-medium text-neutral-900">开启多轮模拟面试</h3>
 					<p class="mt-2 text-sm text-neutral-600">
 						模拟 HR/技术/业务面，支持多轮追问、反问与沟通演练。
 					</p>
