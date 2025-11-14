@@ -81,8 +81,15 @@ export default defineNuxtConfig({
 		}
 	},
 
-	// —— 模板不包含本地代理与额外预渲染 ——
-	nitro: {},
+	nitro: {
+		devProxy: {
+			'/dev-api/': {
+				target: 'http://localhost:8888',
+				changeOrigin: true,
+				rewrite: (p: string) => p.replace(/^\/dev-api/, '')
+			}
+		}
+	},
 
 	// —— Vite 构建优化（精简） ——
 	vite: {
