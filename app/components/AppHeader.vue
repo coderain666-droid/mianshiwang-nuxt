@@ -17,7 +17,16 @@
 				>
 			</div>
 			<nav class="hidden md:flex items-center gap-6 text-sm text-neutral-600">
-				<NuxtLink to="/start">开始 AI 面试</NuxtLink>
+				<NuxtLink
+					to="/start"
+					:class="[
+						'transition-colors',
+						activeNav === 'start'
+							? 'text-neutral-900 font-bold'
+							: 'hover:text-neutral-900'
+					]"
+					>开始 AI 面试</NuxtLink
+				>
 				<NuxtLink
 					to="/#features"
 					:class="[
@@ -103,7 +112,14 @@ import interviewAvatar from '@/assets/imgs/interview.png'
 const userStore = useUserStore()
 
 const userMenuItems = [
-	[{ label: '个人中心', icon: 'i-heroicons-user', to: '/profile' }],
+	[
+		{ label: '个人中心', icon: 'i-heroicons-user', to: '/profile' },
+		{
+			label: '面试记录',
+			icon: 'i-heroicons-chart',
+			to: '/history'
+		}
+	],
 	[
 		{
 			label: '退出登录',
@@ -120,6 +136,7 @@ const route = useRoute()
 const setActiveByRoute = () => {
 	if (route.path === '/faq') activeNav.value = 'faq'
 	else if (route.path === '/contact') activeNav.value = 'contact'
+	else if (route.path === '/start') activeNav.value = 'start'
 	else if (route.path === '/' && route.hash === '#features')
 		activeNav.value = 'features'
 	else if (route.path === '/' && route.hash === '#steps')
