@@ -86,7 +86,7 @@ export default defineNuxtConfig({
 			'/dev-api/': {
 				target: 'http://localhost:8888',
 				changeOrigin: true,
-				rewrite: (p: string) => p.replace(/^\/dev-api/, '')
+				rewrite: (p) => p.replace(/^\/dev-api/, '')
 			}
 		}
 	},

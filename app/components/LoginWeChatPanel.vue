@@ -17,7 +17,7 @@
 			</div>
 		</div>
 
-		<div v-if="activeMethod === 'scan'" class="mt-8 space-y-4 text-center">
+		<div class="mt-8 space-y-4 text-center">
 			<div class="relative mx-auto h-52 w-52">
 				<div
 					class="absolute inset-0 rounded-2xl border border-dashed border-neutral-200 bg-gradient-to-br from-white to-neutral-50 shadow-inner shadow-black/5"
@@ -68,49 +68,6 @@
 			</div>
 		</div>
 
-		<div v-else class="mt-8 space-y-5">
-			<div class="rounded-xl bg-neutral-50 p-4">
-				<h3 class="text-sm font-medium text-neutral-800">微信快速登录流程</h3>
-				<ul class="mt-3 space-y-2 text-xs text-neutral-600">
-					<li class="flex items-start gap-2">
-						<span
-							class="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary"
-						>
-							1
-						</span>
-						打开微信，确认已绑定手机号或邮箱。
-					</li>
-					<li class="flex items-start gap-2">
-						<span
-							class="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary"
-						>
-							2
-						</span>
-						点击下方按钮，授权微信快速登录。
-					</li>
-					<li class="flex items-start gap-2">
-						<span
-							class="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary"
-						>
-							3
-						</span>
-						授权完成后，将自动跳转回面试汪继续使用。
-					</li>
-				</ul>
-			</div>
-			<UButton
-				color="primary"
-				size="lg"
-				class="w-full text-white"
-				@click="emitQuickLogin"
-			>
-				<template #leading>
-					<UIcon name="i-simple-icons-wechat" />
-				</template>
-				一键微信快速登录
-			</UButton>
-		</div>
-
 		<div class="mt-8 flex items-start gap-2 text-xs text-neutral-500">
 			<UCheckbox
 				v-model="agree"
@@ -134,59 +91,122 @@
 
 <script setup>
 import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
+import { useNuxtApp, useToast } from '#imports'
+import {
+	generateWechatQRCodeAPI,
+	checkWechatQRCodeStatusAPI
+} from '@/api/login'
+import { useUserStore } from '@/stores/user'
+import { handleLoginSuccess } from '@/permission'
 
+// 组件向父级抛出的事件：微信快速登录请求、二维码刷新提示
 const emit = defineEmits(['requestQuickLogin', 'refreshQr'])
 
-const activeMethod = ref('scan')
-const countdown = ref(120)
+const userStore = useUserStore()
+
+// 二维码有效倒计时（秒）
+const countdown = ref(300)
+// 用于触发二维码刷新（防缓存）
 const qrSeed = ref(Date.now())
+// 同意协议开关
 const agree = ref(true)
 
-const qrCodeUrl = computed(
-	() =>
-		`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=interview-wang-login-${qrSeed.value}`
-)
+// 二维码图片地址（由后端返回的真实登录二维码链接）
+const qrCodeUrl = ref('')
+const qrCodeId = ref('') // 二维码ID
 
+// 是否过期：倒计时归零视为过期
 const isExpired = computed(() => countdown.value <= 0)
 
+// 倒计时计时器句柄
 let timer = null
+// 扫码状态轮询计时器
+let qrCodeCheckTimer = null
 
+// 启动倒计时（每次刷新二维码都会重置）
 const startTimer = () => {
 	if (timer) {
 		window.clearInterval(timer)
 		timer = null
 	}
-	countdown.value = 120
+	countdown.value = 300
 	timer = window.setInterval(() => {
 		if (countdown.value > 0) {
 			countdown.value -= 1
 		} else {
-			if (timer) {
-				window.clearInterval(timer)
-				timer = null
-			}
+			// 到期后自动刷新二维码（与文案保持一致）
+			refreshQr()
 		}
 	}, 1000)
 }
 
-const refreshQr = () => {
+// 通过接口获取微信扫码登录二维码，并更新展示
+const { $api } = useNuxtApp()
+
+// 拉取二维码地址（后端可能返回不同字段名，做兼容处理）
+const loadQrCode = async () => {
+	const response = await generateWechatQRCodeAPI($api)
+	qrCodeUrl.value = response.qrCodeUrl
+	qrCodeId.value = response.qrCodeId
+	startQRCodeCheck()
+}
+
+// 检查二维码状态
+async function checkQRCodeStatus() {
+	try {
+		// 调用后端接口检查扫码状态
+		const response = await checkWechatQRCodeStatusAPI($api, qrCodeId.value)
+
+		if (response.user && response.token) {
+			// 用户已关注公众号并确认登录
+			// 为 userStore 赋值
+			userStore.isLogin = true
+			userStore.userInfo = response.user
+			userStore.token = response.token
+
+			// 提示登录成功，完成页面跳转
+			const toast = useToast()
+			toast.add({
+				title: '登录成功',
+				description: '正在跳转到刚才浏览的页面…',
+				color: 'success'
+			})
+			// 停止轮询，避免多次跳转
+			if (qrCodeCheckTimer) {
+				clearInterval(qrCodeCheckTimer)
+				qrCodeCheckTimer = null
+			}
+			// 使用统一的登录成功处理，跳转回登录前的页面
+			handleLoginSuccess()
+		}
+	} catch (error) {
+		console.error('检查二维码状态失败:', error)
+		// 如果是网络错误，继续检查
+	}
+}
+
+// 开始检查扫码状态
+function startQRCodeCheck() {
+	qrCodeCheckTimer = setInterval(() => {
+		checkQRCodeStatus()
+	}, 2000)
+}
+
+// 刷新二维码：更新种子、重置倒计时、拉取新链接并通知父组件
+const refreshQr = async () => {
 	qrSeed.value = Date.now()
 	startTimer()
-	if (activeMethod.value !== 'scan') {
-		activeMethod.value = 'scan'
-	}
+	await loadQrCode()
 	emit('refreshQr')
 }
 
-const emitQuickLogin = () => {
-	if (!agree.value) return
-	emit('requestQuickLogin')
-}
-
-onMounted(() => {
+// 组件挂载后，启动倒计时并立即拉取一次二维码
+onMounted(async () => {
 	startTimer()
+	await loadQrCode()
 })
 
+// 组件卸载前清理计时器
 onBeforeUnmount(() => {
 	if (timer) {
 		window.clearInterval(timer)
