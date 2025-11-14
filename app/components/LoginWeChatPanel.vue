@@ -17,54 +17,79 @@
 			</div>
 		</div>
 
-		<div class="mt-8 space-y-4 text-center">
-			<div class="relative mx-auto h-52 w-52">
-				<div
-					class="absolute inset-0 rounded-2xl border border-dashed border-neutral-200 bg-gradient-to-br from-white to-neutral-50 shadow-inner shadow-black/5"
-				></div>
-				<img
-					:src="qrCodeUrl"
-					alt="微信扫码登录二维码"
-					class="relative z-10 h-full w-full rounded-2xl object-cover p-3"
-					:class="{ 'opacity-20': isExpired }"
-				/>
-				<div
-					v-if="isExpired"
-					class="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl bg-white/90 text-sm text-neutral-600"
-				>
-					<p>二维码已过期</p>
-					<UButton
-						class="mt-3 text-white"
-						color="primary"
-						size="sm"
-						@click="refreshQr"
-					>
-						<template #leading>
-							<UIcon name="i-heroicons-arrow-path" />
-						</template>
-						刷新二维码
-					</UButton>
-				</div>
-				<button
-					type="button"
-					class="absolute -bottom-3 -right-4 z-30 rounded-full border border-white bg-white p-2 shadow-md transition hover:scale-105 leading-0"
-					@click="refreshQr"
-					aria-label="刷新二维码"
-				>
-					<UIcon
-						name="i-heroicons-arrow-path"
-						class="h-4 w-4 text-neutral-500"
+		<div class="mt-8 text-center">
+			<div v-if="!scanSuccess">
+				<!-- 扫码登录二维码（包含二维码过期提示） -->
+				<div class="relative mx-auto h-52 w-52">
+					<div
+						class="absolute inset-0 rounded-2xl border border-dashed border-neutral-200 bg-gradient-to-br from-white to-neutral-50 shadow-inner shadow-black/5"
+					></div>
+					<img
+						:src="qrCodeUrl"
+						alt="微信扫码登录二维码"
+						class="relative z-10 h-full w-full rounded-2xl object-cover p-3"
+						:class="{ 'opacity-20': isExpired }"
 					/>
-				</button>
+					<div
+						v-if="isExpired"
+						class="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl bg-white/90 text-sm text-neutral-600"
+					>
+						<p>二维码已过期</p>
+						<UButton
+							class="mt-3 text-white"
+							color="primary"
+							size="sm"
+							@click="refreshQr"
+						>
+							<template #leading>
+								<UIcon name="i-heroicons-arrow-path" />
+							</template>
+							刷新二维码
+						</UButton>
+					</div>
+					<!-- 刷新二维码按钮 -->
+					<button
+						type="button"
+						class="absolute -bottom-3 -right-4 z-30 rounded-full border border-white bg-white p-2 shadow-md transition hover:scale-105 leading-0"
+						@click="refreshQr"
+						aria-label="刷新二维码"
+					>
+						<UIcon
+							name="i-heroicons-arrow-path"
+							class="h-4 w-4 text-neutral-500"
+						/>
+					</button>
+				</div>
+				<p class="text-xs text-neutral-500 mt-4">
+					使用微信扫一扫登录，{{ countdown }} 秒后二维码将自动更新。
+				</p>
+				<div
+					class="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 mt-4 text-xs text-emerald-600"
+				>
+					<UIcon name="i-heroicons-lock-closed" />
+					微信官方授权，账号安全无忧
+				</div>
 			</div>
-			<p class="text-xs text-neutral-500">
-				使用微信扫一扫登录，{{ countdown }} 秒后二维码将自动更新。
-			</p>
-			<div
-				class="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs text-emerald-600"
-			>
-				<UIcon name="i-heroicons-lock-closed" />
-				微信官方授权，账号安全无忧
+
+			<!-- 扫码成功之后的提示 -->
+			<div v-else class="mt-8 space-y-4 text-center">
+				<div class="relative mx-auto h-52 w-52">
+					<div
+						class="absolute inset-0 rounded-2xl border border-dashed border-neutral-200 bg-gradient-to-br from-white to-neutral-50 shadow-inner shadow-black/5"
+					></div>
+					<div
+						class="relative z-10 h-full w-full rounded-2xl p-3 flex flex-col items-center justify-center"
+					>
+						<UIcon
+							name="i-heroicons-check-circle"
+							class="h-16 w-16 text-emerald-600"
+						/>
+						<p class="mt-3 text-sm text-neutral-800">扫码确认成功</p>
+						<p class="mt-1 text-xs text-neutral-500">
+							正在跳转到刚才浏览的页面…
+						</p>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -100,7 +125,7 @@ import { useUserStore } from '@/stores/user'
 import { handleLoginSuccess } from '@/permission'
 
 // 组件向父级抛出的事件：微信快速登录请求、二维码刷新提示
-const emit = defineEmits(['requestQuickLogin', 'refreshQr'])
+const emit = defineEmits(['refreshQr'])
 
 const userStore = useUserStore()
 
@@ -114,6 +139,7 @@ const agree = ref(true)
 // 二维码图片地址（由后端返回的真实登录二维码链接）
 const qrCodeUrl = ref('')
 const qrCodeId = ref('') // 二维码ID
+const scanSuccess = ref(false)
 
 // 是否过期：倒计时归零视为过期
 const isExpired = computed(() => countdown.value <= 0)
@@ -176,8 +202,15 @@ async function checkQRCodeStatus() {
 				clearInterval(qrCodeCheckTimer)
 				qrCodeCheckTimer = null
 			}
-			// 使用统一的登录成功处理，跳转回登录前的页面
-			handleLoginSuccess()
+			// 切换组件 UI，隐藏二维码
+			scanSuccess.value = true
+			// 停止倒计时
+			if (timer) {
+				window.clearInterval(timer)
+				timer = null
+			}
+			// 使用统一的登录成功处理，跳转回登录前的页面（稍作停留展示成功UI）
+			setTimeout(() => handleLoginSuccess(), 1200)
 		}
 	} catch (error) {
 		console.error('检查二维码状态失败:', error)

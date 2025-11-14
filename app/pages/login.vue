@@ -54,10 +54,7 @@
 						<div
 							class="absolute -bottom-6 -right-6 hidden h-20 w-20 rounded-full border border-white/10 lg:block"
 						></div>
-						<LoginWeChatPanel
-							@request-quick-login="handleQuickLogin"
-							@refresh-qr="handleQrRefresh"
-						/>
+						<LoginWeChatPanel @refresh-qr="handleQrRefresh" />
 					</div>
 				</div>
 			</div>
@@ -86,14 +83,6 @@ useSeoMeta({
 })
 
 const toast = useToast()
-
-const handleQuickLogin = () => {
-	toast.add({
-		title: '已发起微信授权',
-		description: '请在手机上确认授权，完成后将自动跳转回面试汪。',
-		color: 'primary'
-	})
-}
 
 const handleQrRefresh = () => {
 	toast.add({
