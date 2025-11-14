@@ -54,6 +54,7 @@
 						<div
 							class="absolute -bottom-6 -right-6 hidden h-20 w-20 rounded-full border border-white/10 lg:block"
 						></div>
+
 						<LoginWeChatPanel @refresh-qr="handleQrRefresh" />
 					</div>
 				</div>

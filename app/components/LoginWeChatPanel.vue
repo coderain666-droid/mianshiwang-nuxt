@@ -2,6 +2,8 @@
 	<div
 		class="card relative overflow-hidden border border-gray-200 bg-white p-8 shadow-lg"
 	>
+		<!-- 增加一个测试登录的按钮 -->
+		<UButton @click="testLogin">测试登录</UButton>
 		<div
 			class="absolute -top-24 right-10 h-40 w-40 rounded-full bg-emerald-500/5 blur-3xl"
 		></div>
@@ -119,7 +121,8 @@ import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import { useNuxtApp, useToast } from '#imports'
 import {
 	generateWechatQRCodeAPI,
-	checkWechatQRCodeStatusAPI
+	checkWechatQRCodeStatusAPI,
+	testLogin as testLoginAPI
 } from '@/api/login'
 import { useUserStore } from '@/stores/user'
 import { handleLoginSuccess } from '@/permission'
@@ -190,13 +193,6 @@ async function checkQRCodeStatus() {
 			userStore.userInfo = response.user
 			userStore.token = response.token
 
-			// 提示登录成功，完成页面跳转
-			const toast = useToast()
-			toast.add({
-				title: '登录成功',
-				description: '跳转到刚才浏览的页面…',
-				color: 'success'
-			})
 			// 停止轮询，避免多次跳转
 			if (qrCodeCheckTimer) {
 				clearInterval(qrCodeCheckTimer)
@@ -245,6 +241,33 @@ onBeforeUnmount(() => {
 		window.clearInterval(timer)
 	}
 })
+
+/**
+ * 本地测试登录
+ */
+const testLogin = async () => {
+	const response = await testLoginAPI($api)
+	// 用户已关注公众号并确认登录
+	// 为 userStore 赋值
+	userStore.isLogin = true
+	userStore.userInfo = response.user
+	userStore.token = response.token
+
+	// 停止轮询，避免多次跳转
+	if (qrCodeCheckTimer) {
+		clearInterval(qrCodeCheckTimer)
+		qrCodeCheckTimer = null
+	}
+	// 切换组件 UI，隐藏二维码
+	scanSuccess.value = true
+	// 停止倒计时
+	if (timer) {
+		window.clearInterval(timer)
+		timer = null
+	}
+	// 使用统一的登录成功处理，跳转回登录前的页面（稍作停留展示成功UI）
+	setTimeout(() => handleLoginSuccess(), 1200)
+}
 </script>
 
 <style scoped></style>
