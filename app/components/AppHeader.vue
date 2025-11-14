@@ -54,7 +54,22 @@
 				>
 			</nav>
 			<div class="flex items-center gap-2">
-				<UButton color="gray" variant="ghost" to="/login">登录</UButton>
+				<template v-if="!userStore.isLogin">
+					<UButton color="gray" variant="ghost" to="/login">登录</UButton>
+				</template>
+				<template v-else>
+					<UDropdownMenu
+						:items="userMenuItems"
+						mode="hover"
+						:popper="{ placement: 'bottom-end' }"
+					>
+						<UButton color="gray" variant="ghost">
+							<UAvatar :src="interviewAvatar" size="sm" class="mr-2" />
+							{{ userStore.userInfo.username || '未命名用户' }}
+							<UIcon name="i-heroicons-chevron-down-20-solid" class="ml-1" />
+						</UButton>
+					</UDropdownMenu>
+				</template>
 				<UButton color="primary" class="text-white" to="/start"
 					>立即试用</UButton
 				>
@@ -65,6 +80,21 @@
 
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue'
+import { useUserStore } from '@/stores/user'
+import interviewAvatar from '@/assets/imgs/interview.png'
+
+const userStore = useUserStore()
+
+const userMenuItems = [
+	[{ label: '个人中心', icon: 'i-heroicons-user', to: '/profile' }],
+	[
+		{
+			label: '退出登录',
+			icon: 'i-heroicons-arrow-left-on-rectangle',
+			click: () => userStore.logout()
+		}
+	]
+]
 
 const scrolled = ref(false)
 const activeNav = ref(null)
