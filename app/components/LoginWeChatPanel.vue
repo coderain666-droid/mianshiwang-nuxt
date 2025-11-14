@@ -63,7 +63,7 @@
 					</button>
 				</div>
 				<p class="text-xs text-neutral-500 mt-4">
-					使用微信扫一扫登录，{{ countdown }} 秒后二维码将自动更新。
+					使用微信扫一扫登录，{{ countDown }} 秒后二维码将自动更新。
 				</p>
 				<div
 					class="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 mt-4 text-xs text-emerald-600"
@@ -240,7 +240,7 @@ const emit = defineEmits(['refreshQr'])
 const userStore = useUserStore()
 
 // 二维码有效倒计时（秒）
-const countdown = ref(300)
+const countDown = ref(300)
 // 用于触发二维码刷新（防缓存）
 const qrSeed = ref(Date.now())
 // 同意协议开关
@@ -252,7 +252,7 @@ const qrCodeId = ref('') // 二维码ID
 const scanSuccess = ref(false)
 
 // 是否过期：倒计时归零视为过期
-const isExpired = computed(() => countdown.value <= 0)
+const isExpired = computed(() => countDown.value <= 0)
 
 // 倒计时计时器句柄
 let timer = null
@@ -265,10 +265,10 @@ const startTimer = () => {
 		window.clearInterval(timer)
 		timer = null
 	}
-	countdown.value = 300
+	countDown.value = 300
 	timer = window.setInterval(() => {
-		if (countdown.value > 0) {
-			countdown.value -= 1
+		if (countDown.value > 0) {
+			countDown.value -= 1
 		} else {
 			// 到期后自动刷新二维码（与文案保持一致）
 			refreshQr()
