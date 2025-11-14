@@ -44,19 +44,6 @@
 				<NuxtLink to="/contact" class="hover:text-neutral-900 transition-colors"
 					>联系我们</NuxtLink
 				>
-				<!-- 外部链接：简历汪网站 -->
-				<NuxtLink
-					to="https://resume.lgdsunday.club/"
-					class="text-sm inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 hover:text-primary-700 transition-all font-medium border border-primary-200"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					<span>简历制作（进入简历汪）</span>
-					<UIcon
-						name="i-heroicons-arrow-top-right-on-square"
-						class="w-3.5 h-3.5"
-					/>
-				</NuxtLink>
 			</nav>
 			<div class="flex items-center gap-2">
 				<template v-if="!userStore.isLogin">
@@ -75,6 +62,19 @@
 						</UButton>
 					</UDropdownMenu>
 				</template>
+				<!-- 外部链接：简历汪网站 -->
+				<NuxtLink
+					to="https://resume.lgdsunday.club/"
+					class="text-sm inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 hover:text-primary-700 transition-all font-medium border border-primary-200"
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					<span>免费制作简历（简历汪）</span>
+					<UIcon
+						name="i-heroicons-arrow-top-right-on-square"
+						class="w-3.5 h-3.5"
+					/>
+				</NuxtLink>
 			</div>
 		</div>
 	</header>
