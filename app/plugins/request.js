@@ -1,5 +1,5 @@
 import { useUserStore } from '~/stores/user'
-import { ElMessageBox, ElNotification } from 'element-plus'
+import { useToast } from '#imports'
 
 export default defineNuxtPlugin(() => {
 	const config = useRuntimeConfig()
@@ -33,19 +33,13 @@ export default defineNuxtPlugin(() => {
 				}
 				// 业务错误：提示 + 抛错
 				if (process.client) {
-					// 检测 401 错误，跳转到登录页
-
+					const toast = useToast()
 					if (body.code === 401) {
-						ElMessageBox.alert('登录已过期，请重新登录', '提示', {
-							confirmButtonText: '确定'
-						}).then(() => {
-							const userStore = useUserStore()
-							userStore.logout()
-						})
+						toast.add({ title: '登录已过期，请重新登录', color: 'warning' })
+						const userStore = useUserStore()
+						userStore.logout()
 					} else if (body.code === 500) {
-						ElMessageBox.alert(body.message || '请求失败', '提示', {
-							confirmButtonText: '确定'
-						})
+						toast.add({ title: body.message || '请求失败', color: 'error' })
 					}
 				}
 				throw createError({
@@ -61,22 +55,22 @@ export default defineNuxtPlugin(() => {
 
 			if (status === 401) {
 				if (process.client) {
-					try {
-						await ElMessageBox.alert('登录已过期，请重新登录', '提示', {
-							confirmButtonText: '确定'
-						})
-					} finally {
-						const userStore = useUserStore()
-						userStore.logout?.()
-						navigateTo({ path: '/login', replace: true })
-					}
+					const toast = useToast()
+					toast.add({ title: '登录已过期，请重新登录', color: 'warning' })
+					const userStore = useUserStore()
+					userStore.logout?.()
+					navigateTo({ path: '/login', replace: true })
 				}
 				// 服务端场景直接抛错即可
 				throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
 			}
 
 			if (process.client) {
-				ElNotification.error(response?._data?.message || '网络错误')
+				const toast = useToast()
+				toast.add({
+					title: response?._data?.message || '网络错误',
+					color: 'error'
+				})
 			}
 			// 抛给调用方（可在页面/组件里按需捕获）
 			throw createError({
