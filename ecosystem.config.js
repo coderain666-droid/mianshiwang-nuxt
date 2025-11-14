@@ -1,10 +1,10 @@
-// 启动指令：pm2 start ecosystem.config.js
+// 启动指令：pm2 start /sunday/resume/jian-li-wang/ecosystem.config.js
 const path = require('path')
 module.exports = {
 	apps: [
 		{
-			name: 'Jian-Li-Wang-Nuxt',
-			port: '3000',
+			name: 'Mian-Shi-Wang-Nuxt',
+			port: '3001',
 			exec_mode: 'fork',
 			script: path.join(__dirname, './.output/server', 'index.mjs')
 		}

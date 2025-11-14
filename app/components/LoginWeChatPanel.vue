@@ -168,7 +168,7 @@ async function checkQRCodeStatus() {
 			const toast = useToast()
 			toast.add({
 				title: '登录成功',
-				description: '正在跳转到刚才浏览的页面…',
+				description: '跳转到刚才浏览的页面…',
 				color: 'success'
 			})
 			// 停止轮询，避免多次跳转
