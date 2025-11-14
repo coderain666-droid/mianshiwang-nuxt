@@ -21,11 +21,13 @@
 						class="mt-5 text-3xl md:text-5xl font-bold tracking-tight text-neutral-900"
 					>
 						用 AI 精准模拟面试<br class="hidden md:block" />
-						为任何职业做好万全准备
+						为你的求职做好万全准备
 					</h1>
 					<p class="mt-5 text-neutral-600 md:text-lg">
-						面试汪结合行业知识库与多轮对话引擎，生成贴合岗位的深度面试场景，
-						并给出结构化反馈与提升建议，让你用更少时间拿到更好结果。
+						面试汪通过 AI 智能模拟面试，根据你的简历，快速模拟真实面试场景
+						帮助你在短时间内提升面试命中率超
+						<span class="text-emerald-500 font-bold">80%</span
+						>，极简流程，立刻见效。
 					</p>
 					<div class="mt-7 flex flex-col sm:flex-row gap-3">
 						<UButton size="lg" color="primary" to="/start" class="text-white"

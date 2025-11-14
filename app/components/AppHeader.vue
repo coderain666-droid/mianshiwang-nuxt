@@ -7,17 +7,17 @@
 	>
 		<div class="container px-4 py-3 flex items-center justify-between">
 			<div class="flex items-center gap-2">
-				<ww-svg-icon name="hero" class="h-6 w-6"></ww-svg-icon>
-				<NuxtLink to="/" class="font-semibold text-neutral-900"
+				<ww-svg-icon name="hero" class="h-8 w-8"></ww-svg-icon>
+				<NuxtLink to="/" class="text-xl font-semibold text-neutral-900"
 					>面试汪</NuxtLink
 				>
 				<span
 					class="hidden sm:inline-block text-xs text-neutral-500 translate-y-px"
-					>AI 面试平台</span
+					>极简三步，完成 AI 面试</span
 				>
 			</div>
 			<nav class="hidden md:flex items-center gap-6 text-sm text-neutral-600">
-				<NuxtLink>开始 AI 面试</NuxtLink>
+				<NuxtLink to="/start">开始 AI 面试</NuxtLink>
 				<NuxtLink
 					to="/#features"
 					:class="[
@@ -38,10 +38,24 @@
 					]"
 					>流程</NuxtLink
 				>
-				<NuxtLink to="/faq" class="hover:text-neutral-900 transition-colors"
-					>FAQ</NuxtLink
+				<NuxtLink
+					to="/faq"
+					:class="[
+						'transition-colors',
+						route.path === '/faq'
+							? 'text-neutral-900 font-bold'
+							: 'hover:text-neutral-900'
+					]"
+					>常见问题</NuxtLink
 				>
-				<NuxtLink to="/contact" class="hover:text-neutral-900 transition-colors"
+				<NuxtLink
+					to="/contact"
+					:class="[
+						'transition-colors',
+						route.path === '/contact'
+							? 'text-neutral-900 font-bold'
+							: 'hover:text-neutral-900'
+					]"
 					>联系我们</NuxtLink
 				>
 			</nav>
@@ -65,7 +79,7 @@
 				<!-- 外部链接：简历汪网站 -->
 				<NuxtLink
 					to="https://resume.lgdsunday.club/"
-					class="text-sm inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 hover:text-primary-700 transition-all font-medium border border-primary-200"
+					class="text-[12px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 hover:text-primary-700 transition-all font-medium border border-primary-200"
 					target="_blank"
 					rel="noopener noreferrer"
 				>
@@ -81,7 +95,8 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import interviewAvatar from '@/assets/imgs/interview.png'
 
@@ -100,6 +115,22 @@ const userMenuItems = [
 
 const scrolled = ref(false)
 const activeNav = ref(null)
+const route = useRoute()
+
+const setActiveByRoute = () => {
+	if (route.path === '/faq') activeNav.value = 'faq'
+	else if (route.path === '/contact') activeNav.value = 'contact'
+	else if (route.path === '/' && route.hash === '#features')
+		activeNav.value = 'features'
+	else if (route.path === '/' && route.hash === '#steps')
+		activeNav.value = 'steps'
+	else if (route.path === '/') activeNav.value = null
+}
+watch(
+	() => route.fullPath,
+	() => setActiveByRoute(),
+	{ immediate: true }
+)
 
 onMounted(() => {
 	// 头部滚动阴影
