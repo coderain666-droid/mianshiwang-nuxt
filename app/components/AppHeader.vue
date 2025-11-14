@@ -47,9 +47,7 @@
 				<NuxtLink to="/#faq" class="hover:text-neutral-900 transition-colors"
 					>FAQ</NuxtLink
 				>
-				<NuxtLink
-					to="/#contact"
-					class="hover:text-neutral-900 transition-colors"
+				<NuxtLink to="/contact" class="hover:text-neutral-900 transition-colors"
 					>联系我们</NuxtLink
 				>
 			</nav>
