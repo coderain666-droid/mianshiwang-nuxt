@@ -67,6 +67,14 @@ export default defineNuxtConfig({
 
 	// —— 模块（保留基础依赖）——
 	modules: ['@pinia/nuxt', '@nuxt/devtools', ['@nuxt/ui', { fonts: false }]],
+	colorMode: {
+		classSuffix: '', // 如果你想去掉默认的类后缀（如 dark 会变为 dark-mode）
+		preference: 'light', // 默认根据系统的颜色模式，值为 'light', 'dark' 或 'system'
+		fallback: 'light', // 如果浏览器不支持 color-mode，则默认为 light 模式
+		storageKey: 'nuxt-color-mode', // 存储在本地存储中的 key 名
+		watch: ['colorMode.preference'] // 监听 colorMode.preference 的变化
+	},
+
 	// —— 资源与样式 ——（注意不要让 body/html 首帧 opacity: 0）
 	css: ['~/assets/css/style.css'],
 
