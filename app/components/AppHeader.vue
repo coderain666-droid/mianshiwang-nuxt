@@ -100,6 +100,24 @@
 				</NuxtLink>
 			</div>
 		</div>
+		<UModal
+			v-model:open="confirmLogoutOpen"
+			title="是否确定退出当前账号？未保存的面试进度可能不会保留。"
+		>
+			<template #footer>
+				<div class="flex gap-2 w-full justify-end">
+					<UButton
+						color="gray"
+						variant="ghost"
+						@click="confirmLogoutOpen = false"
+						>取消</UButton
+					>
+					<UButton class="text-white" @click="handleConfirmLogout"
+						>确定退出</UButton
+					>
+				</div>
+			</template>
+		</UModal>
 	</header>
 </template>
 
@@ -110,6 +128,8 @@ import { useUserStore } from '@/stores/user'
 import interviewAvatar from '@/assets/imgs/interview.png'
 
 const userStore = useUserStore()
+
+const confirmLogoutOpen = ref(false)
 
 const userMenuItems = [
 	[
@@ -124,10 +144,16 @@ const userMenuItems = [
 		{
 			label: '退出登录',
 			icon: 'i-heroicons-arrow-left-on-rectangle',
-			click: () => userStore.logout()
+			onSelect: () => {
+				confirmLogoutOpen.value = true
+			}
 		}
 	]
 ]
+
+const handleConfirmLogout = () => {
+	userStore.logout()
+}
 
 const scrolled = ref(false)
 const activeNav = ref(null)
