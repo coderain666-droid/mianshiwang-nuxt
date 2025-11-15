@@ -65,6 +65,9 @@
 
 <script setup>
 import { useHead, useSeoMeta, useToast } from '#imports'
+import LoginPitch from '../components/login/LoginPitch.vue'
+import LoginWeChatPanel from '../components/login/LoginWeChatPanel.vue'
+import LoginFlowCard from '../components/login/LoginFlowCard.vue'
 
 definePageMeta({
 	layout: 'auth'
