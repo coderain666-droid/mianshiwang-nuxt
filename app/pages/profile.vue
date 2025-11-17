@@ -4,26 +4,40 @@
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				<!-- 左侧：用户信息卡片 -->
 				<div class="lg:col-span-1">
-					<UCard class="sticky top-24">
+					<UCard
+						class="sticky top-24 rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+					>
 						<template #header>
 							<h2 class="text-xl font-semibold text-gray-900">个人信息</h2>
 						</template>
 						<div class="space-y-6">
 							<!-- 头像 -->
-							<div class="flex flex-col items-center">
-								<UAvatar
-									:src="userStore.userInfo.avatar"
-									:alt="userStore.userInfo.username || '用户头像'"
-									size="3xl"
-									class="cursor-pointer hover:ring-4 ring-primary-200 transition-all"
-									@click="editProfileModal = true"
-								/>
-								<button
-									class="mt-4 text-sm text-primary-600 hover:text-primary-700 font-medium"
+							<div class="relative flex flex-col items-center">
+								<div class="relative group">
+									<UAvatar
+										:src="userStore.userInfo.avatar"
+										:alt="userStore.userInfo.username || '用户头像'"
+										size="3xl"
+										class="cursor-pointer"
+									/>
+									<!-- hover 遮罩 -->
+									<div
+										class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition-opacity"
+										@click="editProfileModal = true"
+									>
+										<UIcon name="i-heroicons-camera" class="w-5 h-5" />
+									</div>
+								</div>
+								<UButton
+									color="primary"
+									variant="ghost"
+									size="sm"
+									class="mt-4 gap-2"
 									@click="editProfileModal = true"
 								>
+									<UIcon name="i-heroicons-pencil-square" class="w-4 h-4" />
 									编辑资料
-								</button>
+								</UButton>
 							</div>
 
 							<!-- 用户信息 -->
@@ -58,7 +72,7 @@
 							<!-- 旺旺币余额 -->
 							<div class="pt-4 border-t border-gray-200">
 								<div
-									class="bg-gradient-to-r from-primary-50 to-primary-100 rounded-lg p-4"
+									class="bg-gradient-to-r from-primary-50 to-primary-100 rounded-xl p-4 shadow-inner"
 								>
 									<p class="text-xs text-gray-600 mb-1">旺旺币余额</p>
 									<p class="text-2xl font-bold text-primary-600">
@@ -73,7 +87,9 @@
 				<!-- 右侧：主要内容区域 -->
 				<div class="lg:col-span-2 space-y-6">
 					<!-- 旺旺币记录 -->
-					<UCard>
+					<UCard
+						class="rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+					>
 						<template #header>
 							<div class="flex items-center justify-between">
 								<h2 class="text-xl font-semibold text-gray-900">旺旺币记录</h2>
@@ -192,7 +208,9 @@
 					</UCard>
 
 					<!-- 简历管理 -->
-					<UCard>
+					<UCard
+						class="rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+					>
 						<template #header>
 							<div class="flex items-center justify-between">
 								<h2 class="text-xl font-semibold text-gray-900">我的简历</h2>

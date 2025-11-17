@@ -12,16 +12,22 @@
   --color-warning: #F59E0B;
   /* 警示态 */
 
+
   --color-text: #1A1A1A;
   /* 主文本 */
   --color-muted: #4B5563;
   /* 次文本 */
   --color-subtle: #6B7280;
   /* 辅助文本 */
+  --ui-text-inverted: #ffffff;
+  /* 按钮字体色 */
   --color-border: #E5E7EB;
   /* 边框 */
   --color-bg: #F8FAFC;
   /* 背景 */
+  --ui-bg: #F8FAFC;
+  /* 背景 2 */
+  --ui-border: #b8c2d4;
 
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -84,9 +90,11 @@ button {
 
 /* 本地覆盖：选中文本样式 */
 ::selection {
-  background: rgba(37, 99, 235, 0.25); /* 基于品牌主色 #2563EB */
+  background: rgba(37, 99, 235, 0.25);
+  /* 基于品牌主色 #2563EB */
   color: #ffffff;
 }
+
 ::-moz-selection {
   background: rgba(37, 99, 235, 0.25);
   color: #ffffff;

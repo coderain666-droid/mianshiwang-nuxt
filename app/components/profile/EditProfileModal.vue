@@ -1,21 +1,52 @@
 <template>
-	<UModal v-model:open="isOpen" title="编辑个人信息" :ui="{ width: 'sm:max-w-md' }">
-		<div class="space-y-6 py-4">
-			<!-- 头像上传 -->
-			<div class="flex flex-col items-center">
-				<UAvatar
-					:src="formData.avatar"
-					:alt="formData.username || '用户头像'"
-					size="2xl"
-					class="cursor-pointer hover:ring-4 ring-primary-200 transition-all mb-4"
-					@click="triggerAvatarUpload"
-				/>
+	<UModal v-model:open="isOpen" :ui="{ width: 'sm:max-w-md' }">
+		<template #header>
+			<div class="flex items-center justify-between">
+				<h3 class="text-base font-semibold text-gray-900">编辑个人信息</h3>
 				<UButton
 					color="gray"
 					variant="ghost"
+					icon="i-heroicons-x-mark"
 					size="sm"
+					square
+					@click="isOpen = false"
+				/>
+			</div>
+		</template>
+		<div class="space-y-6 py-4">
+			<!-- 头像上传 -->
+			<div class="flex flex-col items-center">
+				<div class="relative group mb-4">
+					<UAvatar
+						:src="formData.avatar"
+						:alt="formData.username || '用户头像'"
+						size="2xl"
+						class="cursor-pointer"
+					/>
+					<!-- hover 遮罩 + loading 态 -->
+					<div
+						v-if="avatarUploading"
+						class="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center"
+					>
+						<UIcon name="i-heroicons-arrow-path" class="w-6 h-6 text-white animate-spin" />
+					</div>
+					<div
+						v-else
+						class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition-opacity"
+						@click="triggerAvatarUpload"
+					>
+						<UIcon name="i-heroicons-camera" class="w-5 h-5" />
+					</div>
+				</div>
+				<UButton
+					color="primary"
+					variant="ghost"
+					size="sm"
+					class="gap-2"
+					:loading="avatarUploading"
 					@click="triggerAvatarUpload"
 				>
+					<UIcon name="i-heroicons-arrow-up-tray" class="w-4 h-4" />
 					更换头像
 				</UButton>
 				<input
@@ -28,40 +59,66 @@
 			</div>
 
 			<!-- 用户名 -->
-			<div>
-				<UFormGroup label="用户名" name="username" :error="errors.username">
-					<UInput
-						v-model="formData.username"
-						placeholder="请输入用户名"
-						size="lg"
-					/>
-				</UFormGroup>
-			</div>
+		<div>
+			<UFormGroup label="用户名" name="username" :error="errors.username">
+				<UInput
+					v-model="formData.username"
+					placeholder="请输入用户名"
+					size="lg"
+					:ui="{ icon: { trailing: { pointer: '' } } }"
+				>
+					<template #trailing>
+						<UButton
+							v-show="formData.username"
+							color="gray"
+							variant="link"
+							icon="i-heroicons-x-mark"
+							:disabled="loading"
+							@click="formData.username = ''"
+						/>
+					</template>
+				</UInput>
+			</UFormGroup>
+		</div>
 
-			<!-- 邮箱 -->
-			<div>
-				<UFormGroup label="邮箱" name="email" :error="errors.email">
-					<UInput
-						v-model="formData.email"
-						type="email"
-						placeholder="请输入邮箱"
-						size="lg"
-					/>
-				</UFormGroup>
-			</div>
+		<!-- 邮箱 -->
+		<div>
+			<UFormGroup label="邮箱" name="email" :error="errors.email">
+				<UInput
+					v-model="formData.email"
+					type="email"
+					placeholder="请输入邮箱"
+					size="lg"
+					:ui="{ icon: { trailing: { pointer: '' } } }"
+				>
+					<template #trailing>
+						<UButton
+							v-show="formData.email"
+							color="gray"
+							variant="link"
+							icon="i-heroicons-x-mark"
+							:disabled="loading"
+							@click="formData.email = ''"
+						/>
+					</template>
+				</UInput>
+			</UFormGroup>
+		</div>
 		</div>
 
 		<template #footer>
-			<div class="flex gap-2 w-full justify-end">
+			<div class="flex gap-2 w-full">
 				<UButton
 					color="gray"
 					variant="ghost"
+					class="flex-1 justify-center"
 					@click="handleCancel"
 				>
 					取消
 				</UButton>
 				<UButton
 					color="primary"
+					class="flex-1 justify-center"
 					:loading="loading"
 					@click="handleSubmit"
 				>
@@ -95,6 +152,7 @@ const emit = defineEmits(['update:open', 'update'])
 
 const toast = useToast()
 const loading = ref(false)
+const avatarUploading = ref(false)
 const avatarInputRef = ref(null)
 
 const isOpen = computed({
@@ -171,6 +229,7 @@ const handleAvatarChange = async (event) => {
 		return
 	}
 
+	avatarUploading.value = true
 	try {
 		// 预览图片（使用 FileReader）
 		const reader = new FileReader()
@@ -181,9 +240,9 @@ const handleAvatarChange = async (event) => {
 
 		// TODO: 实际上传到服务器
 		// const { $api } = useNuxtApp()
-		// const formData = new FormData()
-		// formData.append('avatar', file)
-		// const { url } = await $api.post('/upload/avatar', formData)
+		// const fd = new FormData()
+		// fd.append('avatar', file)
+		// const { url } = await $api.post('/upload/avatar', fd)
 		// formData.value.avatar = url
 	} catch (error) {
 		toast.add({
@@ -191,6 +250,8 @@ const handleAvatarChange = async (event) => {
 			description: error.message,
 			color: 'error'
 		})
+	} finally {
+		avatarUploading.value = false
 	}
 
 	// 清空input，以便可以重新选择同一个文件
