@@ -56,7 +56,7 @@
 						更换头像
 					</UButton>
 					<p class="text-xs text-gray-500 mt-2 text-center">
-						支持 JPG、PNG 格式，文件大小不超过 5MB
+						支持 JPG、PNG 格式，文件大小不超过 500kb
 					</p>
 					<input
 						ref="avatarInputRef"
@@ -121,6 +121,7 @@ import { ref, watch, computed } from 'vue'
 import { useToast } from '#imports'
 import { updateUserInfoAPI } from '@/api/user'
 import { useUserStore } from '@/stores/user'
+import { getOSSClient } from '@/utils/sts'
 
 const props = defineProps({
 	open: {
@@ -138,6 +139,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:open'])
+const userStore = useUserStore()
 const { $api } = useNuxtApp()
 
 const toast = useToast()
@@ -210,10 +212,10 @@ const handleAvatarChange = async (event) => {
 		return
 	}
 
-	// 验证文件大小（限制 5MB）
-	if (file.size > 5 * 1024 * 1024) {
+	// 验证文件大小（限制 500 kb）
+	if (file.size > 500 * 1024) {
 		toast.add({
-			title: '图片大小不能超过 5MB',
+			title: '图片大小不能超过 500KB',
 			color: 'error'
 		})
 		return
@@ -224,16 +226,10 @@ const handleAvatarChange = async (event) => {
 		// 预览图片（使用 FileReader）
 		const reader = new FileReader()
 		reader.onload = (e) => {
-			formData.value.avatar = e.target.result
+			// 实际上传到服务器
+			updateAvatar(file)
 		}
 		reader.readAsDataURL(file)
-
-		// TODO: 实际上传到服务器
-		// const { $api } = useNuxtApp()
-		// const fd = new FormData()
-		// fd.append('avatar', file)
-		// const { url } = await $api.post('/upload/avatar', fd)
-		// formData.value.avatar = url
 	} catch (error) {
 		toast.add({
 			title: '上传失败',
@@ -244,8 +240,31 @@ const handleAvatarChange = async (event) => {
 		avatarUploading.value = false
 	}
 
-	// 清空input，以便可以重新选择同一个文件
-	event.target.value = ''
+	let ossClient = null
+	const updateAvatar = async (file) => {
+		if (!ossClient) {
+			ossClient = await getOSSClient($api)
+		}
+		try {
+			// 因为当前凭证只具备 images 文件夹下的访问权限，所以图片需要上传到 images/xxx.xx 。否则你将得到一个 《AccessDeniedError: You have no right to access this object because of bucket acl.》 的错误
+			const fileTypeArr = file.type.split('/')
+			const fileName = `${userStore.userInfo.openid}/${Date.now()}.${
+				fileTypeArr[fileTypeArr.length - 1]
+			}`
+
+			// 文件存放路径，文件
+			const res = await ossClient.put(`user-img/${fileName}`, file)
+			formData.value.avatar = res.url
+			event.target.value = ''
+		} catch (e) {
+			event.target.value = ''
+			toast.add({
+				title: '头像上传失败',
+				description: e.message,
+				color: 'error'
+			})
+		}
+	}
 }
 
 // 验证表单
@@ -297,7 +316,6 @@ const handleSubmit = async () => {
 		})
 		isOpen.value = false
 		// 更新 userStore 中的数据
-		const userStore = useUserStore()
 		userStore.userInfo = {
 			...userStore.userInfo,
 			...updatedInfo
