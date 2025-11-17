@@ -5,7 +5,9 @@
 			<div
 				:class="[
 					'border-2 border-dashed rounded-lg p-8 text-center transition-colors',
-					dragOver ? 'border-primary-500 bg-primary-50' : 'border-gray-300 hover:border-gray-400',
+					dragOver
+						? 'border-primary-500 bg-primary-50'
+						: 'border-gray-300 hover:border-gray-400',
 					uploading ? 'opacity-50 pointer-events-none' : 'cursor-pointer'
 				]"
 				@click="triggerFileUpload"
@@ -67,23 +69,19 @@
 
 			<!-- 简历名称 -->
 			<div v-if="selectedFile">
-				<UFormGroup label="简历名称" name="resumeName" :error="errors.resumeName">
+				<UForm label="简历名称" name="resumeName" :error="errors.resumeName">
 					<UInput
 						v-model="resumeName"
 						placeholder="请输入简历名称（选填）"
 						size="lg"
 					/>
-				</UFormGroup>
+				</UForm>
 			</div>
 		</div>
 
 		<template #footer>
 			<div class="flex gap-2 w-full justify-end">
-				<UButton
-					color="gray"
-					variant="ghost"
-					@click="handleCancel"
-				>
+				<UButton color="gray" variant="ghost" @click="handleCancel">
 					取消
 				</UButton>
 				<UButton
@@ -219,7 +217,7 @@ const formatFileSize = (bytes) => {
 	const k = 1024
 	const sizes = ['Bytes', 'KB', 'MB', 'GB']
 	const i = Math.floor(Math.log(bytes) / Math.log(k))
-	return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+	return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i]
 }
 
 // 处理上传
@@ -270,6 +268,4 @@ const handleCancel = () => {
 }
 </script>
 
-<style scoped>
-</style>
-
+<style scoped></style>

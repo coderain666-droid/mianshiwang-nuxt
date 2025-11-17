@@ -15,10 +15,11 @@ export default defineNuxtPlugin(() => {
 			const userStore = useUserStore()
 
 			const headers = new Headers(options.headers || {})
-
+			console.log('userStore', userStore)
 			if (userStore.isLogin && userStore.token) {
 				headers.set('Authorization', `Bearer ${userStore.token}`)
 			}
+
 			options.headers = headers
 		},
 

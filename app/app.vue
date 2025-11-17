@@ -2,6 +2,6 @@
 	<NuxtLayout>
 		<NuxtPage />
 	</NuxtLayout>
-  </template>
+</template>
 
 <script setup></script>

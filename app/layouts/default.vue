@@ -5,7 +5,9 @@
 			<main class="flex-1">
 				<slot />
 			</main>
-			<footer class="border-t border-gray-200 py-8 text-center text-sm text-neutral-500">
+			<footer
+				class="border-t border-gray-200 py-8 text-center text-sm text-neutral-500"
+			>
 				<div class="container px-4">
 					<p>© {{ new Date().getFullYear() }} 面试汪 · AI 面试平台</p>
 					<p class="mt-2">
@@ -23,12 +25,10 @@
 			<BackToTop />
 		</div>
 	</UApp>
-	</template>
+</template>
 
 <script setup>
+// const toaster = { position: 'top-right' }
 </script>
 
-<style scoped>
-</style>
-
-
+<style scoped></style>

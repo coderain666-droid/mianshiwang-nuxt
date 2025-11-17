@@ -1,139 +1,96 @@
 <template>
-	<UModal v-model:open="isOpen" :ui="{ width: 'sm:max-w-md' }">
-		<template #header>
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-2">
-					<UIcon name="i-heroicons-user-circle" class="w-5 h-5 text-primary-600" />
-					<h3 class="text-lg font-semibold text-gray-900">编辑个人信息</h3>
-				</div>
-				<UButton
-					color="gray"
-					variant="ghost"
-					icon="i-heroicons-x-mark"
-					size="sm"
-					square
-					@click="isOpen = false"
-				/>
-			</div>
-		</template>
-		<div class="space-y-6 py-4">
-			<!-- 头像上传 -->
-			<div class="flex flex-col items-center pb-4 border-b border-gray-200">
-				<div class="relative group mb-4">
-					<div class="relative">
-						<UAvatar
-							:src="formData.avatar"
-							:alt="formData.username || '用户头像'"
-							size="3xl"
-							class="cursor-pointer ring-4 ring-primary-100 transition-all hover:ring-primary-200"
-						/>
-						<!-- hover 遮罩 + loading 态 -->
+	<UModal
+		v-model:open="isOpen"
+		title="编辑个人信息"
+		:ui="{ width: 'sm:max-w-md' }"
+	>
+		<template #body>
+			<div class="space-y-6 py-4">
+				<!-- 头像上传 -->
+				<div class="flex flex-col items-center">
+					<div class="relative group mb-4">
+						<div class="relative">
+							<UAvatar
+								:src="formData.avatar"
+								:alt="formData.username || '用户头像'"
+								size="3xl"
+								class="cursor-pointer ring-4 ring-primary-100 transition-all hover:ring-primary-200"
+							/>
+							<!-- hover 遮罩 + loading 态 -->
+							<div
+								v-if="avatarUploading"
+								class="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center backdrop-blur-sm"
+							>
+								<UIcon
+									name="i-heroicons-arrow-path"
+									class="w-7 h-7 text-white animate-spin"
+								/>
+							</div>
+							<div
+								v-else
+								class="absolute inset-0 rounded-full bg-gradient-to-t from-black/60 to-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white text-xs transition-all cursor-pointer"
+								@click="triggerAvatarUpload"
+							>
+								<UIcon name="i-heroicons-camera" class="w-5 h-5 mb-1" />
+								<span class="text-[10px]">更换</span>
+							</div>
+						</div>
+						<!-- 状态指示器 -->
 						<div
 							v-if="avatarUploading"
-							class="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center backdrop-blur-sm"
+							class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-primary-500 text-white text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap"
 						>
-							<UIcon name="i-heroicons-arrow-path" class="w-7 h-7 text-white animate-spin" />
-						</div>
-						<div
-							v-else
-							class="absolute inset-0 rounded-full bg-gradient-to-t from-black/60 to-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-end pb-3 text-white text-xs transition-all cursor-pointer"
-							@click="triggerAvatarUpload"
-						>
-							<UIcon name="i-heroicons-camera" class="w-5 h-5 mb-1" />
-							<span class="text-[10px]">更换</span>
+							上传中...
 						</div>
 					</div>
-					<!-- 状态指示器 -->
-					<div
-						v-if="avatarUploading"
-						class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-primary-500 text-white text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap"
+					<UButton
+						color="primary"
+						variant="soft"
+						size="sm"
+						class="gap-2"
+						:loading="avatarUploading"
+						:disabled="avatarUploading"
+						@click="triggerAvatarUpload"
 					>
-						上传中...
-					</div>
+						<UIcon name="i-heroicons-photo" class="w-4 h-4" />
+						更换头像
+					</UButton>
+					<p class="text-xs text-gray-500 mt-2 text-center">
+						支持 JPG、PNG 格式，文件大小不超过 5MB
+					</p>
+					<input
+						ref="avatarInputRef"
+						type="file"
+						accept="image/*"
+						class="hidden"
+						@change="handleAvatarChange"
+					/>
 				</div>
-				<UButton
-					color="primary"
-					variant="soft"
-					size="sm"
-					class="gap-2"
-					:loading="avatarUploading"
-					:disabled="avatarUploading"
-					@click="triggerAvatarUpload"
-				>
-					<UIcon name="i-heroicons-photo" class="w-4 h-4" />
-					更换头像
-				</UButton>
-				<p class="text-xs text-gray-500 mt-2 text-center">
-					支持 JPG、PNG 格式，文件大小不超过 5MB
-				</p>
-				<input
-					ref="avatarInputRef"
-					type="file"
-					accept="image/*"
-					class="hidden"
-					@change="handleAvatarChange"
-				/>
-			</div>
 
-			<!-- 用户名 -->
-			<div>
-				<UFormGroup label="用户名" name="username" :error="errors.username">
+				<!-- 用户名 -->
+				<div>
 					<UInput
+						class="w-full"
+						icon="i-lucide-user"
 						v-model="formData.username"
 						placeholder="请输入用户名（2-20个字符）"
 						size="lg"
-						:ui="{ icon: { trailing: { pointer: '' } } }"
 					>
-						<template #leading>
-							<UIcon name="i-heroicons-user" class="w-5 h-5 text-gray-400" />
-						</template>
-						<template #trailing>
-							<UButton
-								v-show="formData.username"
-								color="gray"
-								variant="link"
-								icon="i-heroicons-x-mark"
-								:disabled="loading"
-								@click="formData.username = ''"
-							/>
-						</template>
 					</UInput>
-					<template #description>
-						<p class="text-xs text-gray-500 mt-1">用于在平台上显示您的身份</p>
-					</template>
-				</UFormGroup>
-			</div>
-
-			<!-- 邮箱 -->
-			<div>
-				<UFormGroup label="邮箱" name="email" :error="errors.email">
+				</div>
+				<!-- 邮箱 -->
+				<div>
 					<UInput
+						class="w-full"
+						icon="i-lucide-at-sign"
 						v-model="formData.email"
-						type="email"
-						placeholder="请输入邮箱地址（选填）"
+						placeholder="请输入您的邮箱地址"
 						size="lg"
-						:ui="{ icon: { trailing: { pointer: '' } } }"
 					>
-						<template #leading>
-							<UIcon name="i-heroicons-envelope" class="w-5 h-5 text-gray-400" />
-						</template>
-						<template #trailing>
-							<UButton
-								v-show="formData.email"
-								color="gray"
-								variant="link"
-								icon="i-heroicons-x-mark"
-								:disabled="loading"
-								@click="formData.email = ''"
-							/>
-						</template>
 					</UInput>
-					<template #description>
-						<p class="text-xs text-gray-500 mt-1">用于接收重要通知和找回密码</p>
-					</template>
-				</UFormGroup>
+				</div>
 			</div>
-		</div>
+		</template>
 
 		<template #footer>
 			<div class="flex gap-3 w-full">
@@ -152,7 +109,6 @@
 					:loading="loading"
 					@click="handleSubmit"
 				>
-					<UIcon v-if="!loading" name="i-heroicons-check" class="w-4 h-4 mr-1" />
 					保存更改
 				</UButton>
 			</div>
@@ -163,6 +119,8 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { useToast } from '#imports'
+import { updateUserInfoAPI } from '@/api/user'
+import { useUserStore } from '@/stores/user'
 
 const props = defineProps({
 	open: {
@@ -179,7 +137,8 @@ const props = defineProps({
 	}
 })
 
-const emit = defineEmits(['update:open', 'update'])
+const emit = defineEmits(['update:open'])
+const { $api } = useNuxtApp()
 
 const toast = useToast()
 const loading = ref(false)
@@ -291,32 +250,27 @@ const handleAvatarChange = async (event) => {
 
 // 验证表单
 const validate = () => {
-	errors.value = {
-		username: '',
-		email: ''
-	}
-
-	let valid = true
-
-	// 验证用户名
+	// 简单验证下，用户名在 2 ~ 20 个字符之间
 	if (!formData.value.username.trim()) {
 		errors.value.username = '请输入用户名'
-		valid = false
+		return false
 	} else if (formData.value.username.trim().length < 2) {
 		errors.value.username = '用户名至少需要2个字符'
-		valid = false
+		return false
 	} else if (formData.value.username.trim().length > 20) {
 		errors.value.username = '用户名不能超过20个字符'
-		valid = false
+		return false
 	}
-
 	// 验证邮箱
-	if (formData.value.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.value.email)) {
+	if (
+		formData.value.email &&
+		!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.value.email)
+	) {
 		errors.value.email = '请输入有效的邮箱地址'
-		valid = false
+		return false
 	}
 
-	return valid
+	return true
 }
 
 // 处理提交
@@ -333,7 +287,21 @@ const handleSubmit = async () => {
 			avatar: formData.value.avatar
 		}
 
-		emit('update', updatedInfo)
+		// 通过接口修改用户信息
+		const res = await updateUserInfoAPI($api, updatedInfo)
+
+		// 提示用户修改成功，关闭 dialog，修改 userSotre 中的数据
+		toast.add({
+			title: '个人信息修改成功',
+			color: 'success'
+		})
+		isOpen.value = false
+		// 更新 userStore 中的数据
+		const userStore = useUserStore()
+		userStore.userInfo = {
+			...userStore.userInfo,
+			...updatedInfo
+		}
 	} catch (error) {
 		toast.add({
 			title: '保存失败',
@@ -351,6 +319,4 @@ const handleCancel = () => {
 }
 </script>
 
-<style scoped>
-</style>
-
+<style scoped></style>

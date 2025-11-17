@@ -28,6 +28,10 @@
   --ui-bg: #F8FAFC;
   /* 背景 2 */
   --ui-border: #b8c2d4;
+  /* H5 字体颜色 */
+  --ui-text-highlighted: #333;
+  /* 默认字体颜色 */
+  --ui-text: #555;
 
   --radius-sm: 4px;
   --radius-md: 8px;

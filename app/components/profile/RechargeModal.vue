@@ -15,7 +15,9 @@
 		</template>
 		<div class="space-y-6 py-4">
 			<!-- 当前余额 -->
-			<div class="bg-gradient-to-r from-primary-50 to-primary-100 rounded-xl p-4">
+			<div
+				class="bg-gradient-to-r from-primary-50 to-primary-100 rounded-xl p-4"
+			>
 				<p class="text-sm text-gray-600 mb-1">当前余额</p>
 				<p class="text-2xl font-bold text-primary-600">{{ currentBalance }}</p>
 			</div>
@@ -51,7 +53,7 @@
 
 			<!-- 自定义金额 -->
 			<div>
-				<UFormGroup label="自定义金额" name="customAmount">
+				<UForm label="自定义金额" name="customAmount">
 					<UInput
 						v-model.number="customAmount"
 						type="number"
@@ -63,7 +65,7 @@
 							<span class="text-gray-500 text-sm">旺旺币</span>
 						</template>
 					</UInput>
-				</UFormGroup>
+				</UForm>
 				<p class="text-xs text-gray-500 mt-2">
 					单次充值最低 1 旺旺币，最高 10000 旺旺币
 				</p>
@@ -72,10 +74,15 @@
 			<!-- 优惠提示 -->
 			<div class="bg-amber-50 border border-amber-200 rounded-lg p-3">
 				<div class="flex items-start gap-2">
-					<UIcon name="i-heroicons-information-circle" class="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+					<UIcon
+						name="i-heroicons-information-circle"
+						class="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0"
+					/>
 					<div class="text-sm text-amber-800">
 						<p class="font-medium mb-1">充值优惠</p>
-						<p class="text-xs">充值越多，赠送越多！更多优惠活动请关注官方公告。</p>
+						<p class="text-xs">
+							充值越多，赠送越多！更多优惠活动请关注官方公告。
+						</p>
 					</div>
 				</div>
 			</div>
@@ -172,7 +179,11 @@ watch(selectedAmount, () => {
 
 // 处理充值
 const handleRecharge = async () => {
-	if (!finalAmount.value || finalAmount.value < 1 || finalAmount.value > 10000) {
+	if (
+		!finalAmount.value ||
+		finalAmount.value < 1 ||
+		finalAmount.value > 10000
+	) {
 		toast.add({
 			title: '充值金额无效',
 			description: '请输入 1-10000 之间的金额',
@@ -190,7 +201,7 @@ const handleRecharge = async () => {
 		// })
 
 		// 模拟充值成功
-		await new Promise(resolve => setTimeout(resolve, 1500))
+		await new Promise((resolve) => setTimeout(resolve, 1500))
 
 		emit('recharge', {
 			amount: finalAmount.value,
@@ -221,6 +232,4 @@ const handleCancel = () => {
 }
 </script>
 
-<style scoped>
-</style>
-
+<style scoped></style>
