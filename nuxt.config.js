@@ -66,7 +66,12 @@ export default defineNuxtConfig({
 	},
 
 	// —— 模块（保留基础依赖）——
-	modules: ['@pinia/nuxt', '@nuxt/devtools', ['@nuxt/ui', { fonts: false }]],
+	modules: [
+		'@pinia/nuxt',
+		'pinia-plugin-persistedstate/nuxt',
+		'@nuxt/devtools',
+		['@nuxt/ui', { fonts: false }]
+	],
 	colorMode: {
 		classSuffix: '', // 如果你想去掉默认的类后缀（如 dark 会变为 dark-mode）
 		preference: 'light', // 默认根据系统的颜色模式，值为 'light', 'dark' 或 'system'
