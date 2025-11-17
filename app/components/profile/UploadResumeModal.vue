@@ -33,7 +33,7 @@
 							点击或拖拽文件到此处上传
 						</p>
 						<p class="text-xs text-gray-500">
-							支持 PDF、DOC、DOCX 格式，文件大小不超过 10MB
+							支持 PDF、DOC、DOCX 格式，文件大小不超过 5MB
 						</p>
 					</div>
 
@@ -67,17 +67,6 @@
 						</UButton>
 					</div>
 				</div>
-
-				<!-- 简历名称 -->
-				<div v-if="selectedFile">
-					<UForm label="简历名称" name="resumeName" :error="errors.resumeName">
-						<UInput
-							v-model="resumeName"
-							placeholder="请输入简历名称（选填）"
-							size="lg"
-						/>
-					</UForm>
-				</div>
 			</div>
 		</template>
 
@@ -102,6 +91,9 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { useToast } from '#imports'
+import { getOSSClient } from '@/utils/sts'
+import { useUserStore } from '@/stores/user'
+import { uploadResumeAPI } from '@/api/resume'
 
 const props = defineProps({
 	open: {
@@ -111,8 +103,10 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:open', 'uploaded'])
-
+const { $api } = useNuxtApp()
+const userStore = useUserStore()
 const toast = useToast()
+
 const fileInputRef = ref(null)
 const selectedFile = ref(null)
 const resumeName = ref('')
@@ -200,10 +194,10 @@ const processFile = (file) => {
 		return
 	}
 
-	// 验证文件大小（限制 10MB）
-	if (file.size > 10 * 1024 * 1024) {
+	// 验证文件大小（限制 5MB）
+	if (file.size > 5 * 1024 * 1024) {
 		toast.add({
-			title: '文件大小不能超过 10MB',
+			title: '文件大小不能超过 5MB',
 			color: 'error'
 		})
 		return
@@ -227,39 +221,51 @@ const handleUpload = async () => {
 	if (!selectedFile.value) {
 		return
 	}
-
 	uploading.value = true
-	try {
-		// TODO: 实际上传到服务器
-		// const { $api } = useNuxtApp()
-		// const formData = new FormData()
-		// formData.append('file', selectedFile.value)
-		// if (resumeName.value.trim()) {
-		// 	formData.append('name', resumeName.value.trim())
-		// }
-		// const resume = await $api.post('/resume/upload', formData)
 
-		// 模拟上传
-		const resume = {
-			id: Date.now().toString(),
-			name: resumeName.value.trim() || selectedFile.value.name,
-			fileName: selectedFile.value.name,
-			fileSize: selectedFile.value.size,
-			fileUrl: URL.createObjectURL(selectedFile.value), // 临时URL，实际应该是服务器返回的URL
-			createTime: new Date().toISOString()
+	let ossClient = null
+	const updateAvatar = async (file) => {
+		if (!ossClient) {
+			ossClient = await getOSSClient($api)
 		}
+		try {
+			// 因为当前凭证只具备 images 文件夹下的访问权限，所以图片需要上传到 images/xxx.xx 。否则你将得到一个 《AccessDeniedError: You have no right to access this object because of bucket acl.》 的错误
+			const fileTypeArr = file.type.split('/')
+			const fileName = `${userStore.userInfo.openid}/resumes/${Date.now()}.${
+				fileTypeArr[fileTypeArr.length - 1]
+			}`
 
-		emit('uploaded', resume)
-		isOpen.value = false
-	} catch (error) {
-		toast.add({
-			title: '上传失败',
-			description: error.message,
-			color: 'error'
-		})
-	} finally {
-		uploading.value = false
+			// 文件存放路径，文件
+			const res = await ossClient.put(`user-resumes/${fileName}`, file)
+			console.log('简历文件地址：', res.url)
+			console.log('简历信息：', res)
+			console.log('简历文件：', file)
+			await uploadResumeAPI($api, {
+				url: res.url,
+				resumeName: file.name,
+				uploadTime: new Date().toISOString()
+			})
+
+			// 简历上传成功
+			toast.add({
+				title: '上传成功',
+				description: '简历上传成功',
+				color: 'success'
+			})
+			isOpen.value = false
+		} catch (e) {
+			console.log('e.message', e.message)
+
+			toast.add({
+				title: '上传失败',
+				description: e.message,
+				color: 'error'
+			})
+		} finally {
+			uploading.value = false
+		}
 	}
+	updateAvatar(selectedFile.value)
 }
 
 // 处理取消

@@ -16,7 +16,7 @@
 			<div
 				v-for="(resume, index) in userStore.resumes"
 				:key="resume.id"
-				class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all"
+				class="flex items-center gap-4 p-4 mb-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all"
 			>
 				<!-- 简历图标 -->
 				<div
@@ -34,10 +34,12 @@
 						{{ resume.resumeName }}
 					</p>
 					<div class="flex items-center gap-3 mt-1 text-xs text-gray-500">
-						<span>{{ resume.jobInfo.jobIntention }}</span>
-						<span>·</span>
-						<span>{{ resume.jobInfo.cityIntention }}</span>
-						<span>·</span>
+						<span v-if="resume.jobInfo">{{
+							resume.jobInfo?.jobIntention
+						}}</span>
+						<span v-if="resume.jobInfo">{{
+							resume.jobInfo?.cityIntention
+						}}</span>
 						<span>{{ formatDate(resume.createTime) }}</span>
 					</div>
 				</div>
