@@ -1,11 +1,13 @@
 <template>
-	<div class="min-h-screen bg-gray-50 py-8">
+	<div
+		class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 py-8"
+	>
 		<div class="container px-4 mx-auto max-w-6xl">
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				<!-- 左侧：用户信息卡片 -->
 				<div class="lg:col-span-1">
 					<UCard
-						class="sticky top-24 rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+						class="sticky top-24 rounded-2xl shadow-md hover:shadow-lg transition-all border-0 bg-white/80 backdrop-blur-sm"
 					>
 						<template #header>
 							<h2 class="text-xl font-semibold text-gray-900">个人信息</h2>
@@ -41,28 +43,40 @@
 							</div>
 
 							<!-- 用户信息 -->
-							<div class="space-y-4">
-								<div class="flex items-start gap-3">
-									<UIcon
-										name="i-heroicons-user"
-										class="w-5 h-5 text-gray-400 mt-0.5"
-									/>
+							<div class="space-y-3">
+								<div
+									class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+								>
+									<div
+										class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors"
+									>
+										<UIcon
+											name="i-heroicons-user"
+											class="w-5 h-5 text-primary-600"
+										/>
+									</div>
 									<div class="flex-1 min-w-0">
 										<p class="text-xs text-gray-500 mb-1">用户名</p>
-										<p class="text-sm font-medium text-gray-900 truncate">
+										<p class="text-sm font-semibold text-gray-900 truncate">
 											{{ userStore.userInfo.username || '未设置' }}
 										</p>
 									</div>
 								</div>
 
-								<div class="flex items-start gap-3">
-									<UIcon
-										name="i-heroicons-envelope"
-										class="w-5 h-5 text-gray-400 mt-0.5"
-									/>
+								<div
+									class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+								>
+									<div
+										class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors"
+									>
+										<UIcon
+											name="i-heroicons-envelope"
+											class="w-5 h-5 text-blue-600"
+										/>
+									</div>
 									<div class="flex-1 min-w-0">
 										<p class="text-xs text-gray-500 mb-1">邮箱</p>
-										<p class="text-sm font-medium text-gray-900 truncate">
+										<p class="text-sm font-semibold text-gray-900 truncate">
 											{{ userStore.userInfo.email || '未设置' }}
 										</p>
 									</div>
@@ -72,12 +86,74 @@
 							<!-- 旺旺币余额 -->
 							<div class="pt-4 border-t border-gray-200">
 								<div
-									class="bg-gradient-to-r from-primary-50 to-primary-100 rounded-xl p-4 shadow-inner"
+									class="bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 rounded-2xl p-6 shadow-lg relative overflow-hidden"
 								>
-									<p class="text-xs text-gray-600 mb-1">旺旺币余额</p>
-									<p class="text-2xl font-bold text-primary-600">
-										{{ userStore.walletBalance }}
-									</p>
+									<!-- 背景装饰 -->
+									<div
+										class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"
+									></div>
+									<div
+										class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12"
+									></div>
+
+									<div class="relative z-10">
+										<div class="flex items-center justify-between mb-4">
+											<div class="flex items-center gap-2">
+												<UIcon
+													name="i-heroicons-currency-dollar"
+													class="w-5 h-5 text-white/90"
+												/>
+												<p class="text-sm text-white/90 font-medium">
+													旺旺币余额
+												</p>
+											</div>
+											<UIcon
+												name="i-heroicons-wallet"
+												class="w-6 h-6 text-white/80"
+											/>
+										</div>
+										<p class="text-3xl font-bold text-white mb-1">
+											{{ userStore.walletBalance }}
+										</p>
+										<p class="text-xs text-white/80 mb-4">当前可用余额</p>
+
+										<!-- 快捷操作 -->
+										<div class="flex gap-2 mt-4">
+											<UButton
+												color="white"
+												variant="solid"
+												class="flex-1 justify-center shadow-md"
+												@click="rechargeModal = true"
+											>
+												<UIcon
+													name="i-heroicons-plus-circle"
+													class="w-4 h-4 mr-1"
+												/>
+												充值
+											</UButton>
+											<UButton
+												color="white"
+												variant="outline"
+												class="px-3"
+												@click="walletTab = 0"
+											>
+												<UIcon name="i-heroicons-clock" class="w-4 h-4" />
+											</UButton>
+										</div>
+									</div>
+								</div>
+
+								<!-- 快速充值提示 -->
+								<div
+									class="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3"
+								>
+									<div class="flex items-center gap-2 text-xs text-amber-800">
+										<UIcon
+											name="i-heroicons-sparkles"
+											class="w-4 h-4 flex-shrink-0"
+										/>
+										<span>首次充值享额外赠送，限时优惠中</span>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -86,13 +162,90 @@
 
 				<!-- 右侧：主要内容区域 -->
 				<div class="lg:col-span-2 space-y-6">
+					<!-- 统计数据卡片 -->
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+						<UCard
+							class="rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02]"
+						>
+							<div class="flex items-center justify-between">
+								<div>
+									<p class="text-xs text-gray-500 mb-1">简历数量</p>
+									<p class="text-2xl font-bold text-gray-900">
+										{{ userStore.resumes.length }}
+									</p>
+									<p class="text-xs text-gray-500 mt-1">共 5 份</p>
+								</div>
+								<div
+									class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center"
+								>
+									<UIcon
+										name="i-heroicons-document-text"
+										class="w-6 h-6 text-green-600"
+									/>
+								</div>
+							</div>
+						</UCard>
+
+						<UCard
+							class="rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02]"
+						>
+							<div class="flex items-center justify-between">
+								<div>
+									<p class="text-xs text-gray-500 mb-1">充值记录</p>
+									<p class="text-2xl font-bold text-gray-900">
+										{{ userStore.wallet.rechargeRecords.length }}
+									</p>
+									<p class="text-xs text-gray-500 mt-1">总记录</p>
+								</div>
+								<div
+									class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center"
+								>
+									<UIcon
+										name="i-heroicons-arrow-down-circle"
+										class="w-6 h-6 text-blue-600"
+									/>
+								</div>
+							</div>
+						</UCard>
+
+						<UCard
+							class="rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02]"
+						>
+							<div class="flex items-center justify-between">
+								<div>
+									<p class="text-xs text-gray-500 mb-1">消费记录</p>
+									<p class="text-2xl font-bold text-gray-900">
+										{{ userStore.wallet.consumptionRecords.length }}
+									</p>
+									<p class="text-xs text-gray-500 mt-1">总记录</p>
+								</div>
+								<div
+									class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center"
+								>
+									<UIcon
+										name="i-heroicons-arrow-up-circle"
+										class="w-6 h-6 text-orange-600"
+									/>
+								</div>
+							</div>
+						</UCard>
+					</div>
+
 					<!-- 旺旺币记录 -->
 					<UCard
-						class="rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+						class="rounded-2xl shadow-md hover:shadow-lg transition-all border-0 bg-white/80 backdrop-blur-sm"
 					>
 						<template #header>
 							<div class="flex items-center justify-between">
-								<h2 class="text-xl font-semibold text-gray-900">旺旺币记录</h2>
+								<div class="flex items-center gap-2">
+									<UIcon
+										name="i-heroicons-chart-bar"
+										class="w-5 h-5 text-primary-600"
+									/>
+									<h2 class="text-xl font-semibold text-gray-900">
+										旺旺币记录
+									</h2>
+								</div>
 								<div class="flex gap-2">
 									<UButton
 										:color="walletTab === 0 ? 'primary' : 'gray'"
@@ -130,7 +283,7 @@
 								<div
 									v-for="(record, index) in userStore.wallet.rechargeRecords"
 									:key="index"
-									class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+									class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-white rounded-xl hover:from-green-100 hover:shadow-md transition-all border border-green-100/50"
 								>
 									<div class="flex items-center gap-4">
 										<div
@@ -176,7 +329,7 @@
 								<div
 									v-for="(record, index) in userStore.wallet.consumptionRecords"
 									:key="index"
-									class="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+									class="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-white rounded-xl hover:from-orange-100 hover:shadow-md transition-all border border-orange-100/50"
 								>
 									<div class="flex items-center gap-4">
 										<div
@@ -209,11 +362,22 @@
 
 					<!-- 简历管理 -->
 					<UCard
-						class="rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+						class="rounded-2xl shadow-md hover:shadow-lg transition-all border-0 bg-white/80 backdrop-blur-sm"
 					>
 						<template #header>
 							<div class="flex items-center justify-between">
-								<h2 class="text-xl font-semibold text-gray-900">我的简历</h2>
+								<div class="flex items-center gap-3">
+									<UIcon
+										name="i-heroicons-folder"
+										class="w-5 h-5 text-primary-600"
+									/>
+									<h2 class="text-xl font-semibold text-gray-900">我的简历</h2>
+									<span
+										class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
+									>
+										{{ userStore.resumes.length }}/5
+									</span>
+								</div>
 								<UButton
 									v-if="userStore.canAddResume"
 									color="primary"
@@ -229,25 +393,77 @@
 							</div>
 						</template>
 
+						<!-- 空状态：支持拖拽上传 -->
 						<div
 							v-if="userStore.resumes.length === 0"
-							class="text-center py-12 text-gray-500"
+							:class="[
+								'border-2 border-dashed rounded-xl p-12 text-center transition-all',
+								dragOverResume
+									? 'border-primary-500 bg-primary-50 scale-[1.02]'
+									: 'border-gray-300 hover:border-primary-400 hover:bg-gray-50'
+							]"
+							@dragover.prevent="handleResumeDragOver"
+							@dragleave.prevent="handleResumeDragLeave"
+							@drop.prevent="handleResumeDrop"
+							@click="userStore.canAddResume && (uploadResumeModal = true)"
 						>
 							<UIcon
-								name="i-heroicons-document-text"
-								class="w-12 h-12 mx-auto mb-4 text-gray-300"
+								:name="
+									dragOverResume
+										? 'i-heroicons-arrow-down-tray'
+										: 'i-heroicons-document-plus'
+								"
+								:class="[
+									'w-16 h-16 mx-auto mb-4 transition-all',
+									dragOverResume ? 'text-primary-500' : 'text-gray-400'
+								]"
 							/>
-							<p class="mb-2">暂无简历</p>
-							<p class="text-sm">点击上传按钮添加您的第一份简历</p>
+							<p class="text-lg font-medium text-gray-700 mb-2">
+								{{ dragOverResume ? '松开以上传简历' : '拖拽文件到这里上传' }}
+							</p>
+							<p class="text-sm text-gray-500 mb-4">或点击此处选择文件</p>
+							<p class="text-xs text-gray-400">
+								支持 PDF、DOC、DOCX 格式，文件大小不超过 10MB
+							</p>
 						</div>
 
-						<ResumeList
+						<!-- 简历列表：支持在列表区域拖拽上传 -->
+						<div
 							v-else
-							:resumes="userStore.resumes"
-							@update-order="handleResumeOrderUpdate"
-							@delete="handleResumeDelete"
-							@reorder="handleResumeReorder"
-						/>
+							:class="[
+								'relative transition-all',
+								dragOverResume &&
+									'ring-2 ring-primary-500 ring-offset-2 rounded-lg'
+							]"
+							@dragover.prevent="handleResumeDragOver"
+							@dragleave.prevent="handleResumeDragLeave"
+							@drop.prevent="handleResumeDrop"
+						>
+							<!-- 拖拽上传覆盖层 -->
+							<div
+								v-if="dragOverResume"
+								class="absolute inset-0 bg-primary-500/10 rounded-lg z-10 flex items-center justify-center pointer-events-none"
+							>
+								<div
+									class="bg-white rounded-xl p-6 shadow-lg border-2 border-primary-500 border-dashed"
+								>
+									<UIcon
+										name="i-heroicons-arrow-down-tray"
+										class="w-12 h-12 mx-auto mb-3 text-primary-500"
+									/>
+									<p class="text-lg font-semibold text-gray-900">
+										松开以上传简历
+									</p>
+								</div>
+							</div>
+
+							<ResumeList
+								:resumes="userStore.resumes"
+								@update-order="handleResumeOrderUpdate"
+								@delete="handleResumeDelete"
+								@reorder="handleResumeReorder"
+							/>
+						</div>
 					</UCard>
 				</div>
 			</div>
@@ -265,6 +481,13 @@
 			v-model:open="uploadResumeModal"
 			@uploaded="handleResumeUploaded"
 		/>
+
+		<!-- 充值弹窗 -->
+		<RechargeModal
+			v-model:open="rechargeModal"
+			:balance="userStore.walletBalance"
+			@recharge="handleRecharge"
+		/>
 	</div>
 </template>
 
@@ -275,6 +498,7 @@ import { useToast } from '#imports'
 import EditProfileModal from '@/components/profile/EditProfileModal.vue'
 import UploadResumeModal from '@/components/profile/UploadResumeModal.vue'
 import ResumeList from '@/components/profile/ResumeList.vue'
+import RechargeModal from '@/components/profile/RechargeModal.vue'
 import dayjs from 'dayjs'
 
 definePageMeta({
@@ -295,7 +519,9 @@ const toast = useToast()
 
 const editProfileModal = ref(false)
 const uploadResumeModal = ref(false)
+const rechargeModal = ref(false)
 const walletTab = ref(0)
+const dragOverResume = ref(false)
 
 // 格式化日期
 const formatDate = (date) => {
@@ -356,6 +582,115 @@ const handleResumeOrderUpdate = (newOrder) => {
 // 处理简历拖拽重排
 const handleResumeReorder = (newOrder) => {
 	userStore.updateResumes(newOrder)
+}
+
+// 处理简历区域拖拽上传
+const handleResumeDragOver = () => {
+	if (userStore.canAddResume) {
+		dragOverResume.value = true
+	}
+}
+
+const handleResumeDragLeave = () => {
+	dragOverResume.value = false
+}
+
+const handleResumeDrop = (event) => {
+	dragOverResume.value = false
+
+	if (!userStore.canAddResume) {
+		toast.add({
+			title: '无法上传',
+			description: '最多只能上传 5 份简历',
+			color: 'warning'
+		})
+		return
+	}
+
+	const files = event.dataTransfer.files
+	if (files && files.length > 0) {
+		const file = files[0]
+		// 验证文件类型
+		const allowedTypes = [
+			'application/pdf',
+			'application/msword',
+			'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+		]
+		const allowedExtensions = ['.pdf', '.doc', '.docx']
+		const fileExtension = '.' + file.name.split('.').pop().toLowerCase()
+
+		if (
+			!allowedTypes.includes(file.type) &&
+			!allowedExtensions.includes(fileExtension)
+		) {
+			toast.add({
+				title: '不支持的文件格式',
+				description: '请上传 PDF、DOC 或 DOCX 格式的文件',
+				color: 'error'
+			})
+			return
+		}
+
+		// 验证文件大小（限制 10MB）
+		if (file.size > 10 * 1024 * 1024) {
+			toast.add({
+				title: '文件大小不能超过 10MB',
+				color: 'error'
+			})
+			return
+		}
+
+		// 创建临时 FileList 对象，触发上传
+		uploadResumeModal.value = true
+		// 注意：这里需要等待 modal 打开后再设置文件，可以通过 props 传递
+		// 或者直接在这里处理上传逻辑
+		setTimeout(() => {
+			// 触发上传逻辑
+			handleDirectResumeUpload(file)
+		}, 100)
+	}
+}
+
+// 直接处理简历上传（从拖拽）
+const handleDirectResumeUpload = async (file) => {
+	try {
+		// TODO: 实际上传到服务器
+		const resume = {
+			id: Date.now().toString(),
+			name: file.name.replace(/\.[^/.]+$/, ''),
+			fileName: file.name,
+			fileSize: file.size,
+			fileUrl: URL.createObjectURL(file),
+			createTime: new Date().toISOString()
+		}
+
+		handleResumeUploaded(resume)
+	} catch (error) {
+		toast.add({
+			title: '上传失败',
+			description: error.message,
+			color: 'error'
+		})
+	}
+}
+
+// 处理充值
+const handleRecharge = (rechargeData) => {
+	// 更新余额
+	userStore.updateWalletBalance(userStore.walletBalance + rechargeData.amount)
+
+	// 添加充值记录
+	userStore.addRechargeRecord({
+		amount: rechargeData.amount,
+		orderNo: rechargeData.orderNo,
+		createTime: new Date().toISOString()
+	})
+
+	toast.add({
+		title: '充值成功',
+		description: `成功充值 ${rechargeData.amount} 旺旺币`,
+		color: 'success'
+	})
 }
 </script>
 

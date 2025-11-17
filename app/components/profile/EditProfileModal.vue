@@ -2,7 +2,10 @@
 	<UModal v-model:open="isOpen" :ui="{ width: 'sm:max-w-md' }">
 		<template #header>
 			<div class="flex items-center justify-between">
-				<h3 class="text-base font-semibold text-gray-900">编辑个人信息</h3>
+				<div class="flex items-center gap-2">
+					<UIcon name="i-heroicons-user-circle" class="w-5 h-5 text-primary-600" />
+					<h3 class="text-lg font-semibold text-gray-900">编辑个人信息</h3>
+				</div>
 				<UButton
 					color="gray"
 					variant="ghost"
@@ -15,40 +18,54 @@
 		</template>
 		<div class="space-y-6 py-4">
 			<!-- 头像上传 -->
-			<div class="flex flex-col items-center">
+			<div class="flex flex-col items-center pb-4 border-b border-gray-200">
 				<div class="relative group mb-4">
-					<UAvatar
-						:src="formData.avatar"
-						:alt="formData.username || '用户头像'"
-						size="2xl"
-						class="cursor-pointer"
-					/>
-					<!-- hover 遮罩 + loading 态 -->
+					<div class="relative">
+						<UAvatar
+							:src="formData.avatar"
+							:alt="formData.username || '用户头像'"
+							size="3xl"
+							class="cursor-pointer ring-4 ring-primary-100 transition-all hover:ring-primary-200"
+						/>
+						<!-- hover 遮罩 + loading 态 -->
+						<div
+							v-if="avatarUploading"
+							class="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center backdrop-blur-sm"
+						>
+							<UIcon name="i-heroicons-arrow-path" class="w-7 h-7 text-white animate-spin" />
+						</div>
+						<div
+							v-else
+							class="absolute inset-0 rounded-full bg-gradient-to-t from-black/60 to-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-end pb-3 text-white text-xs transition-all cursor-pointer"
+							@click="triggerAvatarUpload"
+						>
+							<UIcon name="i-heroicons-camera" class="w-5 h-5 mb-1" />
+							<span class="text-[10px]">更换</span>
+						</div>
+					</div>
+					<!-- 状态指示器 -->
 					<div
 						v-if="avatarUploading"
-						class="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center"
+						class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-primary-500 text-white text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap"
 					>
-						<UIcon name="i-heroicons-arrow-path" class="w-6 h-6 text-white animate-spin" />
-					</div>
-					<div
-						v-else
-						class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition-opacity"
-						@click="triggerAvatarUpload"
-					>
-						<UIcon name="i-heroicons-camera" class="w-5 h-5" />
+						上传中...
 					</div>
 				</div>
 				<UButton
 					color="primary"
-					variant="ghost"
+					variant="soft"
 					size="sm"
 					class="gap-2"
 					:loading="avatarUploading"
+					:disabled="avatarUploading"
 					@click="triggerAvatarUpload"
 				>
-					<UIcon name="i-heroicons-arrow-up-tray" class="w-4 h-4" />
+					<UIcon name="i-heroicons-photo" class="w-4 h-4" />
 					更换头像
 				</UButton>
+				<p class="text-xs text-gray-500 mt-2 text-center">
+					支持 JPG、PNG 格式，文件大小不超过 5MB
+				</p>
 				<input
 					ref="avatarInputRef"
 					type="file"
@@ -59,70 +76,84 @@
 			</div>
 
 			<!-- 用户名 -->
-		<div>
-			<UFormGroup label="用户名" name="username" :error="errors.username">
-				<UInput
-					v-model="formData.username"
-					placeholder="请输入用户名"
-					size="lg"
-					:ui="{ icon: { trailing: { pointer: '' } } }"
-				>
-					<template #trailing>
-						<UButton
-							v-show="formData.username"
-							color="gray"
-							variant="link"
-							icon="i-heroicons-x-mark"
-							:disabled="loading"
-							@click="formData.username = ''"
-						/>
+			<div>
+				<UFormGroup label="用户名" name="username" :error="errors.username">
+					<UInput
+						v-model="formData.username"
+						placeholder="请输入用户名（2-20个字符）"
+						size="lg"
+						:ui="{ icon: { trailing: { pointer: '' } } }"
+					>
+						<template #leading>
+							<UIcon name="i-heroicons-user" class="w-5 h-5 text-gray-400" />
+						</template>
+						<template #trailing>
+							<UButton
+								v-show="formData.username"
+								color="gray"
+								variant="link"
+								icon="i-heroicons-x-mark"
+								:disabled="loading"
+								@click="formData.username = ''"
+							/>
+						</template>
+					</UInput>
+					<template #description>
+						<p class="text-xs text-gray-500 mt-1">用于在平台上显示您的身份</p>
 					</template>
-				</UInput>
-			</UFormGroup>
-		</div>
+				</UFormGroup>
+			</div>
 
-		<!-- 邮箱 -->
-		<div>
-			<UFormGroup label="邮箱" name="email" :error="errors.email">
-				<UInput
-					v-model="formData.email"
-					type="email"
-					placeholder="请输入邮箱"
-					size="lg"
-					:ui="{ icon: { trailing: { pointer: '' } } }"
-				>
-					<template #trailing>
-						<UButton
-							v-show="formData.email"
-							color="gray"
-							variant="link"
-							icon="i-heroicons-x-mark"
-							:disabled="loading"
-							@click="formData.email = ''"
-						/>
+			<!-- 邮箱 -->
+			<div>
+				<UFormGroup label="邮箱" name="email" :error="errors.email">
+					<UInput
+						v-model="formData.email"
+						type="email"
+						placeholder="请输入邮箱地址（选填）"
+						size="lg"
+						:ui="{ icon: { trailing: { pointer: '' } } }"
+					>
+						<template #leading>
+							<UIcon name="i-heroicons-envelope" class="w-5 h-5 text-gray-400" />
+						</template>
+						<template #trailing>
+							<UButton
+								v-show="formData.email"
+								color="gray"
+								variant="link"
+								icon="i-heroicons-x-mark"
+								:disabled="loading"
+								@click="formData.email = ''"
+							/>
+						</template>
+					</UInput>
+					<template #description>
+						<p class="text-xs text-gray-500 mt-1">用于接收重要通知和找回密码</p>
 					</template>
-				</UInput>
-			</UFormGroup>
-		</div>
+				</UFormGroup>
+			</div>
 		</div>
 
 		<template #footer>
-			<div class="flex gap-2 w-full">
+			<div class="flex gap-3 w-full">
 				<UButton
 					color="gray"
 					variant="ghost"
 					class="flex-1 justify-center"
+					:disabled="loading"
 					@click="handleCancel"
 				>
 					取消
 				</UButton>
 				<UButton
 					color="primary"
-					class="flex-1 justify-center"
+					class="flex-1 justify-center shadow-md"
 					:loading="loading"
 					@click="handleSubmit"
 				>
-					保存
+					<UIcon v-if="!loading" name="i-heroicons-check" class="w-4 h-4 mr-1" />
+					保存更改
 				</UButton>
 			</div>
 		</template>
