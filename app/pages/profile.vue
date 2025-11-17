@@ -430,6 +430,7 @@ import EditProfileModal from '@/components/profile/EditProfileModal.vue'
 import UploadResumeModal from '@/components/profile/UploadResumeModal.vue'
 import ResumeList from '@/components/profile/ResumeList.vue'
 import RechargeModal from '@/components/profile/RechargeModal.vue'
+import { getResumeListAPI } from '@/api/resume'
 import dayjs from 'dayjs'
 
 definePageMeta({
@@ -447,6 +448,7 @@ useSeoMeta({
 
 const userStore = useUserStore()
 const toast = useToast()
+const { $api } = useNuxtApp()
 
 const editProfileModal = ref(false)
 const uploadResumeModal = ref(false)
@@ -481,14 +483,12 @@ const handleProfileUpdate = async (updatedInfo) => {
 	}
 }
 
-// 处理简历上传
-const handleResumeUploaded = (resume) => {
-	userStore.addResume(resume)
-	toast.add({
-		title: '上传成功',
-		color: 'success'
-	})
-	uploadResumeModal.value = false
+// 简历上传成功之后的回调
+const handleResumeUploaded = async () => {
+	// TODO：重新获取简历列表
+	const res = await getResumeListAPI($api)
+
+	userStore.resumes = res || []
 }
 
 // 处理简历删除

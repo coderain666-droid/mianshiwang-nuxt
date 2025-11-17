@@ -94,6 +94,7 @@ import { useToast } from '#imports'
 import { getOSSClient } from '@/utils/sts'
 import { useUserStore } from '@/stores/user'
 import { uploadResumeAPI } from '@/api/resume'
+import { createActionGuard } from '@/utils/actionGuard'
 
 const props = defineProps({
 	open: {
@@ -221,6 +222,28 @@ const handleUpload = async () => {
 	if (!selectedFile.value) {
 		return
 	}
+
+	// 限流器，防止用户频繁多次上传简历
+	const guard = createActionGuard(
+		`resume-upload-${userStore.userInfo.openid || 'guest'}`,
+		{
+			maxAttempts: 3,
+			windowMs: 1 * 60 * 1000 // 1 分钟内最多三次
+		}
+	)
+
+	const { allowed, retryAfter } = guard.attempt()
+
+	if (!allowed) {
+		const seconds = Math.ceil(retryAfter / 1000)
+		toast.add({
+			title: '操作过于频繁，一分钟最多上传 3 份简历',
+			description: `请${seconds || 1}秒后再试`,
+			color: 'warning'
+		})
+		return
+	}
+
 	uploading.value = true
 
 	let ossClient = null
@@ -237,9 +260,7 @@ const handleUpload = async () => {
 
 			// 文件存放路径，文件
 			const res = await ossClient.put(`user-resumes/${fileName}`, file)
-			console.log('简历文件地址：', res.url)
-			console.log('简历信息：', res)
-			console.log('简历文件：', file)
+
 			await uploadResumeAPI($api, {
 				url: res.url,
 				resumeName: file.name,
@@ -253,6 +274,8 @@ const handleUpload = async () => {
 				color: 'success'
 			})
 			isOpen.value = false
+			// 通知父组件
+			emit('uploaded')
 		} catch (e) {
 			console.log('e.message', e.message)
 
