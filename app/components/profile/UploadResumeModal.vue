@@ -1,83 +1,85 @@
 <template>
 	<UModal v-model:open="isOpen" title="上传简历" :ui="{ width: 'sm:max-w-md' }">
-		<div class="space-y-6 py-4">
-			<!-- 拖拽上传区域 -->
-			<div
-				:class="[
-					'border-2 border-dashed rounded-lg p-8 text-center transition-colors',
-					dragOver
-						? 'border-primary-500 bg-primary-50'
-						: 'border-gray-300 hover:border-gray-400',
-					uploading ? 'opacity-50 pointer-events-none' : 'cursor-pointer'
-				]"
-				@click="triggerFileUpload"
-				@dragover.prevent="handleDragOver"
-				@dragleave.prevent="handleDragLeave"
-				@drop.prevent="handleDrop"
-			>
-				<input
-					ref="fileInputRef"
-					type="file"
-					accept=".pdf,.doc,.docx"
-					class="hidden"
-					@change="handleFileChange"
-				/>
-
-				<div v-if="!uploading && !selectedFile">
-					<UIcon
-						name="i-heroicons-cloud-arrow-up"
-						class="w-12 h-12 mx-auto mb-4 text-gray-400"
+		<template #body>
+			<div class="space-y-6 py-4">
+				<!-- 拖拽上传区域 -->
+				<div
+					:class="[
+						'border-2 border-dashed rounded-lg p-8 text-center transition-colors',
+						dragOver
+							? 'border-primary-500 bg-primary-50'
+							: 'border-gray-300 hover:border-gray-400',
+						uploading ? 'opacity-50 pointer-events-none' : 'cursor-pointer'
+					]"
+					@click="triggerFileUpload"
+					@dragover.prevent="handleDragOver"
+					@dragleave.prevent="handleDragLeave"
+					@drop.prevent="handleDrop"
+				>
+					<input
+						ref="fileInputRef"
+						type="file"
+						accept=".pdf,.doc,.docx"
+						class="hidden"
+						@change="handleFileChange"
 					/>
-					<p class="text-sm font-medium text-gray-700 mb-1">
-						点击或拖拽文件到此处上传
-					</p>
-					<p class="text-xs text-gray-500">
-						支持 PDF、DOC、DOCX 格式，文件大小不超过 10MB
-					</p>
+
+					<div v-if="!uploading && !selectedFile">
+						<UIcon
+							name="i-heroicons-cloud-arrow-up"
+							class="w-12 h-12 mx-auto mb-4 text-gray-400"
+						/>
+						<p class="text-sm font-medium text-gray-700 mb-1">
+							点击或拖拽文件到此处上传
+						</p>
+						<p class="text-xs text-gray-500">
+							支持 PDF、DOC、DOCX 格式，文件大小不超过 10MB
+						</p>
+					</div>
+
+					<div v-else-if="uploading" class="flex flex-col items-center">
+						<UIcon
+							name="i-heroicons-arrow-path"
+							class="w-12 h-12 mx-auto mb-4 text-primary-500 animate-spin"
+						/>
+						<p class="text-sm font-medium text-gray-700">上传中...</p>
+					</div>
+
+					<div v-else-if="selectedFile" class="flex flex-col items-center">
+						<UIcon
+							name="i-heroicons-document-check"
+							class="w-12 h-12 mx-auto mb-4 text-green-500"
+						/>
+						<p class="text-sm font-medium text-gray-700 mb-1">
+							{{ selectedFile.name }}
+						</p>
+						<p class="text-xs text-gray-500">
+							{{ formatFileSize(selectedFile.size) }}
+						</p>
+						<UButton
+							color="gray"
+							variant="ghost"
+							size="sm"
+							class="mt-2"
+							@click.stop="selectedFile = null"
+						>
+							重新选择
+						</UButton>
+					</div>
 				</div>
 
-				<div v-else-if="uploading" class="flex flex-col items-center">
-					<UIcon
-						name="i-heroicons-arrow-path"
-						class="w-12 h-12 mx-auto mb-4 text-primary-500 animate-spin"
-					/>
-					<p class="text-sm font-medium text-gray-700">上传中...</p>
-				</div>
-
-				<div v-else-if="selectedFile" class="flex flex-col items-center">
-					<UIcon
-						name="i-heroicons-document-check"
-						class="w-12 h-12 mx-auto mb-4 text-green-500"
-					/>
-					<p class="text-sm font-medium text-gray-700 mb-1">
-						{{ selectedFile.name }}
-					</p>
-					<p class="text-xs text-gray-500">
-						{{ formatFileSize(selectedFile.size) }}
-					</p>
-					<UButton
-						color="gray"
-						variant="ghost"
-						size="sm"
-						class="mt-2"
-						@click.stop="selectedFile = null"
-					>
-						重新选择
-					</UButton>
+				<!-- 简历名称 -->
+				<div v-if="selectedFile">
+					<UForm label="简历名称" name="resumeName" :error="errors.resumeName">
+						<UInput
+							v-model="resumeName"
+							placeholder="请输入简历名称（选填）"
+							size="lg"
+						/>
+					</UForm>
 				</div>
 			</div>
-
-			<!-- 简历名称 -->
-			<div v-if="selectedFile">
-				<UForm label="简历名称" name="resumeName" :error="errors.resumeName">
-					<UInput
-						v-model="resumeName"
-						placeholder="请输入简历名称（选填）"
-						size="lg"
-					/>
-				</UForm>
-			</div>
-		</div>
+		</template>
 
 		<template #footer>
 			<div class="flex gap-2 w-full justify-end">
