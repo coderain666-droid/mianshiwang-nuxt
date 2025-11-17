@@ -35,3 +35,19 @@ export const deleteResumeAPI = ($api, resumeId) => {
 		}
 	})
 }
+
+/**
+ * 更新简历名称
+ * @param {*} resumeId
+ * @param {*} resumeName
+ * @returns
+ */
+export const updateResumeNameAPI = ($api, { resumeId, resumeName }) => {
+	return $api(`/resume/updateResumeName`, {
+		method: 'POST',
+		body: {
+			resumeId,
+			resumeName
+		}
+	})
+}

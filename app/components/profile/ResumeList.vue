@@ -20,7 +20,7 @@
 			>
 				<!-- 简历图标 -->
 				<div
-					class="w-12 h-12 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0"
+					class="w-12 h-12 rounded-lg bg-primary-100 flex items-center justify-center shrink-0"
 				>
 					<UIcon
 						name="i-heroicons-document-text"
@@ -45,17 +45,25 @@
 				</div>
 
 				<!-- 操作按钮 -->
-				<div class="flex items-center gap-2 flex-shrink-0">
+				<div class="flex items-center gap-2 shrink-0">
+					<!-- 修改简历名 -->
 					<UButton
-						color="gray"
-						variant="ghost"
+						color="primary"
+						variant="solid"
+						size="sm"
+						icon="i-heroicons-pencil"
+						@click="handleEditName(index, resume)"
+					/>
+					<UButton
+						color="success"
+						variant="solid"
 						size="sm"
 						icon="i-heroicons-eye"
 						@click="handlePreview(resume)"
 					/>
 					<UButton
-						color="gray"
-						variant="ghost"
+						color="error"
+						variant="solid"
 						size="sm"
 						icon="i-heroicons-trash"
 						@click="handleDelete(index, resume)"
@@ -81,6 +89,43 @@
 					<div v-else class="p-12 text-center text-gray-500">
 						<p>无法预览此文件</p>
 					</div>
+				</div>
+			</template>
+		</UModal>
+
+		<!-- 重命名弹窗 -->
+		<UModal v-model:open="editNameModal" title="修改简历名称">
+			<template #body>
+				<div class="space-y-4">
+					<UInput
+						class="w-full"
+						v-model="editNameValue"
+						placeholder="请输入新的简历名称"
+						:disabled="editNameLoading"
+						@input="editNameError = ''"
+						@keyup.enter="confirmEditName"
+						autofocus
+					/>
+					<p class="text-xs text-gray-400">不超过 10 个字符，便于快速识别</p>
+				</div>
+			</template>
+			<template #footer>
+				<div class="flex gap-2 justify-end w-full">
+					<UButton
+						color="gray"
+						variant="ghost"
+						@click="closeEditNameModal"
+						:disabled="editNameLoading"
+					>
+						取消
+					</UButton>
+					<UButton
+						color="primary"
+						:loading="editNameLoading"
+						@click="confirmEditName"
+					>
+						保存
+					</UButton>
 				</div>
 			</template>
 		</UModal>
@@ -116,9 +161,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useToast } from '#imports'
-import { getResumeListAPI, deleteResumeAPI } from '@/api/resume'
+import {
+	getResumeListAPI,
+	deleteResumeAPI,
+	updateResumeNameAPI
+} from '@/api/resume'
 import dayjs from 'dayjs'
 import { useUserStore } from '@/stores/user'
 
@@ -140,6 +189,12 @@ const previewResume = ref(null)
 const deleteConfirmModal = ref(false)
 const deleteIndex = ref(-1)
 const deleteResume = ref(null)
+const editNameModal = ref(false)
+const editNameValue = ref('')
+const editNameError = ref('')
+const editNameLoading = ref(false)
+const editingResume = ref(null)
+const editingIndex = ref(-1)
 // 格式化日期
 const formatDate = (date) => {
 	if (!date) return ''
@@ -189,6 +244,63 @@ const confirmDelete = async () => {
 		deleteConfirmModal.value = false
 		deleteIndex.value = -1
 		deleteResume.value = null
+	}
+}
+
+const handleEditName = (index, resume) => {
+	editingIndex.value = index
+	editingResume.value = resume
+	editNameValue.value = resume.resumeName
+	editNameError.value = ''
+	editNameModal.value = true
+}
+
+const closeEditNameModal = () => {
+	editNameModal.value = false
+	editNameLoading.value = false
+	editNameError.value = ''
+	editNameValue.value = ''
+	editingIndex.value = -1
+	editingResume.value = null
+}
+
+const confirmEditName = async () => {
+	const value = editNameValue.value.trim()
+	if (!value) {
+		editNameError.value = '请输入新的简历名称'
+		return
+	}
+	if (value.length > 10) {
+		editNameError.value = '简历名称不能超过 10 个字符'
+		return
+	}
+
+	if (!editingResume.value) {
+		editNameError.value = '未找到需要修改的简历'
+		return
+	}
+
+	editNameLoading.value = true
+	try {
+		await updateResumeNameAPI($api, {
+			resumeId: editingResume.value.resumeId,
+			resumeName: value
+		})
+
+		userStore.resumes[editingIndex.value].resumeName = value
+		toast.add({
+			title: '修改成功',
+			color: 'success'
+		})
+		closeEditNameModal()
+	} catch (error) {
+		toast.add({
+			title: '修改失败',
+			description: error?.message || '请稍后再试',
+			color: 'error'
+		})
+	} finally {
+		editNameLoading.value = false
 	}
 }
 
