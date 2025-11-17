@@ -271,7 +271,7 @@
 						<div v-if="walletTab === 0" class="space-y-4">
 							<div
 								v-if="userStore.wallet.rechargeRecords.length === 0"
-								class="text-center py-12 text-gray-500"
+								class="flex flex-col justify-center items-center py-12 text-gray-500"
 							>
 								<UIcon
 									name="i-heroicons-wallet"
@@ -393,77 +393,8 @@
 							</div>
 						</template>
 
-						<!-- 空状态：支持拖拽上传 -->
-						<div
-							v-if="userStore.resumes.length === 0"
-							:class="[
-								'border-2 border-dashed rounded-xl p-12 text-center transition-all',
-								dragOverResume
-									? 'border-primary-500 bg-primary-50 scale-[1.02]'
-									: 'border-gray-300 hover:border-primary-400 hover:bg-gray-50'
-							]"
-							@dragover.prevent="handleResumeDragOver"
-							@dragleave.prevent="handleResumeDragLeave"
-							@drop.prevent="handleResumeDrop"
-							@click="userStore.canAddResume && (uploadResumeModal = true)"
-						>
-							<UIcon
-								:name="
-									dragOverResume
-										? 'i-heroicons-arrow-down-tray'
-										: 'i-heroicons-document-plus'
-								"
-								:class="[
-									'w-16 h-16 mx-auto mb-4 transition-all',
-									dragOverResume ? 'text-primary-500' : 'text-gray-400'
-								]"
-							/>
-							<p class="text-lg font-medium text-gray-700 mb-2">
-								{{ dragOverResume ? '松开以上传简历' : '拖拽文件到这里上传' }}
-							</p>
-							<p class="text-sm text-gray-500 mb-4">或点击此处选择文件</p>
-							<p class="text-xs text-gray-400">
-								支持 PDF、DOC、DOCX 格式，文件大小不超过 10MB
-							</p>
-						</div>
-
-						<!-- 简历列表：支持在列表区域拖拽上传 -->
-						<div
-							v-else
-							:class="[
-								'relative transition-all',
-								dragOverResume &&
-									'ring-2 ring-primary-500 ring-offset-2 rounded-lg'
-							]"
-							@dragover.prevent="handleResumeDragOver"
-							@dragleave.prevent="handleResumeDragLeave"
-							@drop.prevent="handleResumeDrop"
-						>
-							<!-- 拖拽上传覆盖层 -->
-							<div
-								v-if="dragOverResume"
-								class="absolute inset-0 bg-primary-500/10 rounded-lg z-10 flex items-center justify-center pointer-events-none"
-							>
-								<div
-									class="bg-white rounded-xl p-6 shadow-lg border-2 border-primary-500 border-dashed"
-								>
-									<UIcon
-										name="i-heroicons-arrow-down-tray"
-										class="w-12 h-12 mx-auto mb-3 text-primary-500"
-									/>
-									<p class="text-lg font-semibold text-gray-900">
-										松开以上传简历
-									</p>
-								</div>
-							</div>
-
-							<ResumeList
-								:resumes="userStore.resumes"
-								@update-order="handleResumeOrderUpdate"
-								@delete="handleResumeDelete"
-								@reorder="handleResumeReorder"
-							/>
-						</div>
+						<!-- 简历列表 -->
+						<ResumeList />
 					</UCard>
 				</div>
 			</div>
@@ -521,7 +452,6 @@ const editProfileModal = ref(false)
 const uploadResumeModal = ref(false)
 const rechargeModal = ref(false)
 const walletTab = ref(0)
-const dragOverResume = ref(false)
 
 // 格式化日期
 const formatDate = (date) => {
@@ -570,109 +500,7 @@ const handleResumeDelete = (index) => {
 	})
 }
 
-// 处理简历排序更新
-const handleResumeOrderUpdate = (newOrder) => {
-	userStore.updateResumes(newOrder)
-	toast.add({
-		title: '排序已保存',
-		color: 'success'
-	})
-}
-
-// 处理简历拖拽重排
-const handleResumeReorder = (newOrder) => {
-	userStore.updateResumes(newOrder)
-}
-
-// 处理简历区域拖拽上传
-const handleResumeDragOver = () => {
-	if (userStore.canAddResume) {
-		dragOverResume.value = true
-	}
-}
-
-const handleResumeDragLeave = () => {
-	dragOverResume.value = false
-}
-
-const handleResumeDrop = (event) => {
-	dragOverResume.value = false
-
-	if (!userStore.canAddResume) {
-		toast.add({
-			title: '无法上传',
-			description: '最多只能上传 5 份简历',
-			color: 'warning'
-		})
-		return
-	}
-
-	const files = event.dataTransfer.files
-	if (files && files.length > 0) {
-		const file = files[0]
-		// 验证文件类型
-		const allowedTypes = [
-			'application/pdf',
-			'application/msword',
-			'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-		]
-		const allowedExtensions = ['.pdf', '.doc', '.docx']
-		const fileExtension = '.' + file.name.split('.').pop().toLowerCase()
-
-		if (
-			!allowedTypes.includes(file.type) &&
-			!allowedExtensions.includes(fileExtension)
-		) {
-			toast.add({
-				title: '不支持的文件格式',
-				description: '请上传 PDF、DOC 或 DOCX 格式的文件',
-				color: 'error'
-			})
-			return
-		}
-
-		// 验证文件大小（限制 10MB）
-		if (file.size > 10 * 1024 * 1024) {
-			toast.add({
-				title: '文件大小不能超过 10MB',
-				color: 'error'
-			})
-			return
-		}
-
-		// 创建临时 FileList 对象，触发上传
-		uploadResumeModal.value = true
-		// 注意：这里需要等待 modal 打开后再设置文件，可以通过 props 传递
-		// 或者直接在这里处理上传逻辑
-		setTimeout(() => {
-			// 触发上传逻辑
-			handleDirectResumeUpload(file)
-		}, 100)
-	}
-}
-
-// 直接处理简历上传（从拖拽）
-const handleDirectResumeUpload = async (file) => {
-	try {
-		// TODO: 实际上传到服务器
-		const resume = {
-			id: Date.now().toString(),
-			name: file.name.replace(/\.[^/.]+$/, ''),
-			fileName: file.name,
-			fileSize: file.size,
-			fileUrl: URL.createObjectURL(file),
-			createTime: new Date().toISOString()
-		}
-
-		handleResumeUploaded(resume)
-	} catch (error) {
-		toast.add({
-			title: '上传失败',
-			description: error.message,
-			color: 'error'
-		})
-	}
-}
+// 移除排序与拖拽上传相关逻辑
 
 // 处理充值
 const handleRecharge = (rechargeData) => {
