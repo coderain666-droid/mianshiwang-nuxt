@@ -58,7 +58,7 @@
 						variant="ghost"
 						size="sm"
 						icon="i-heroicons-trash"
-						@click="handleDelete(index)"
+						@click="handleDelete(index, resume)"
 					/>
 				</div>
 			</div>
@@ -89,7 +89,14 @@
 		<UModal v-model:open="deleteConfirmModal" title="确认删除">
 			<template #body>
 				<div class="py-4">
-					<p class="text-gray-700">确定要删除这份简历吗？删除后无法恢复。</p>
+					<p class="text-gray-700" v-if="deleteResume?.isJianLiWang">
+						【简历汪】中简历会被同步删除！
+						<br />
+						确定要删除这份简历吗？删除后无法恢复。
+					</p>
+					<p class="text-gray-700" v-else>
+						确定要删除这份简历吗？删除后无法恢复。
+					</p>
 				</div>
 			</template>
 			<template #footer>
@@ -111,7 +118,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useToast } from '#imports'
-import { getResumeListAPI } from '@/api/resume'
+import { getResumeListAPI, deleteResumeAPI } from '@/api/resume'
 import dayjs from 'dayjs'
 import { useUserStore } from '@/stores/user'
 
@@ -132,7 +139,7 @@ const previewModal = ref(false)
 const previewResume = ref(null)
 const deleteConfirmModal = ref(false)
 const deleteIndex = ref(-1)
-
+const deleteResume = ref(null)
 // 格式化日期
 const formatDate = (date) => {
 	if (!date) return ''
@@ -164,17 +171,24 @@ const handlePreview = (resume) => {
 }
 
 // 删除简历
-const handleDelete = (index) => {
+const handleDelete = (index, resume) => {
 	deleteIndex.value = index
+	deleteResume.value = resume
 	deleteConfirmModal.value = true
 }
 
 // 确认删除
-const confirmDelete = () => {
-	if (deleteIndex.value >= 0) {
-		emit('delete', deleteIndex.value)
+const confirmDelete = async () => {
+	const res = await deleteResumeAPI($api, deleteResume.value.resumeId)
+	if (res) {
+		toast.add({
+			title: '删除成功',
+			color: 'success'
+		})
+		userStore.resumes.splice(deleteIndex.value, 1)
 		deleteConfirmModal.value = false
 		deleteIndex.value = -1
+		deleteResume.value = null
 	}
 }
 

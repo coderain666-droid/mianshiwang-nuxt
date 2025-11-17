@@ -21,3 +21,17 @@ export const uploadResumeAPI = ($api, body) => {
 		body
 	})
 }
+
+/**
+ * 删除简历
+ * @param {*} resumeId
+ * @returns
+ */
+export const deleteResumeAPI = ($api, resumeId) => {
+	return $api(`/resume/deleteResume`, {
+		method: 'POST',
+		body: {
+			resumeId
+		}
+	})
+}
