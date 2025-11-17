@@ -67,14 +67,14 @@
 		<!-- 预览弹窗 -->
 		<UModal
 			v-model:open="previewModal"
-			:title="previewResume.resumeName"
+			:title="previewTitle"
 			:ui="{ content: 'w-[1200px] max-w-[90vw]' }"
 		>
 			<template #body>
 				<div class="border rounded-lg overflow-hidden">
 					<iframe
-						v-if="previewResume.resumeUrl"
-						:src="previewResume.resumeUrl"
+						v-if="previewResume?.resumeUrl"
+						:src="previewResume?.resumeUrl"
 						class="w-full h-[600px]"
 						frameborder="0"
 					/>
@@ -144,7 +144,6 @@ const formatDate = (date) => {
 // 预览简历
 const handlePreview = (resume) => {
 	// 判断是否为用户单独上传的简历
-	debugger
 	if (!resume.isJianLiWang) {
 		previewResume.value = resume
 		previewModal.value = true
@@ -152,7 +151,15 @@ const handlePreview = (resume) => {
 	}
 	console.log('resume', resume)
 
-	previewResume.value = resume
+	// 环境变量的预览地址
+	// 测试环境使用：http://192.168.0.102:3001/
+	// 生成环境使用：https://resume.lgdsunday.club/
+	const config = useRuntimeConfig()
+
+	previewResume.value = {
+		...resume,
+		resumeUrl: `${config.public.resumePreviewUrl}edit?id=${resume.resumeId}&template=${resume.templateName}`
+	}
 	previewModal.value = true
 }
 
@@ -170,6 +177,16 @@ const confirmDelete = () => {
 		deleteIndex.value = -1
 	}
 }
+
+const previewTitle = computed(() => {
+	if (!previewResume.value) return '简历预览'
+
+	if (!previewResume.value.isJianLiWang) {
+		return previewResume.value?.resumeName
+	}
+
+	return previewResume.value?.resumeName + '（支持在线修改，可同步生效）'
+})
 </script>
 
 <style scoped>

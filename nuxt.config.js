@@ -90,7 +90,9 @@ export default defineNuxtConfig({
 		public: {
 			appVersion: process.env.npm_package_version,
 			buildTime: new Date().toISOString(),
-			apiBase: process.env.VITE_API_BASE_URL || '/dev-api'
+			apiBase: process.env.VITE_API_BASE_URL || '/dev-api',
+			resumePreviewUrl:
+				process.env.VITE_RESUME_PREVIEW_URL || 'https://resume.lgdsunday.club/'
 		}
 	},
 
