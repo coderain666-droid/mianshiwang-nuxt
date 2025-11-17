@@ -67,29 +67,19 @@
 		<!-- 预览弹窗 -->
 		<UModal
 			v-model:open="previewModal"
-			title="简历预览"
-			:ui="{ width: 'sm:max-w-4xl' }"
+			:title="previewResume.resumeName"
+			:ui="{ content: 'w-[1200px] max-w-[90vw]' }"
 		>
 			<template #body>
-				<div class="py-4">
-					<div v-if="previewResume" class="space-y-4">
-						<div class="bg-gray-50 rounded-lg p-4">
-							<p class="font-medium text-gray-900 mb-2">
-								{{ previewResume.name }}
-							</p>
-							<p class="text-sm text-gray-600">{{ previewResume.fileName }}</p>
-						</div>
-						<div class="border rounded-lg overflow-hidden">
-							<iframe
-								v-if="previewResume.fileUrl"
-								:src="previewResume.fileUrl"
-								class="w-full h-[600px]"
-								frameborder="0"
-							/>
-							<div v-else class="p-12 text-center text-gray-500">
-								<p>无法预览此文件</p>
-							</div>
-						</div>
+				<div class="border rounded-lg overflow-hidden">
+					<iframe
+						v-if="previewResume.resumeUrl"
+						:src="previewResume.resumeUrl"
+						class="w-full h-[600px]"
+						frameborder="0"
+					/>
+					<div v-else class="p-12 text-center text-gray-500">
+						<p>无法预览此文件</p>
 					</div>
 				</div>
 			</template>
@@ -153,6 +143,15 @@ const formatDate = (date) => {
 
 // 预览简历
 const handlePreview = (resume) => {
+	// 判断是否为用户单独上传的简历
+	debugger
+	if (!resume.isJianLiWang) {
+		previewResume.value = resume
+		previewModal.value = true
+		return
+	}
+	console.log('resume', resume)
+
 	previewResume.value = resume
 	previewModal.value = true
 }
