@@ -79,7 +79,12 @@
 						:popper="{ placement: 'bottom-end' }"
 					>
 						<UButton color="gray" variant="ghost">
-							<UAvatar :src="interviewAvatar" size="sm" class="mr-2" />
+							<UAvatar
+								:src="userStore.userInfo.avatar || interviewAvatar"
+								:alt="userStore.userInfo.username || '用户头像'"
+								size="lg"
+								class="cursor-pointer"
+							/>
 							{{ userStore.userInfo.username || '未命名用户' }}
 							<UIcon name="i-heroicons-chevron-down-20-solid" class="ml-1" />
 						</UButton>

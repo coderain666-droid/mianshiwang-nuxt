@@ -120,9 +120,9 @@
 										<!-- 快捷操作 -->
 										<div class="flex gap-2 mt-4">
 											<UButton
-												color="white"
+												color="neutral"
 												variant="solid"
-												class="flex-1 justify-center shadow-md"
+												class="flex-1 justify-center shadow-md text-green-500"
 												@click="rechargeModal = true"
 											>
 												<UIcon
@@ -130,14 +130,6 @@
 													class="w-4 h-4 mr-1"
 												/>
 												充值
-											</UButton>
-											<UButton
-												color="white"
-												variant="outline"
-												class="px-3"
-												@click="walletTab = 0"
-											>
-												<UIcon name="i-heroicons-clock" class="w-4 h-4" />
 											</UButton>
 										</div>
 									</div>
@@ -162,74 +154,7 @@
 
 				<!-- 右侧：主要内容区域 -->
 				<div class="lg:col-span-2 space-y-6">
-					<!-- 统计数据卡片 -->
-					<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-						<UCard
-							class="rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02]"
-						>
-							<div class="flex items-center justify-between">
-								<div>
-									<p class="text-xs text-gray-500 mb-1">简历数量</p>
-									<p class="text-2xl font-bold text-gray-900">
-										{{ userStore.resumes.length }}
-									</p>
-									<p class="text-xs text-gray-500 mt-1">共 5 份</p>
-								</div>
-								<div
-									class="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center"
-								>
-									<UIcon
-										name="i-heroicons-document-text"
-										class="w-6 h-6 text-green-600"
-									/>
-								</div>
-							</div>
-						</UCard>
-
-						<UCard
-							class="rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02]"
-						>
-							<div class="flex items-center justify-between">
-								<div>
-									<p class="text-xs text-gray-500 mb-1">充值记录</p>
-									<p class="text-2xl font-bold text-gray-900">
-										{{ userStore.wallet.rechargeRecords.length }}
-									</p>
-									<p class="text-xs text-gray-500 mt-1">总记录</p>
-								</div>
-								<div
-									class="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center"
-								>
-									<UIcon
-										name="i-heroicons-arrow-down-circle"
-										class="w-6 h-6 text-blue-600"
-									/>
-								</div>
-							</div>
-						</UCard>
-
-						<UCard
-							class="rounded-xl shadow-sm hover:shadow-md transition-all hover:scale-[1.02]"
-						>
-							<div class="flex items-center justify-between">
-								<div>
-									<p class="text-xs text-gray-500 mb-1">消费记录</p>
-									<p class="text-2xl font-bold text-gray-900">
-										{{ userStore.wallet.consumptionRecords.length }}
-									</p>
-									<p class="text-xs text-gray-500 mt-1">总记录</p>
-								</div>
-								<div
-									class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center"
-								>
-									<UIcon
-										name="i-heroicons-arrow-up-circle"
-										class="w-6 h-6 text-orange-600"
-									/>
-								</div>
-							</div>
-						</UCard>
-					</div>
+					<!-- TODO：设计一个充值积分的体系，充值多少或者模拟面试多少次，有对应的等级和排名 -->
 
 					<!-- 旺旺币记录 -->
 					<UCard
@@ -242,33 +167,15 @@
 										name="i-heroicons-chart-bar"
 										class="w-5 h-5 text-primary-600"
 									/>
-									<h2 class="text-xl font-semibold text-gray-900">
+									<h2 class="text-base font-semibold text-gray-900">
 										旺旺币记录
 									</h2>
-								</div>
-								<div class="flex gap-2">
-									<UButton
-										:color="walletTab === 0 ? 'primary' : 'gray'"
-										:variant="walletTab === 0 ? 'solid' : 'ghost'"
-										size="sm"
-										@click="walletTab = 0"
-									>
-										充值记录
-									</UButton>
-									<UButton
-										:color="walletTab === 1 ? 'primary' : 'gray'"
-										:variant="walletTab === 1 ? 'solid' : 'ghost'"
-										size="sm"
-										@click="walletTab = 1"
-									>
-										消费记录
-									</UButton>
 								</div>
 							</div>
 						</template>
 
 						<!-- 充值记录 -->
-						<div v-if="walletTab === 0" class="space-y-4">
+						<div class="space-y-4">
 							<div
 								v-if="userStore.wallet.rechargeRecords.length === 0"
 								class="flex flex-col justify-center items-center py-12 text-gray-500"
@@ -312,52 +219,6 @@
 								</div>
 							</div>
 						</div>
-
-						<!-- 消费记录 -->
-						<div v-else class="space-y-4">
-							<div
-								v-if="userStore.wallet.consumptionRecords.length === 0"
-								class="text-center py-12 text-gray-500"
-							>
-								<UIcon
-									name="i-heroicons-shopping-cart"
-									class="w-12 h-12 mx-auto mb-4 text-gray-300"
-								/>
-								<p>暂无消费记录</p>
-							</div>
-							<div v-else class="space-y-3">
-								<div
-									v-for="(record, index) in userStore.wallet.consumptionRecords"
-									:key="index"
-									class="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-white rounded-xl hover:from-orange-100 hover:shadow-md transition-all border border-orange-100/50"
-								>
-									<div class="flex items-center gap-4">
-										<div
-											class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center"
-										>
-											<UIcon
-												name="i-heroicons-arrow-up-circle"
-												class="w-5 h-5 text-orange-600"
-											/>
-										</div>
-										<div>
-											<p class="font-medium text-gray-900">{{ record.type }}</p>
-											<p class="text-sm text-gray-500">
-												{{ formatDate(record.createTime) }}
-											</p>
-										</div>
-									</div>
-									<div class="text-right">
-										<p class="font-semibold text-orange-600">
-											-{{ record.amount }}
-										</p>
-										<p class="text-xs text-gray-500">
-											{{ record.description }}
-										</p>
-									</div>
-								</div>
-							</div>
-						</div>
 					</UCard>
 
 					<!-- 简历管理 -->
@@ -371,25 +232,41 @@
 										name="i-heroicons-folder"
 										class="w-5 h-5 text-primary-600"
 									/>
-									<h2 class="text-xl font-semibold text-gray-900">我的简历</h2>
+									<h2 class="text-base font-semibold text-gray-900">
+										我的简历
+									</h2>
 									<span
 										class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
 									>
 										{{ userStore.resumes.length }}/5
 									</span>
 								</div>
-								<UButton
-									v-if="userStore.canAddResume"
-									color="primary"
-									variant="solid"
-									@click="uploadResumeModal = true"
-								>
-									<UIcon name="i-heroicons-plus" class="w-4 h-4 mr-1" />
-									上传简历
-								</UButton>
-								<span v-else class="text-sm text-gray-500">
-									最多上传 5 份简历
-								</span>
+								<div class="flex items-center">
+									<NuxtLink
+										to="https://resume.lgdsunday.club/"
+										class="text-[12px] mr-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 hover:text-primary-700 transition-all font-medium border border-primary-200"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										<span>免费制作简历（简历汪）</span>
+										<UIcon
+											name="i-heroicons-arrow-top-right-on-square"
+											class="w-3.5 h-3.5"
+										/>
+									</NuxtLink>
+									<UButton
+										v-if="userStore.canAddResume"
+										color="primary"
+										variant="solid"
+										@click="uploadResumeModal = true"
+									>
+										<UIcon name="i-heroicons-plus" class="w-4 h-4 mr-1" />
+										上传简历
+									</UButton>
+									<span v-else class="text-sm text-gray-500">
+										最多上传 5 份简历
+									</span>
+								</div>
 							</div>
 						</template>
 
@@ -453,7 +330,6 @@ const { $api } = useNuxtApp()
 const editProfileModal = ref(false)
 const uploadResumeModal = ref(false)
 const rechargeModal = ref(false)
-const walletTab = ref(0)
 
 // 格式化日期
 const formatDate = (date) => {

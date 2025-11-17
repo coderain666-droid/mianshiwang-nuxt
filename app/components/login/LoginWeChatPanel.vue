@@ -104,7 +104,12 @@
 			/>
 			<p class="leading-[20px]">
 				继续登录即表示你已阅读并同意
-				<UModal scrollable title="服务协议" description="请仔细阅读以下条款">
+				<UModal
+					scrollable
+					title="服务协议"
+					description="请仔细阅读以下条款"
+					:ui="{ content: 'w-[1200px] max-w-[90vw]' }"
+				>
 					<span class="text-primary hover:underline cursor-pointer"
 						>《服务协议》</span
 					>

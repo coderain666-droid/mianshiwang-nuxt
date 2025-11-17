@@ -16,7 +16,8 @@
 			<div
 				v-for="(resume, index) in userStore.resumes"
 				:key="resume.id"
-				class="flex items-center gap-4 p-4 mb-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all"
+				class="flex items-center gap-4 p-4 mb-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
+				@click="handlePreview(resume)"
 			>
 				<!-- 简历图标 -->
 				<div
@@ -48,25 +49,25 @@
 				<div class="flex items-center gap-2 shrink-0">
 					<!-- 修改简历名 -->
 					<UButton
-						color="primary"
-						variant="solid"
+						color="neutral"
+						variant="ghost"
 						size="sm"
 						icon="i-heroicons-pencil"
-						@click="handleEditName(index, resume)"
+						@click.stop="handleEditName(index, resume)"
 					/>
 					<UButton
-						color="success"
-						variant="solid"
+						color="neutral"
+						variant="ghost"
 						size="sm"
 						icon="i-heroicons-eye"
-						@click="handlePreview(resume)"
+						@click.stop="handlePreview(resume)"
 					/>
 					<UButton
-						color="error"
-						variant="solid"
+						color="neutral"
+						variant="ghost"
 						size="sm"
 						icon="i-heroicons-trash"
-						@click="handleDelete(index, resume)"
+						@click.stop="handleDelete(index, resume)"
 					/>
 				</div>
 			</div>
