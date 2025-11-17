@@ -141,7 +141,7 @@ const userMenuItems = [
 		{ label: '个人中心', icon: 'i-heroicons-user', to: '/profile' },
 		{
 			label: '面试记录',
-			icon: 'i-heroicons-chart',
+			icon: 'i-heroicons-chart-bar',
 			to: '/history'
 		}
 	],

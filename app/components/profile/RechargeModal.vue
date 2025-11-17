@@ -1,7 +1,7 @@
 <template>
 	<UModal
 		v-model:open="isOpen"
-		title="重置享优惠"
+		title="充值享优惠"
 		:ui="{ width: 'sm:max-w-md' }"
 	>
 		<template #body>

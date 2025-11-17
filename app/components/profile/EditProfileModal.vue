@@ -2,7 +2,7 @@
 	<UModal
 		v-model:open="isOpen"
 		title="编辑个人信息"
-		:ui="{ content: 'w-[1200px] max-w-[90vw]' }"
+		:ui="{ width: 'sm:max-w-md' }"
 	>
 		<template #body>
 			<div class="space-y-6 py-4">
