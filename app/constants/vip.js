@@ -11,6 +11,7 @@ export const SERVICE_TAGS = {
 }
 
 // 充值套餐列表
+// 需要和 后端套餐验证一致才有效。不从后端获取数据的原因为：尽量减少接口请求次数
 export const rechargePlans = [
 	{
 		id: 'single',
@@ -80,16 +81,16 @@ export const rechargePlans = [
 // 支付方式列表
 export const paymentMethods = [
 	{
-		id: 'wechat',
-		label: '微信支付',
-		description: '推荐，秒级到账',
-		icon: 'i-heroicons-chat-bubble-left-right'
-	},
-	{
 		id: 'alipay',
 		label: '支付宝',
 		description: '支持花呗分期',
-		icon: 'i-heroicons-credit-card'
+		icon: 'alipay'
+	},
+	{
+		id: 'wechat',
+		label: '微信支付',
+		description: '推荐，秒级到账',
+		icon: 'wechat'
 	}
 ]
 

@@ -206,10 +206,10 @@
 					>
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2 text-sm font-medium">
-								<button
+								<UButton
 									v-for="method in paymentMethods"
 									:key="method.id"
-									type="button"
+									color="default"
 									class="px-3 py-1.5 rounded-full border text-xs transition-all"
 									:class="
 										selectedPayment === method.id
@@ -219,7 +219,10 @@
 									@click="handlePaymentSelect(method.id)"
 								>
 									{{ method.label }}
-								</button>
+									<template #leading>
+										<ww-svg-icon :name="method.icon" class="w-4 h-4" />
+									</template>
+								</UButton>
 							</div>
 							<span class="text-[11px] text-gray-400">安全支付</span>
 						</div>
@@ -242,8 +245,8 @@
 						<div
 							class="h-[188px] rounded-xl border border-dashed border-gray-300 bg-white text-center text-xs text-gray-400"
 						>
-							<p>支付二维码将在正式环境展示</p>
-							<p>当前为演示占位</p>
+							<!-- 支付二维码 -->
+							<img :src="order?.qrcode" class="w-full h-full object-contain" />
 						</div>
 
 						<p class="text-[11px] text-gray-400 text-center">
@@ -274,6 +277,7 @@
 
 <script setup>
 import { ref, watch, computed } from 'vue'
+import QRCode from 'qrcode'
 import { useToast } from '#imports'
 import {
 	rechargePlans,
@@ -283,6 +287,7 @@ import {
 	REDEEM_COST,
 	CUSTOM_RECHARGE_ID
 } from '@/constants/vip'
+import { createOrderAPI } from '@/api/payment'
 
 const props = defineProps({
 	open: {
@@ -295,6 +300,8 @@ const props = defineProps({
 	}
 })
 
+const { $api } = useNuxtApp()
+
 const emit = defineEmits(['update:open', 'recharge', 'redeem'])
 
 const toast = useToast()
@@ -302,7 +309,7 @@ const loading = ref(false)
 
 // 支持自定义充值，key === custom
 const selectedPlanId = ref('pro')
-const selectedPayment = ref('wechat')
+const selectedPayment = ref('alipay')
 const customAmount = ref('')
 
 const isOpen = computed({
@@ -378,91 +385,28 @@ const handleCustomRecharge = async () => {
 	// TODO: 调用充值 API
 }
 
-const handleRedeemService = (service) => {
-	if (currentBalance.value < REDEEM_COST) {
-		toast.add({
-			title: '旺旺币不足',
-			description: '至少需要 20 旺旺币才能兑换一次服务',
-			color: 'warning'
-		})
-		return
+// 订单对象
+const order = ref(null)
+// 生成订单二维码，监听 selectedPlan 变化
+const generateOrderQRCode = async () => {
+	const req = {
+		amount: selectedPlan.value.price,
+		description: selectedPlan.value.description,
+		channel: selectedPayment.value,
+		planId: selectedPlan.value.id,
+		planName: selectedPlan.value.name,
+		source: 'web'
 	}
 
-	emit('redeem', {
-		serviceType: service.type,
-		serviceLabel: service.label,
-		cost: REDEEM_COST
-	})
+	order.value = await createOrderAPI($api, req)
+
+	// 处理订单二维码
+	const qrcode = await QRCode.toDataURL(order.value.codeUrl)
+	order.value.qrcode = qrcode
 }
 
-// 处理充值
-const handleRecharge = async () => {
-	if (!selectedPlan.value) {
-		toast.add({
-			title: '充值金额无效',
-			description: '请选择一个充值方案',
-			color: 'error'
-		})
-		return
-	}
-
-	if (!selectedPayment.value) {
-		toast.add({
-			title: '支付方式无效',
-			description: '请选择支付方式',
-			color: 'error'
-		})
-		return
-	}
-
-	loading.value = true
-	try {
-		// TODO: 调用充值 API
-		// const { $api } = useNuxtApp()
-		// const result = await $api.post('/wallet/recharge', {
-		// 	planId: selectedPlan.value.id,
-		// 	paymentMethod: selectedPayment.value
-		// })
-
-		// 模拟充值成功
-		await new Promise((resolve) => setTimeout(resolve, 1500))
-
-		emit('recharge', {
-			amount: selectedPlan.value.coins,
-			orderNo: 'R' + Date.now().toString(),
-			planId: selectedPlan.value.id,
-			planName: selectedPlan.value.name,
-			price: selectedPlan.value.price,
-			originalPrice: selectedPlan.value.originalPrice,
-			saving: selectedPlan.value.saving,
-			validDays: selectedPlan.value.validDays,
-			perks: selectedPlan.value.perks,
-			paymentMethod: selectedPayment.value,
-			paymentLabel: selectedPaymentInfo.value?.label
-		})
-
-		toast.add({
-			title: '充值成功',
-			description: `充值成功，已到账 ${selectedPlan.value.coins} 旺旺币`,
-			color: 'success'
-		})
-
-		isOpen.value = false
-	} catch (error) {
-		toast.add({
-			title: '充值失败',
-			description: error.message || '请稍后重试',
-			color: 'error'
-		})
-	} finally {
-		loading.value = false
-	}
-}
-
-// 处理取消
-const handleCancel = () => {
-	isOpen.value = false
-}
+watch(selectedPlan, generateOrderQRCode)
+watch(selectedPayment, generateOrderQRCode)
 </script>
 
 <style scoped></style>
