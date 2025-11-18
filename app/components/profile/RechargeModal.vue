@@ -174,7 +174,7 @@
 							<div
 								v-for="service in serviceHighlights"
 								:key="service.title"
-								class="rounded-xl border border-gray-100 bg-gray-50/70 px-4 py-3 flex gap-3 items-start"
+								class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 flex gap-3 items-start"
 							>
 								<div
 									class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-inner"

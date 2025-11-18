@@ -99,14 +99,14 @@ export const serviceHighlights = [
 		icon: 'i-heroicons-document-text'
 	},
 	{
-		title: '综合面试',
-		description: '全方位评估与反馈，查漏补缺更全面。',
-		icon: 'i-heroicons-chat-bubble-left-right'
+		title: '专项面试',
+		description: '靶向练习，细分场景训练更高效。', // 针对技术面试、专业场景面试进行训练，提升应对能力。
+		icon: 'i-heroicons-bolt'
 	},
 	{
-		title: '专项面试',
-		description: '靶向练习，细分场景训练更高效。',
-		icon: 'i-heroicons-bolt'
+		title: '综合面试',
+		description: '全方位评估与反馈，查漏补缺更全面。', // 适合行测与HR面试，全面评估与反馈，帮助全面提升面试表现。
+		icon: 'i-heroicons-chat-bubble-left-right'
 	}
 ]
 
