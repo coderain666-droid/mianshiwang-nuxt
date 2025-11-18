@@ -81,16 +81,16 @@ export const rechargePlans = [
 // 支付方式列表
 export const paymentMethods = [
 	{
-		id: 'alipay',
-		label: '支付宝',
-		description: '支持花呗分期',
-		icon: 'alipay'
-	},
-	{
 		id: 'wechat',
 		label: '微信支付',
 		description: '推荐，秒级到账',
 		icon: 'wechat'
+	},
+	{
+		id: 'alipay',
+		label: '支付宝',
+		description: '支持花呗分期',
+		icon: 'alipay'
 	}
 ]
 

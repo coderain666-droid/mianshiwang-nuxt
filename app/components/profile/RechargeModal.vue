@@ -243,10 +243,35 @@
 						</div>
 
 						<div
-							class="h-[188px] rounded-xl border border-dashed border-gray-300 bg-white text-center text-xs text-gray-400"
+							class="h-[188px] rounded-xl border border-dashed border-gray-300 bg-white text-center text-xs text-gray-400 relative"
 						>
+							<!-- Loading 状态 -->
+							<div
+								v-if="loading"
+								class="absolute inset-0 flex items-center justify-center bg-white/90 rounded-xl z-10"
+							>
+								<div class="flex flex-col items-center gap-2">
+									<UIcon
+										name="i-heroicons-arrow-path"
+										class="w-6 h-6 text-primary-500 animate-spin"
+									/>
+									<p class="text-xs text-gray-500">正在生成二维码...</p>
+								</div>
+							</div>
 							<!-- 支付二维码 -->
-							<img :src="order?.qrcode" class="w-full h-full object-contain" />
+							<img
+								v-if="order?.qrcode && !loading"
+								:src="order?.qrcode"
+								class="w-full h-full object-contain"
+								alt="支付二维码"
+							/>
+							<!-- 无二维码时的占位提示 -->
+							<div
+								v-if="!order?.qrcode && !loading"
+								class="flex items-center justify-center h-full text-gray-400"
+							>
+								请选择套餐和支付方式
+							</div>
 						</div>
 
 						<p class="text-[11px] text-gray-400 text-center">
@@ -309,7 +334,7 @@ const loading = ref(false)
 
 // 支持自定义充值，key === custom
 const selectedPlanId = ref('pro')
-const selectedPayment = ref('alipay')
+const selectedPayment = ref('wechat')
 const customAmount = ref('')
 
 const isOpen = computed({
@@ -354,10 +379,13 @@ const selectedPaymentInfo = computed(() =>
 // 监听弹窗打开，重置表单
 watch(isOpen, (open) => {
 	if (open) {
-		selectedPlanId.value = rechargePlans[0].id
-		selectedPayment.value = paymentMethods[0].id
+		order.value = null
+		selectedPlanId.value = 'pro'
+		selectedPayment.value = 'wechat'
 		loading.value = false
 		customAmount.value = ''
+		// 生成订单二维码
+		generateOrderQRCode()
 	}
 })
 
@@ -389,20 +417,32 @@ const handleCustomRecharge = async () => {
 const order = ref(null)
 // 生成订单二维码，监听 selectedPlan 变化
 const generateOrderQRCode = async () => {
-	const req = {
-		amount: selectedPlan.value.price,
-		description: selectedPlan.value.description,
-		channel: selectedPayment.value,
-		planId: selectedPlan.value.id,
-		planName: selectedPlan.value.name,
-		source: 'web'
+	try {
+		loading.value = true
+		const req = {
+			amount: selectedPlan.value.price,
+			description: selectedPlan.value.description,
+			channel: selectedPayment.value,
+			planId: selectedPlan.value.id,
+			planName: selectedPlan.value.name,
+			source: 'web'
+		}
+
+		order.value = await createOrderAPI($api, req)
+
+		// 处理订单二维码
+		const qrcode = await QRCode.toDataURL(order.value.codeUrl)
+		order.value.qrcode = qrcode
+	} catch (error) {
+		console.error('生成订单二维码失败:', error)
+		toast.add({
+			title: '生成二维码失败，请重试',
+			color: 'error'
+		})
+		order.value = null
+	} finally {
+		loading.value = false
 	}
-
-	order.value = await createOrderAPI($api, req)
-
-	// 处理订单二维码
-	const qrcode = await QRCode.toDataURL(order.value.codeUrl)
-	order.value.qrcode = qrcode
 }
 
 watch(selectedPlan, generateOrderQRCode)
