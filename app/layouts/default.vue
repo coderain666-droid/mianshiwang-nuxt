@@ -1,5 +1,5 @@
 <template>
-	<UApp>
+	<UApp :toaster="toaster">
 		<div class="min-h-screen flex flex-col">
 			<AppHeader />
 			<main class="flex-1">
@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-// const toaster = { position: 'top-right' }
+const toaster = { position: 'top-right' }
 </script>
 
 <style scoped></style>

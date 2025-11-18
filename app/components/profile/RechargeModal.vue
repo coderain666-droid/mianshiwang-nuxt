@@ -40,11 +40,11 @@
 							<UInput
 								class="w-[80%]"
 								v-model="customAmount"
+								color="success"
 								type="number"
 								placeholder="输入 1 - 10000 的整数"
 								min="1"
 								max="10000"
-								:disabled="customLoading"
 								:ui="{
 									base: 'pr-[50px]'
 								}"
@@ -56,7 +56,11 @@
 									<span class="text-xs text-gray-500">旺旺币</span>
 								</template>
 							</UInput>
-							<UButton color="warning" size="xs" variant="outline"
+							<UButton
+								color="warning"
+								size="xs"
+								variant="outline"
+								@click="handleCustomRecharge"
 								>确定</UButton
 							>
 						</div>
@@ -276,7 +280,8 @@ import {
 	paymentMethods,
 	serviceHighlights,
 	redeemServices,
-	REDEEM_COST
+	REDEEM_COST,
+	CUSTOM_RECHARGE_ID
 } from '@/constants/vip'
 
 const props = defineProps({
@@ -294,7 +299,8 @@ const emit = defineEmits(['update:open', 'recharge', 'redeem'])
 
 const toast = useToast()
 const loading = ref(false)
-const customLoading = ref(false)
+
+// 支持自定义充值，key === custom
 const selectedPlanId = ref('pro')
 const selectedPayment = ref('wechat')
 const customAmount = ref('')
@@ -309,10 +315,30 @@ const currentBalance = computed(() => props.balance)
 const redeemableCount = computed(() =>
 	Math.floor(Number(currentBalance.value || 0) / REDEEM_COST)
 )
-
-const selectedPlan = computed(() =>
-	rechargePlans.find((plan) => plan.id === selectedPlanId.value)
-)
+/**
+ * 获取当前选择的套餐
+ * 如果选择的套餐不存在，则表示为自定义充值
+ * 返回自定义充值的套餐对象
+ * @returns {Object} 当前选择的套餐对象
+ */
+const selectedPlan = computed(() => {
+	const res = rechargePlans.find((plan) => plan.id === selectedPlanId.value)
+	if (!res) {
+		// 表示为自定义充值
+		return {
+			id: CUSTOM_RECHARGE_ID,
+			name: '自定义充值',
+			price: customAmount.value,
+			coins: customAmount.value,
+			originalPrice: customAmount.value,
+			saving: 0,
+			validDays: 0,
+			perks: [],
+			paymentMethod: CUSTOM_RECHARGE_ID
+		}
+	}
+	return res
+})
 
 const selectedPaymentInfo = computed(() =>
 	paymentMethods.find((method) => method.id === selectedPayment.value)
@@ -324,7 +350,6 @@ watch(isOpen, (open) => {
 		selectedPlanId.value = rechargePlans[0].id
 		selectedPayment.value = paymentMethods[0].id
 		loading.value = false
-		customLoading.value = false
 		customAmount.value = ''
 	}
 })
@@ -338,7 +363,7 @@ const handlePaymentSelect = (methodId) => {
 }
 
 const handleCustomRecharge = async () => {
-	const amount = Number(customAmount.value)
+	const amount = Number(customAmount.value) || 0
 	if (!amount || amount < 1 || amount > 10000) {
 		toast.add({
 			title: '请输入 1-10000 的旺旺币数量',
@@ -347,30 +372,10 @@ const handleCustomRecharge = async () => {
 		return
 	}
 
-	customLoading.value = true
-	try {
-		await new Promise((resolve) => setTimeout(resolve, 800))
-		emit('recharge', {
-			amount,
-			orderNo: 'C' + Date.now().toString(),
-			planId: 'custom',
-			planName: '自定义充值',
-			price: amount,
-			coins: amount,
-			source: 'custom',
-			paymentMethod: 'custom',
-			paymentLabel: '自定义充值'
-		})
-		customAmount.value = ''
-	} catch (error) {
-		toast.add({
-			title: '充值失败',
-			description: error.message || '请稍后重试',
-			color: 'error'
-		})
-	} finally {
-		customLoading.value = false
-	}
+	// 修改 selectedPlanId 为 custom
+	selectedPlanId.value = CUSTOM_RECHARGE_ID
+
+	// TODO: 调用充值 API
 }
 
 const handleRedeemService = (service) => {

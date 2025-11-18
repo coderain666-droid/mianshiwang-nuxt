@@ -1,6 +1,8 @@
 // 兑换一次服务（服务包含简历押题 / 专项面试 / 综合面试）的成本
 export const REDEEM_COST = 20
 
+// 自定义充值
+export const CUSTOM_RECHARGE_ID = 'custom'
 // 服务标记
 export const SERVICE_TAGS = {
 	RESUME: 'resume',
