@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 py-8"
+		class="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-50 py-8"
 	>
 		<div class="container px-4 mx-auto max-w-6xl">
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -48,7 +48,7 @@
 									class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
 								>
 									<div
-										class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center flex-shrink-0 group-hover:bg-primary-200 transition-colors"
+									class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0 group-hover:bg-primary-200 transition-colors"
 									>
 										<UIcon
 											name="i-heroicons-user"
@@ -67,7 +67,7 @@
 									class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
 								>
 									<div
-										class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors"
+									class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 group-hover:bg-blue-200 transition-colors"
 									>
 										<UIcon
 											name="i-heroicons-envelope"
@@ -86,7 +86,7 @@
 							<!-- 旺旺币余额 -->
 							<div class="pt-4 border-t border-gray-200">
 								<div
-									class="bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 rounded-2xl p-6 shadow-lg relative overflow-hidden"
+									class="bg-linear-to-br from-primary-500 via-primary-600 to-primary-700 rounded-2xl p-6 shadow-lg relative overflow-hidden"
 								>
 									<!-- 背景装饰 -->
 									<div
@@ -142,7 +142,7 @@
 									<div class="flex items-center gap-2 text-xs text-amber-800">
 										<UIcon
 											name="i-heroicons-sparkles"
-											class="w-4 h-4 flex-shrink-0"
+										class="w-4 h-4 shrink-0"
 										/>
 										<span>首次充值享额外赠送，限时优惠中</span>
 									</div>
@@ -190,7 +190,7 @@
 								<div
 									v-for="(record, index) in userStore.wallet.rechargeRecords"
 									:key="index"
-									class="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-white rounded-xl hover:from-green-100 hover:shadow-md transition-all border border-green-100/50"
+									class="flex items-center justify-between p-4 bg-linear-to-r from-green-50 to-white rounded-xl hover:from-green-100 hover:shadow-md transition-all border border-green-100/50"
 								>
 									<div class="flex items-center gap-4">
 										<div
@@ -202,9 +202,14 @@
 											/>
 										</div>
 										<div>
-											<p class="font-medium text-gray-900">充值</p>
-											<p class="text-sm text-gray-500">
-												{{ formatDate(record.createTime) }}
+											<p class="font-medium text-gray-900">
+												{{ record.planName || '充值' }}
+											</p>
+											<p class="text-xs text-gray-500 flex items-center gap-1">
+												<span>{{ formatDate(record.createTime) }}</span>
+												<span v-if="getPaymentLabel(record)">
+													· {{ getPaymentLabel(record) }}
+												</span>
 											</p>
 										</div>
 									</div>
@@ -331,6 +336,17 @@ const editProfileModal = ref(false)
 const uploadResumeModal = ref(false)
 const rechargeModal = ref(false)
 
+const paymentLabelMap = {
+	wechat: '微信支付',
+	alipay: '支付宝',
+	bank: '银行卡'
+}
+
+const getPaymentLabel = (record) => {
+	if (!record) return ''
+	return record.paymentLabel || paymentLabelMap[record.paymentMethod] || ''
+}
+
 // 格式化日期
 const formatDate = (date) => {
 	if (!date) return ''
@@ -387,12 +403,22 @@ const handleRecharge = (rechargeData) => {
 	userStore.addRechargeRecord({
 		amount: rechargeData.amount,
 		orderNo: rechargeData.orderNo,
-		createTime: new Date().toISOString()
+		createTime: new Date().toISOString(),
+		planName: rechargeData.planName,
+		paymentMethod: rechargeData.paymentMethod,
+		paymentLabel: rechargeData.paymentLabel
 	})
+
+	const paymentName =
+		rechargeData.paymentLabel ||
+		paymentLabelMap[rechargeData.paymentMethod] ||
+		''
 
 	toast.add({
 		title: '充值成功',
-		description: `成功充值 ${rechargeData.amount} 旺旺币`,
+		description: `${rechargeData.planName || '充值'}：到账 ${
+			rechargeData.amount
+		} 旺旺币${paymentName ? ` · ${paymentName}` : ''}`,
 		color: 'success'
 	})
 }
