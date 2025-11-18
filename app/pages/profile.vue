@@ -120,9 +120,9 @@
 										<!-- 快捷操作 -->
 										<div class="flex gap-2 mt-4">
 											<UButton
-												color="neutral"
+												color="warning"
 												variant="solid"
-												class="flex-1 justify-center shadow-md text-green-500"
+												class="flex-1 justify-center shadow-md"
 												@click="rechargeModal = true"
 											>
 												<UIcon

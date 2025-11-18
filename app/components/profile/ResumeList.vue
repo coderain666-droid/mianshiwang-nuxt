@@ -35,10 +35,10 @@
 						{{ resume.resumeName }}
 					</p>
 					<div class="flex items-center gap-3 mt-1 text-xs text-gray-500">
-						<span v-if="resume.jobInfo">{{
+						<span v-if="resume.jobInfo?.jobIntention">{{
 							resume.jobInfo?.jobIntention
 						}}</span>
-						<span v-if="resume.jobInfo">{{
+						<span v-if="resume.jobInfo?.cityIntention">{{
 							resume.jobInfo?.cityIntention
 						}}</span>
 						<span>{{ formatDate(resume.createTime) }}</span>
