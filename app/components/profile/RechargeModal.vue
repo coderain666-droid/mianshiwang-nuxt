@@ -6,22 +6,63 @@
 	>
 		<template #body>
 			<div class="space-y-6">
-				<!-- 当前余额 -->
+				<!-- 旺旺币余额-->
 				<div
-					class="bg-linear-to-r from-primary-500/10 via-primary-500/5 to-primary-500/10 rounded-2xl p-5 border border-primary-100 flex items-center justify-between"
+					class="flex justify-between bg-linear-to-r from-primary-500/10 via-primary-500/5 to-primary-500/10 rounded-2xl p-5 border border-primary-100"
 				>
 					<div>
-						<p class="text-sm text-gray-600 mb-1">当前余额</p>
-						<p class="text-3xl font-bold text-primary-600">
-							{{ currentBalance }} 旺旺币
-						</p>
-						<p class="text-xs text-gray-500 mt-1">
-							充值成功后即时到账，可用于购买面试服务
-						</p>
+						<div class="flex items-center justify-between gap-4">
+							<div>
+								<span class="text-sm text-gray-600 mr-2">当前余额</span>
+								<span class="text-2xl font-bold text-primary-600">
+									{{ currentBalance }} 旺旺币
+								</span>
+								<p class="text-xs text-gray-500 mt-1">
+									充值成功后即时到账，
+									<span class="text-primary-600 font-bold text-sm"
+										>{{ REDEEM_COST }}
+									</span>
+									旺旺币可兑换一次简历押题 / 专项面试 / 综合面试
+									<span class="text-gray-500 text-xs ml-4">
+										目前可兑换
+										<span class="text-primary-600 font-bold text-sm">{{
+											redeemableCount
+										}}</span>
+										次
+									</span>
+								</p>
+							</div>
+						</div>
 					</div>
-					<div class="text-xs text-gray-500 text-right space-y-1">
-						<p>套餐权益实时生效</p>
-						<p>支持微信 / 支付宝 / 银行卡</p>
+
+					<div class="flex flex-col gap-2 w-[300px]">
+						<div class="flex items-center gap-2">
+							<UInput
+								class="w-[80%]"
+								v-model="customAmount"
+								type="number"
+								placeholder="输入 1 - 10000 的整数"
+								min="1"
+								max="10000"
+								:disabled="customLoading"
+								:ui="{
+									base: 'pr-[50px]'
+								}"
+							>
+								<template #leading>
+									<span class="text-xs text-gray-500">购买</span>
+								</template>
+								<template #trailing>
+									<span class="text-xs text-gray-500">旺旺币</span>
+								</template>
+							</UInput>
+							<UButton color="warning" size="xs" variant="outline"
+								>确定</UButton
+							>
+						</div>
+						<p class="text-[11px] text-gray-500">
+							旺旺币可用于兑换 简历押题 / 专项面试 / 综合面试 等服务
+						</p>
 					</div>
 				</div>
 
@@ -37,7 +78,7 @@
 									</p>
 									<p class="text-xs text-gray-500">一次支付，解锁更多权益</p>
 								</div>
-								<p class="text-xs text-gray-400">有效期覆盖面试全周期</p>
+								<p class="text-xs text-gray-400">套餐权益实时生效</p>
 							</div>
 							<!-- 套餐包列表 -->
 							<div
@@ -111,9 +152,6 @@
 											原价 {{ plan.originalPrice }} 元 · 立省
 											{{ plan.saving }} 元
 										</span>
-										<span class="text-gray-500"
-											>有效期 {{ plan.validDays }} 天</span
-										>
 									</div>
 									<div class="mt-3">
 										<p class="text-3xl font-bold text-gray-900">
@@ -201,6 +239,16 @@
 							<p>当前为演示占位</p>
 						</div>
 
+						<UButton
+							color="primary"
+							class="w-full justify-center"
+							:loading="loading"
+							:disabled="!selectedPlan"
+							@click="handleRecharge"
+						>
+							立即支付 ¥{{ selectedPlan?.price || '--' }}
+						</UButton>
+
 						<p class="text-[11px] text-gray-400 text-center">
 							支付即视为同意相关用户条款与服务协议
 						</p>
@@ -214,6 +262,13 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { useToast } from '#imports'
+import {
+	rechargePlans,
+	paymentMethods,
+	serviceHighlights,
+	redeemServices,
+	REDEEM_COST
+} from '@/constants/vip'
 
 const props = defineProps({
 	open: {
@@ -226,12 +281,14 @@ const props = defineProps({
 	}
 })
 
-const emit = defineEmits(['update:open', 'recharge'])
+const emit = defineEmits(['update:open', 'recharge', 'redeem'])
 
 const toast = useToast()
 const loading = ref(false)
+const customLoading = ref(false)
 const selectedPlanId = ref('pro')
 const selectedPayment = ref('wechat')
+const customAmount = ref('')
 
 const isOpen = computed({
 	get: () => props.open,
@@ -240,108 +297,9 @@ const isOpen = computed({
 
 const currentBalance = computed(() => props.balance)
 
-const rechargePlans = [
-	{
-		id: 'single',
-		name: '单次包',
-		description: '搞定 1 轮面试，低门槛应急',
-		tagline: '搞定 1 轮面试，低门槛应急',
-		price: 18.8,
-		originalPrice: 20,
-		saving: 1.2,
-		validDays: 30,
-		coins: 18.8,
-		badge: '',
-		perks: [
-			{ key: '0', label: '简历押题', count: 0 },
-			{ key: '1', label: '专项面试', count: 1 },
-			{ key: '2', label: '综合面试', count: 0 }
-		]
-	},
-	{
-		id: 'pro',
-		name: '突击包',
-		description: '适合临时面试，快速补齐短板',
-		tagline: '搞定 1 轮面试，低门槛应急',
-		price: 28.8,
-		originalPrice: 60,
-		saving: 28.8,
-		validDays: 90,
-		coins: 28.8,
-		badge: '热销',
-		perks: [
-			{ key: '0', label: '简历押题', count: 1 },
-			{ key: '1', label: '专项面试', count: 1 },
-			{ key: '2', label: '综合面试', count: 1 }
-		]
-	},
-	{
-		id: 'max',
-		name: '冲刺包',
-		description: '性价比之王，覆盖多轮面试',
-		tagline: '3.8 折！入职性价比之王',
-		price: 68.8,
-		originalPrice: 180,
-		saving: 111.2,
-		validDays: 180,
-		coins: 68.8,
-		perks: [
-			{ key: '0', label: '简历押题', count: 3 },
-			{ key: '1', label: '专项面试', count: 3 },
-			{ key: '2', label: '综合面试', count: 3 }
-		]
-	},
-	{
-		id: 'ultra',
-		name: '上岸包',
-		description: '高频练习，多岗位冲刺专用',
-		tagline: '2.1 折！面试次数拉满',
-		price: 128.8,
-		originalPrice: 600,
-		saving: 471.2,
-		validDays: 360,
-		coins: 128.8,
-		badge: '高性价比',
-		perks: [
-			{ key: '0', label: '简历押题', count: 6 },
-			{ key: '1', label: '专项面试', count: 16 },
-			{ key: '2', label: '综合面试', count: 8 }
-		]
-	}
-]
-
-const paymentMethods = [
-	{
-		id: 'wechat',
-		label: '微信支付',
-		description: '推荐，秒级到账',
-		icon: 'i-heroicons-chat-bubble-left-right'
-	},
-	{
-		id: 'alipay',
-		label: '支付宝',
-		description: '支持花呗分期',
-		icon: 'i-heroicons-credit-card'
-	}
-]
-
-const serviceHighlights = [
-	{
-		title: '简历押题',
-		description: '面试知己知彼，精准拆解岗位需求。',
-		icon: 'i-heroicons-document-text'
-	},
-	{
-		title: '综合面试',
-		description: '全方位评估与反馈，查漏补缺更全面。',
-		icon: 'i-heroicons-chat-bubble-left-right'
-	},
-	{
-		title: '专项面试',
-		description: '靶向练习，细分场景训练更高效。',
-		icon: 'i-heroicons-bolt'
-	}
-]
+const redeemableCount = computed(() =>
+	Math.floor(Number(currentBalance.value || 0) / REDEEM_COST)
+)
 
 const selectedPlan = computed(() =>
 	rechargePlans.find((plan) => plan.id === selectedPlanId.value)
@@ -357,6 +315,8 @@ watch(isOpen, (open) => {
 		selectedPlanId.value = rechargePlans[0].id
 		selectedPayment.value = paymentMethods[0].id
 		loading.value = false
+		customLoading.value = false
+		customAmount.value = ''
 	}
 })
 
@@ -366,6 +326,59 @@ const handlePlanSelect = (planId) => {
 
 const handlePaymentSelect = (methodId) => {
 	selectedPayment.value = methodId
+}
+
+const handleCustomRecharge = async () => {
+	const amount = Number(customAmount.value)
+	if (!amount || amount < 1 || amount > 10000) {
+		toast.add({
+			title: '请输入 1-10000 的旺旺币数量',
+			color: 'warning'
+		})
+		return
+	}
+
+	customLoading.value = true
+	try {
+		await new Promise((resolve) => setTimeout(resolve, 800))
+		emit('recharge', {
+			amount,
+			orderNo: 'C' + Date.now().toString(),
+			planId: 'custom',
+			planName: '自定义充值',
+			price: amount,
+			coins: amount,
+			source: 'custom',
+			paymentMethod: 'custom',
+			paymentLabel: '自定义充值'
+		})
+		customAmount.value = ''
+	} catch (error) {
+		toast.add({
+			title: '充值失败',
+			description: error.message || '请稍后重试',
+			color: 'error'
+		})
+	} finally {
+		customLoading.value = false
+	}
+}
+
+const handleRedeemService = (service) => {
+	if (currentBalance.value < REDEEM_COST) {
+		toast.add({
+			title: '旺旺币不足',
+			description: '至少需要 20 旺旺币才能兑换一次服务',
+			color: 'warning'
+		})
+		return
+	}
+
+	emit('redeem', {
+		serviceType: service.type,
+		serviceLabel: service.label,
+		cost: REDEEM_COST
+	})
 }
 
 // 处理充值

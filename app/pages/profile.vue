@@ -48,7 +48,7 @@
 									class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
 								>
 									<div
-									class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0 group-hover:bg-primary-200 transition-colors"
+										class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0 group-hover:bg-primary-200 transition-colors"
 									>
 										<UIcon
 											name="i-heroicons-user"
@@ -67,7 +67,7 @@
 									class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
 								>
 									<div
-									class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 group-hover:bg-blue-200 transition-colors"
+										class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 group-hover:bg-blue-200 transition-colors"
 									>
 										<UIcon
 											name="i-heroicons-envelope"
@@ -142,7 +142,7 @@
 									<div class="flex items-center gap-2 text-xs text-amber-800">
 										<UIcon
 											name="i-heroicons-sparkles"
-										class="w-4 h-4 shrink-0"
+											class="w-4 h-4 shrink-0"
 										/>
 										<span>首次充值享额外赠送，限时优惠中</span>
 									</div>
@@ -300,6 +300,7 @@
 			v-model:open="rechargeModal"
 			:balance="userStore.walletBalance"
 			@recharge="handleRecharge"
+			@redeem="handleRedeem"
 		/>
 	</div>
 </template>
@@ -335,6 +336,8 @@ const { $api } = useNuxtApp()
 const editProfileModal = ref(false)
 const uploadResumeModal = ref(false)
 const rechargeModal = ref(false)
+
+const SERVICE_REDEEM_COST = 20
 
 const paymentLabelMap = {
 	wechat: '微信支付',
@@ -399,12 +402,17 @@ const handleRecharge = (rechargeData) => {
 	// 更新余额
 	userStore.updateWalletBalance(userStore.walletBalance + rechargeData.amount)
 
+	const planLabel = rechargeData.planName || '自定义充值'
 	// 添加充值记录
 	userStore.addRechargeRecord({
 		amount: rechargeData.amount,
 		orderNo: rechargeData.orderNo,
 		createTime: new Date().toISOString(),
-		planName: rechargeData.planName,
+		planName: planLabel,
+		price: rechargeData.price,
+		originalPrice: rechargeData.originalPrice,
+		saving: rechargeData.saving,
+		validDays: rechargeData.validDays,
 		paymentMethod: rechargeData.paymentMethod,
 		paymentLabel: rechargeData.paymentLabel
 	})
@@ -416,9 +424,35 @@ const handleRecharge = (rechargeData) => {
 
 	toast.add({
 		title: '充值成功',
-		description: `${rechargeData.planName || '充值'}：到账 ${
-			rechargeData.amount
-		} 旺旺币${paymentName ? ` · ${paymentName}` : ''}`,
+		description: `${planLabel}：到账 ${rechargeData.amount} 旺旺币${
+			paymentName ? ` · ${paymentName}` : ''
+		}`,
+		color: 'success'
+	})
+}
+
+const handleRedeem = (payload) => {
+	if (userStore.walletBalance < SERVICE_REDEEM_COST) {
+		toast.add({
+			title: '旺旺币不足',
+			description: '余额不足，无法兑换该服务',
+			color: 'warning'
+		})
+		return
+	}
+
+	userStore.updateWalletBalance(userStore.walletBalance - SERVICE_REDEEM_COST)
+
+	userStore.addConsumptionRecord({
+		type: payload.serviceType,
+		amount: SERVICE_REDEEM_COST,
+		description: `${payload.serviceLabel}兑换一次服务`,
+		createTime: new Date().toISOString()
+	})
+
+	toast.add({
+		title: '兑换成功',
+		description: `已使用 ${SERVICE_REDEEM_COST} 旺旺币兑换 ${payload.serviceLabel} 1 次`,
 		color: 'success'
 	})
 }
