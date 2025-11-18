@@ -152,6 +152,9 @@
 											原价 {{ plan.originalPrice }} 元 · 立省
 											{{ plan.saving }} 元
 										</span>
+										<span class="text-gray-500 mt-1"
+											>支付之后，套餐永久有效</span
+										>
 									</div>
 									<div class="mt-3">
 										<p class="text-3xl font-bold text-gray-900">
@@ -239,18 +242,24 @@
 							<p>当前为演示占位</p>
 						</div>
 
-						<UButton
-							color="primary"
-							class="w-full justify-center"
-							:loading="loading"
-							:disabled="!selectedPlan"
-							@click="handleRecharge"
-						>
-							立即支付 ¥{{ selectedPlan?.price || '--' }}
-						</UButton>
-
 						<p class="text-[11px] text-gray-400 text-center">
-							支付即视为同意相关用户条款与服务协议
+							支付即视为同意相关<NuxtLink
+								to="/agreement"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-primary hover:underline"
+							>
+								服务协议
+							</NuxtLink>
+							与
+							<NuxtLink
+								to="/policy"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="text-primary hover:underline"
+							>
+								隐私政策
+							</NuxtLink>
 						</p>
 					</div>
 				</div>
