@@ -86,7 +86,7 @@
 								class="cursor-pointer"
 							/>
 							{{ userStore.userInfo.username || '未命名用户' }}
-							<UIcon name="i-heroicons-chevron-down-20-solid" class="ml-1" />
+							<UIcon name="i-heroicons-chevron-down" class="ml-1" />
 						</UButton>
 					</UDropdownMenu>
 				</template>

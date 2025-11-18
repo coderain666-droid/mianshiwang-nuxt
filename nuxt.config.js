@@ -62,7 +62,9 @@ export default defineNuxtConfig({
 
 	// —— 路由级规则（模板仅预渲染首页）——
 	routeRules: {
-		'/': { prerender: true }
+		'/': { prerender: true },
+		// 忽略 API 路径，避免被 Vue Router 处理
+		'/dev-api/**': { ssr: false, index: false }
 	},
 
 	// —— 模块（保留基础依赖）——
