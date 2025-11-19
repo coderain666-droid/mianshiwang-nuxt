@@ -43,7 +43,7 @@ export const useUserStore = defineStore('user', {
 				consumptionRecords: []
 			}
 			this.resumes = []
-			navigateTo('/login')
+			// navigateTo('/login')
 		},
 		// 更新用户信息
 		updateUserInfo(userInfo) {

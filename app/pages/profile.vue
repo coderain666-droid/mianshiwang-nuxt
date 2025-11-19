@@ -314,10 +314,11 @@ import UploadResumeModal from '@/components/profile/UploadResumeModal.vue'
 import ResumeList from '@/components/profile/ResumeList.vue'
 import RechargeModal from '@/components/profile/RechargeModal.vue'
 import { getResumeListAPI } from '@/api/resume'
+import { getUserInfoAPI } from '@/api/user'
 import dayjs from 'dayjs'
 
 definePageMeta({
-	middleware: 'auth'
+	requiresAuth: true
 })
 
 useHead({
@@ -345,6 +346,15 @@ const paymentLabelMap = {
 	bank: '银行卡'
 }
 
+const initUserInfo = async () => {
+	const res = await getUserInfoAPI($api)
+	console.log('res', res)
+	// if (res.success) {
+	// 	userStore.userInfo = res.data
+	// }
+}
+initUserInfo()
+
 const getPaymentLabel = (record) => {
 	if (!record) return ''
 	return record.paymentLabel || paymentLabelMap[record.paymentMethod] || ''
@@ -359,10 +369,6 @@ const formatDate = (date) => {
 // 处理个人信息更新
 const handleProfileUpdate = async (updatedInfo) => {
 	try {
-		// TODO: 调用API更新用户信息
-		// const { $api } = useNuxtApp()
-		// await $api.put('/user/profile', updatedInfo)
-
 		userStore.updateUserInfo(updatedInfo)
 		toast.add({
 			title: '更新成功',
@@ -394,8 +400,6 @@ const handleResumeDelete = (index) => {
 		color: 'success'
 	})
 }
-
-// 移除排序与拖拽上传相关逻辑
 
 // 处理充值
 const handleRecharge = (rechargeData) => {

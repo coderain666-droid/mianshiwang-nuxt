@@ -8,3 +8,12 @@ export const updateUserInfoAPI = ($api, body) => {
 		body
 	})
 }
+
+/**
+ * 获取用户信息
+ */
+export const getUserInfoAPI = ($api) => {
+	return $api('/user/info', {
+		method: 'GET'
+	})
+}

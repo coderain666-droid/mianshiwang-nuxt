@@ -471,8 +471,6 @@ const queryOrderStatus = async () => {
 		channel: selectedPayment.value
 	})
 
-	console.log('res', res)
-
 	// 用户支付成功
 	if (res.success) {
 		paymentSuccess.value = true

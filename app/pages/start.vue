@@ -125,6 +125,10 @@ import InterviewStep3 from '@/components/interview/InterviewStep3.vue'
 import { useHead } from 'nuxt/app'
 import { SEO } from '@/constants/seo'
 
+definePageMeta({
+	requiresAuth: true
+})
+
 const interviewStore = useInterviewStore()
 
 const currentStep = computed(() => interviewStore.currentStep)
