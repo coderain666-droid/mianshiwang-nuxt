@@ -243,11 +243,23 @@
 						</div>
 
 						<div
-							class="h-[188px] rounded-xl border border-dashed border-gray-300 bg-white text-center text-xs text-gray-400 relative"
+							class="h-[188px] rounded-xl border border-dashed border-gray-300 bg-white text-center text-xs text-gray-400 relative overflow-hidden"
 						>
+							<!-- 支付成功 -->
+							<div
+								v-if="paymentSuccess"
+								class="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-emerald-50 text-emerald-700"
+							>
+								<UIcon
+									name="i-heroicons-check-circle"
+									class="w-10 h-10 text-emerald-500"
+								/>
+								<p class="text-base font-semibold">支付成功</p>
+								<p class="text-xs">权益已更新，可立即使用</p>
+							</div>
 							<!-- Loading 状态 -->
 							<div
-								v-if="loading"
+								v-else-if="loading"
 								class="absolute inset-0 flex items-center justify-center bg-white/90 rounded-xl z-10"
 							>
 								<div class="flex flex-col items-center gap-2">
@@ -260,14 +272,14 @@
 							</div>
 							<!-- 支付二维码 -->
 							<img
-								v-if="order?.qrcode && !loading"
+								v-else-if="order?.qrcode"
 								:src="order?.qrcode"
 								class="w-full h-full object-contain"
 								alt="支付二维码"
 							/>
 							<!-- 无二维码时的占位提示 -->
 							<div
-								v-if="!order?.qrcode && !loading"
+								v-else
 								class="flex items-center justify-center h-full text-gray-400"
 							>
 								请选择套餐和支付方式
@@ -301,7 +313,7 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onUnmounted, onMounted } from 'vue'
 import QRCode from 'qrcode'
 import { useToast } from '#imports'
 import {
@@ -331,6 +343,7 @@ const emit = defineEmits(['update:open', 'recharge', 'redeem'])
 
 const toast = useToast()
 const loading = ref(false)
+const paymentSuccess = ref(false)
 
 // 支持自定义充值，key === custom
 const selectedPlanId = ref('pro')
@@ -383,6 +396,7 @@ watch(isOpen, (open) => {
 		selectedPlanId.value = 'pro'
 		selectedPayment.value = 'wechat'
 		loading.value = false
+		paymentSuccess.value = false
 		customAmount.value = ''
 		// 生成订单二维码
 		generateOrderQRCode()
@@ -419,6 +433,7 @@ const order = ref(null)
 const generateOrderQRCode = async () => {
 	try {
 		loading.value = true
+		paymentSuccess.value = false
 		const req = {
 			amount: selectedPlan.value.price,
 			description: selectedPlan.value.description,
@@ -450,24 +465,29 @@ watch(selectedPayment, generateOrderQRCode)
 
 // 常见定时查询器，每 4 秒查询一次
 const queryOrderStatus = async () => {
-	if (!order.value) return
+	if (!order.value || paymentSuccess.value) return
 	const res = await queryOrderStatusAPI($api, {
 		orderId: order.value.orderId,
 		channel: selectedPayment.value
 	})
+
+	console.log('res', res)
+
 	// 用户支付成功
 	if (res.success) {
-		toast.add({
-			title: '支付成功',
-			color: 'success'
-		})
+		paymentSuccess.value = true
+		emit('recharge', { plan: selectedPlan.value })
 		//  TODO：用户支付成功之后的操作
 	}
 }
 
-const interval = setInterval(queryOrderStatus, 4000)
+let interval = null
+onMounted(() => {
+	interval = setInterval(queryOrderStatus, 3000)
+})
+
 onUnmounted(() => {
-	clearInterval(interval)
+	interval && clearInterval(interval)
 })
 </script>
 
