@@ -312,7 +312,7 @@ import {
 	REDEEM_COST,
 	CUSTOM_RECHARGE_ID
 } from '@/constants/vip'
-import { createOrderAPI } from '@/api/payment'
+import { createOrderAPI, queryOrderStatusAPI } from '@/api/payment'
 
 const props = defineProps({
 	open: {
@@ -447,6 +447,28 @@ const generateOrderQRCode = async () => {
 
 watch(selectedPlan, generateOrderQRCode)
 watch(selectedPayment, generateOrderQRCode)
+
+// 常见定时查询器，每 4 秒查询一次
+const queryOrderStatus = async () => {
+	if (!order.value) return
+	const res = await queryOrderStatusAPI($api, {
+		orderId: order.value.orderId,
+		channel: selectedPayment.value
+	})
+	// 用户支付成功
+	if (res.success) {
+		toast.add({
+			title: '支付成功',
+			color: 'success'
+		})
+		//  TODO：用户支付成功之后的操作
+	}
+}
+
+const interval = setInterval(queryOrderStatus, 4000)
+onUnmounted(() => {
+	clearInterval(interval)
+})
 </script>
 
 <style scoped></style>

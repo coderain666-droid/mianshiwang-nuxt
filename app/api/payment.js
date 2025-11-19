@@ -13,3 +13,15 @@ export const createOrderAPI = ($api, body) => {
 		body
 	})
 }
+
+/**
+ * 查询订单支付状态
+ * orderId：订单id
+ * channel：支付渠道，alipay, wechat
+ */
+export const queryOrderStatusAPI = ($api, body) => {
+	return $api(`/payment/order/status`, {
+		method: 'POST',
+		body
+	})
+}
