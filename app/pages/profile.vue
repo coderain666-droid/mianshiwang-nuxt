@@ -113,10 +113,13 @@
 										<div class="mb-2 text-xs text-white/80">
 											当前可用旺旺币余额
 											<span
-												class="text-3xl font-bold text-white tracking-tight"
+												class="ml-2 text-3xl font-bold text-white tracking-tight"
 											>
 												{{ userStore.userInfo.wwCoinBalance }}
 											</span>
+											<p class="mt-1 text-[11px] text-white/70">
+												20 旺旺币可兑换一次简历押题 / 专项面试 / 综合面试
+											</p>
 										</div>
 
 										<div class="space-y-3 text-white mb-2">

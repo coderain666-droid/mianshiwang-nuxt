@@ -22,6 +22,7 @@
 									<span class="text-primary-600 font-bold text-sm"
 										>{{ REDEEM_COST }}
 									</span>
+									<!-- TODO：实现兑换功能 -->
 									旺旺币可兑换一次简历押题 / 专项面试 / 综合面试
 									<span class="text-gray-500 text-xs ml-4">
 										目前可兑换
@@ -400,6 +401,8 @@ watch(isOpen, (open) => {
 		customAmount.value = ''
 		// 生成订单二维码
 		generateOrderQRCode()
+	} else {
+		handleClose()
 	}
 })
 
@@ -484,9 +487,12 @@ onMounted(() => {
 	interval = setInterval(queryOrderStatus, 3000)
 })
 
-onUnmounted(() => {
+/**
+ * 关闭弹窗，清除定时器
+ */
+const handleClose = () => {
 	interval && clearInterval(interval)
-})
+}
 </script>
 
 <style scoped></style>
