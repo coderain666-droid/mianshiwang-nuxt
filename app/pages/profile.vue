@@ -113,7 +113,18 @@
 											/>
 										</div>
 										<p class="text-3xl font-bold text-white mb-1">
-											{{ userStore.walletBalance }}
+											{{ userStore.userInfo.wwCoinBalance }}
+										</p>
+										<p>
+											简历押题: {{ userStore.userInfo.resumeRemainingCount }} 次
+										</p>
+										<p>
+											专项面试:
+											{{ userStore.userInfo.specialRemainingCount }} 次
+										</p>
+										<p>
+											综合面试:
+											{{ userStore.userInfo.behaviorRemainingCount }} 次
 										</p>
 										<p class="text-xs text-white/80 mb-4">当前可用余额</p>
 
@@ -175,7 +186,7 @@
 						</template>
 
 						<!-- 充值记录 -->
-						<div class="space-y-4">
+						<!-- <div class="space-y-4">
 							<div
 								v-if="userStore.wallet.rechargeRecords.length === 0"
 								class="flex flex-col justify-center items-center py-12 text-gray-500"
@@ -223,7 +234,7 @@
 									</div>
 								</div>
 							</div>
-						</div>
+						</div> -->
 					</UCard>
 
 					<!-- 简历管理 -->
@@ -346,9 +357,11 @@ const paymentLabelMap = {
 	bank: '银行卡'
 }
 
+/**
+ * 获取用户信息
+ */
 const initUserInfo = async () => {
 	const res = await getUserInfoAPI($api)
-	console.log('res', res)
 	// if (res.success) {
 	// 	userStore.userInfo = res.data
 	// }

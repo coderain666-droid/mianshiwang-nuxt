@@ -3,21 +3,38 @@ import { navigateTo } from '#app'
 
 export const useUserStore = defineStore('user', {
 	state: () => ({
-		userInfo: {
-			username: '',
-			openid: '',
-			avatar: '',
-			email: ''
-		},
+		/**
+		 *  "user": {
+            "_id": "691db92e532b04d29b89ebaf",
+            "username": "Sunday账号",
+            "phone": "",
+            "roles": [
+                "user"
+            ],
+            "isActive": false,
+            "gender": "other",
+            "isVerified": false,
+            "isVip": false,
+            "aiInterviewRemainingCount": 0,
+            "aiInterviewRemainingMinutes": 0,
+            "wwCoinBalance": 0,
+            "resumeRemainingCount": 1,
+            "specialRemainingCount": 1,
+            "behaviorRemainingCount": 1,
+            "openid": "test-openid-1235",
+            "isWechatBound": true,
+            "wechatBoundTime": "2025-11-19T12:33:50.066Z",
+            "createdAt": "2025-11-19T12:33:50.085Z",
+            "updatedAt": "2025-11-19T13:00:47.194Z",
+            "__v": 0,
+            "avatar": "http://ww-zhi-dao.oss-cn-beijing.aliyuncs.com/user-img/test-openid-1235/1763557230746.jpeg",
+            "email": "1205507971@qq.com"
+        },
+		 */
+		userInfo: {},
 		isLogin: false,
 		token: '',
-		// 旺旺币相关
-		wallet: {
-			balance: 0, // 余额
-			rechargeRecords: [], // 充值记录
-			consumptionRecords: [] // 消费记录
-		},
-		// 简历列表
+		// 简历列表。TODO：好像是无用的
 		resumes: []
 	}),
 	getters: {
@@ -31,17 +48,7 @@ export const useUserStore = defineStore('user', {
 		logout() {
 			this.isLogin = false
 			this.token = ''
-			this.userInfo = {
-				username: '',
-				openid: '',
-				avatar: '',
-				email: ''
-			}
-			this.wallet = {
-				balance: 0,
-				rechargeRecords: [],
-				consumptionRecords: []
-			}
+			this.userInfo = {}
 			this.resumes = []
 			// navigateTo('/login')
 		},

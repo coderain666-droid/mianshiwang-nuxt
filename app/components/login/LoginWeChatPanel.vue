@@ -197,31 +197,38 @@ async function checkQRCodeStatus() {
 		const response = await checkWechatQRCodeStatusAPI($api, qrCodeId.value)
 
 		if (response.user && response.token) {
-			// 用户已关注公众号并确认登录
-			// 为 userStore 赋值
-			userStore.isLogin = true
-			userStore.userInfo = response.user
-			userStore.token = response.token
-
-			// 停止轮询，避免多次跳转
-			if (qrCodeCheckTimer) {
-				clearInterval(qrCodeCheckTimer)
-				qrCodeCheckTimer = null
-			}
-			// 切换组件 UI，隐藏二维码
-			scanSuccess.value = true
-			// 停止倒计时
-			if (timer) {
-				window.clearInterval(timer)
-				timer = null
-			}
-			// 使用统一的登录成功处理，跳转回登录前的页面（稍作停留展示成功UI）
-			setTimeout(() => handleLoginSuccess(), 1200)
+			// 登录成功之后的操作
+			loginHandle(response)
 		}
 	} catch (error) {
 		// console.error('检查二维码状态失败:', error)
 		// 如果是网络错误，继续检查
 	}
+}
+
+/**
+ * 登录成功之后的操作
+ */
+const loginHandle = async (response) => {
+	// 为 userStore 赋值
+	userStore.isLogin = true
+	userStore.userInfo = response.user
+	userStore.token = response.token
+
+	// 停止轮询，避免多次跳转
+	if (qrCodeCheckTimer) {
+		clearInterval(qrCodeCheckTimer)
+		qrCodeCheckTimer = null
+	}
+	// 切换组件 UI，隐藏二维码
+	scanSuccess.value = true
+	// 停止倒计时
+	if (timer) {
+		window.clearInterval(timer)
+		timer = null
+	}
+	// 使用统一的登录成功处理，跳转回登录前的页面（稍作停留展示成功UI）
+	setTimeout(() => handleLoginSuccess(), 1200)
 }
 
 // 开始检查扫码状态
@@ -257,26 +264,7 @@ onBeforeUnmount(() => {
  */
 const testLogin = async () => {
 	const response = await testLoginAPI($api)
-	// 用户已关注公众号并确认登录
-	// 为 userStore 赋值
-	userStore.isLogin = true
-	userStore.userInfo = response.user
-	userStore.token = response.token
-
-	// 停止轮询，避免多次跳转
-	if (qrCodeCheckTimer) {
-		clearInterval(qrCodeCheckTimer)
-		qrCodeCheckTimer = null
-	}
-	// 切换组件 UI，隐藏二维码
-	scanSuccess.value = true
-	// 停止倒计时
-	if (timer) {
-		window.clearInterval(timer)
-		timer = null
-	}
-	// 使用统一的登录成功处理，跳转回登录前的页面（稍作停留展示成功UI）
-	setTimeout(() => handleLoginSuccess(), 1200)
+	loginHandle(response)
 }
 </script>
 
