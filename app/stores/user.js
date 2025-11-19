@@ -38,8 +38,6 @@ export const useUserStore = defineStore('user', {
 		resumes: []
 	}),
 	getters: {
-		// 获取剩余旺旺币
-		walletBalance: (state) => state.wallet.balance,
 		// 是否可以添加更多简历（最多5份）
 		canAddResume: (state) => state.resumes.length < 5
 	},

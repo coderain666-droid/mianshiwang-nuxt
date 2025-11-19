@@ -13,151 +13,213 @@
 							<h2 class="text-xl font-semibold text-gray-900">个人信息</h2>
 						</template>
 						<div class="space-y-6">
-							<!-- 头像 -->
-							<div class="relative flex flex-col items-center">
-								<div class="relative group">
-									<UAvatar
-										:src="userStore.userInfo.avatar"
-										:alt="userStore.userInfo.username || '用户头像'"
-										size="3xl"
-										class="cursor-pointer"
-									/>
-									<!-- hover 遮罩 -->
-									<div
-										class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition-opacity"
+							<div class="flex">
+								<!-- 头像 -->
+								<div class="relative flex flex-col items-center justify-center">
+									<div class="relative group">
+										<UAvatar
+											:src="userStore.userInfo.avatar"
+											:alt="userStore.userInfo.username || '用户头像'"
+											size="3xl"
+											class="cursor-pointer"
+										/>
+										<!-- hover 遮罩 -->
+										<div
+											class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition-opacity"
+											@click="editProfileModal = true"
+										>
+											<UIcon name="i-heroicons-camera" class="w-5 h-5" />
+										</div>
+									</div>
+									<UButton
+										color="primary"
+										variant="ghost"
+										size="sm"
+										class="gap-2"
 										@click="editProfileModal = true"
 									>
-										<UIcon name="i-heroicons-camera" class="w-5 h-5" />
-									</div>
-								</div>
-								<UButton
-									color="primary"
-									variant="ghost"
-									size="sm"
-									class="mt-4 gap-2"
-									@click="editProfileModal = true"
-								>
-									<UIcon name="i-heroicons-pencil-square" class="w-4 h-4" />
-									编辑资料
-								</UButton>
-							</div>
-
-							<!-- 用户信息 -->
-							<div class="space-y-3">
-								<div
-									class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
-								>
-									<div
-										class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0 group-hover:bg-primary-200 transition-colors"
-									>
-										<UIcon
-											name="i-heroicons-user"
-											class="w-5 h-5 text-primary-600"
-										/>
-									</div>
-									<div class="flex-1 min-w-0">
-										<p class="text-xs text-gray-500 mb-1">用户名</p>
-										<p class="text-sm font-semibold text-gray-900 truncate">
-											{{ userStore.userInfo.username || '未设置' }}
-										</p>
-									</div>
+										<UIcon name="i-heroicons-pencil-square" class="w-4 h-4" />
+										编辑资料
+									</UButton>
 								</div>
 
-								<div
-									class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
-								>
+								<!-- 用户信息 -->
+								<div class="space-y-3">
 									<div
-										class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 group-hover:bg-blue-200 transition-colors"
+										class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
 									>
-										<UIcon
-											name="i-heroicons-envelope"
-											class="w-5 h-5 text-blue-600"
-										/>
+										<div
+											class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0 group-hover:bg-primary-200 transition-colors"
+										>
+											<UIcon
+												name="i-heroicons-user"
+												class="w-5 h-5 text-primary-600"
+											/>
+										</div>
+										<div class="flex-1 min-w-0">
+											<p class="text-xs text-gray-500 mb-1">用户名</p>
+											<p class="text-sm font-semibold text-gray-900 truncate">
+												{{ userStore.userInfo.username || '未设置' }}
+											</p>
+										</div>
 									</div>
-									<div class="flex-1 min-w-0">
-										<p class="text-xs text-gray-500 mb-1">邮箱</p>
-										<p class="text-sm font-semibold text-gray-900 truncate">
-											{{ userStore.userInfo.email || '未设置' }}
-										</p>
+
+									<div
+										class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
+									>
+										<div
+											class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 group-hover:bg-blue-200 transition-colors"
+										>
+											<UIcon
+												name="i-heroicons-envelope"
+												class="w-5 h-5 text-blue-600"
+											/>
+										</div>
+										<div class="flex-1 min-w-0">
+											<p class="text-xs text-gray-500 mb-1">邮箱</p>
+											<p class="text-sm font-semibold text-gray-900 truncate">
+												{{ userStore.userInfo.email || '未设置' }}
+											</p>
+										</div>
 									</div>
 								</div>
 							</div>
 
-							<!-- 旺旺币余额 -->
+							<!-- 旺旺币 与 套餐余额 -->
 							<div class="pt-4 border-t border-gray-200">
 								<div
-									class="bg-linear-to-br from-primary-500 via-primary-600 to-primary-700 rounded-2xl p-6 shadow-lg relative overflow-hidden"
+									class="relative rounded-2xl p-4 shadow-xl bg-linear-to-br from-primary-600 via-primary-500 to-primary-700 overflow-hidden border border-white/20"
 								>
-									<!-- 背景装饰 -->
+									<span
+										class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.25),transparent_55%)]"
+									></span>
 									<div
-										class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"
-									></div>
-									<div
-										class="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12"
+										class="absolute -right-12 -top-12 w-40 h-40 bg-white/10 blur-2xl rounded-full"
 									></div>
 
 									<div class="relative z-10">
-										<div class="flex items-center justify-between mb-4">
-											<div class="flex items-center gap-2">
-												<UIcon
-													name="i-heroicons-currency-dollar"
-													class="w-5 h-5 text-white/90"
-												/>
-												<p class="text-sm text-white/90 font-medium">
-													旺旺币余额
+										<div class="flex items-center justify-between mb-2">
+											<div>
+												<div class="flex items-center gap-2 text-white">
+													<UIcon
+														name="i-heroicons-currency-dollar"
+														class="w-5 h-5 text-white/90"
+													/>
+													<p class="text-base font-semibold">账户总览</p>
+												</div>
+											</div>
+										</div>
+
+										<div class="mb-2 text-xs text-white/80">
+											当前可用旺旺币余额
+											<span
+												class="text-3xl font-bold text-white tracking-tight"
+											>
+												{{ userStore.userInfo.wwCoinBalance }}
+											</span>
+										</div>
+
+										<div class="space-y-3 text-white mb-2">
+											<div
+												v-for="stat in [
+													{
+														label: '简历押题',
+														value: userStore.userInfo.resumeRemainingCount,
+														icon: 'i-heroicons-document-text',
+														desc: '剩余押题次数'
+													},
+													{
+														label: '专项面试',
+														value: userStore.userInfo.specialRemainingCount,
+														icon: 'i-heroicons-light-bulb',
+														desc: '专项演练次数'
+													},
+													{
+														label: '综合面试',
+														value: userStore.userInfo.behaviorRemainingCount,
+														icon: 'i-heroicons-users',
+														desc: '综合面试次数'
+													}
+												]"
+												:key="stat.label"
+												class="flex items-center justify-between rounded-xl border border-white/20 bg-white/10 backdrop-blur-sm px-4 py-3"
+											>
+												<div class="flex items-center gap-3">
+													<div
+														class="w-11 h-11 rounded-full bg-white/15 flex items-center justify-center"
+													>
+														<UIcon :name="stat.icon" class="w-5 h-5" />
+													</div>
+													<div>
+														<p class="text-sm text-white/90 font-medium">
+															{{ stat.label }}
+														</p>
+														<p class="text-xs text-white/70">{{ stat.desc }}</p>
+													</div>
+												</div>
+												<p class="text-2xl font-semibold">
+													{{ stat.value }}
+													<span class="text-xs font-normal text-white/70 ml-1">
+														次
+													</span>
 												</p>
 											</div>
-											<UIcon
-												name="i-heroicons-wallet"
-												class="w-6 h-6 text-white/80"
-											/>
 										</div>
-										<p class="text-3xl font-bold text-white mb-1">
-											{{ userStore.userInfo.wwCoinBalance }}
-										</p>
-										<p>
-											简历押题: {{ userStore.userInfo.resumeRemainingCount }} 次
-										</p>
-										<p>
-											专项面试:
-											{{ userStore.userInfo.specialRemainingCount }} 次
-										</p>
-										<p>
-											综合面试:
-											{{ userStore.userInfo.behaviorRemainingCount }} 次
-										</p>
-										<p class="text-xs text-white/80 mb-4">当前可用余额</p>
 
 										<!-- 快捷操作 -->
-										<div class="flex gap-2 mt-4">
+										<div class="flex flex-wrap gap-3 pt-1">
 											<UButton
 												color="warning"
 												variant="solid"
-												class="flex-1 justify-center shadow-md"
+												class="flex-1 min-w-[120px] justify-center shadow-lg shadow-white/20 hover:shadow-white/30"
 												@click="rechargeModal = true"
 											>
 												<UIcon
 													name="i-heroicons-plus-circle"
 													class="w-4 h-4 mr-1"
 												/>
-												充值
+												充值旺旺币
+											</UButton>
+											<UButton
+												variant="ghost"
+												color="white"
+												class="flex-1 min-w-[120px] justify-center text-white/90 border border-white/30 bg-white/5 hover:bg-white/15"
+												@click="rechargeModal = true"
+											>
+												<UIcon
+													name="i-heroicons-arrow-path-rounded-square"
+													class="w-4 h-4 mr-1"
+												/>
+												套餐兑换
 											</UButton>
 										</div>
 									</div>
 								</div>
 
-								<!-- 快速充值提示 -->
-								<div
-									class="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3"
+								<!-- 充值加赠提示 -->
+								<!-- <div
+									class="mt-4 rounded-xl border border-amber-200 bg-linear-to-r from-amber-50 via-white to-amber-50 p-3 pl-4"
 								>
-									<div class="flex items-center gap-2 text-xs text-amber-800">
-										<UIcon
-											name="i-heroicons-sparkles"
-											class="w-4 h-4 shrink-0"
-										/>
-										<span>首次充值享额外赠送，限时优惠中</span>
+									<div class="flex items-center gap-3 text-xs text-amber-800">
+										<div
+											class="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center shadow-inner"
+										>
+											<UIcon name="i-heroicons-sparkles" class="w-4 h-4" />
+										</div>
+										<div class="flex-1">
+											<p class="font-semibold text-sm">限时充值加赠</p>
+											<p class="text-[11px] text-amber-700/80 mt-0.5">
+												首次充值立返 20% 旺旺币，下一档折扣自动解锁
+											</p>
+										</div>
+										<span
+											class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-800 px-2 py-1 rounded-full bg-amber-100 border border-amber-200"
+										>
+											<UIcon name="i-heroicons-bolt" class="w-3.5 h-3.5" />
+											限时
+										</span>
 									</div>
-								</div>
+								</div> -->
 							</div>
 						</div>
 					</UCard>
