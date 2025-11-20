@@ -340,7 +340,7 @@ const props = defineProps({
 
 const { $api } = useNuxtApp()
 
-const emit = defineEmits(['update:open', 'recharge', 'redeem'])
+const emit = defineEmits(['update:open', 'recharge'])
 
 const toast = useToast()
 const loading = ref(false)
@@ -374,6 +374,7 @@ const selectedPlan = computed(() => {
 		return {
 			id: CUSTOM_RECHARGE_ID,
 			name: '自定义充值',
+			description: '自定义充值',
 			price: customAmount.value,
 			coins: customAmount.value,
 			originalPrice: customAmount.value,
@@ -426,8 +427,6 @@ const handleCustomRecharge = async () => {
 
 	// 修改 selectedPlanId 为 custom
 	selectedPlanId.value = CUSTOM_RECHARGE_ID
-
-	// TODO: 调用充值 API
 }
 
 // 订单对象
@@ -477,8 +476,15 @@ const queryOrderStatus = async () => {
 	// 用户支付成功
 	if (res.success) {
 		paymentSuccess.value = true
-		emit('recharge', { plan: selectedPlan.value })
-		//  TODO：用户支付成功之后的操作
+		emit('recharge')
+		toast.add({
+			title: '支付成功',
+			color: 'success'
+		})
+		// 3 秒后关闭弹窗
+		setTimeout(() => {
+			isOpen.value = false
+		}, 3000)
 	}
 }
 
@@ -493,6 +499,12 @@ onMounted(() => {
 const handleClose = () => {
 	interval && clearInterval(interval)
 }
+
+// TODO：实现旺旺币充值功能
+// TODO：实现旺旺币兑换功能
+// TODO：获取消费与充值记录
+// TODO：实现微信支付
+// TODO：验证支付结果是否是全部正确的，需要从头做一次完整的测试
 </script>
 
 <style scoped></style>

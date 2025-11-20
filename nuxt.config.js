@@ -100,16 +100,16 @@ export default defineNuxtConfig({
 
 	nitro: {
 		devProxy: {
-			'/dev-api/': {
-				target: 'https://test.api.lgdsunday.club',
-				changeOrigin: true,
-				rewrite: (p) => p.replace(/^\/dev-api/, '')
-			}
 			// '/dev-api/': {
-			// 	target: 'http://localhost:8888',
+			// 	target: 'https://test.api.lgdsunday.club',
 			// 	changeOrigin: true,
 			// 	rewrite: (p) => p.replace(/^\/dev-api/, '')
 			// }
+			'/dev-api/': {
+				target: 'http://localhost:8888',
+				changeOrigin: true,
+				rewrite: (p) => p.replace(/^\/dev-api/, '')
+			}
 		}
 	},
 

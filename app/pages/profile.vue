@@ -230,9 +230,50 @@
 
 				<!-- 右侧：主要内容区域 -->
 				<div class="lg:col-span-2 space-y-6">
-					<!-- TODO：设计一个充值积分的体系，充值多少或者模拟面试多少次，有对应的等级和排名 -->
+					<!-- TODO：分享一次赠送 5 旺旺币-->
 
-					<!-- 旺旺币记录 -->
+					<!-- 简历管理 -->
+					<UCard
+						class="rounded-2xl shadow-md hover:shadow-lg transition-all border-0 bg-white/80 backdrop-blur-sm"
+					>
+						<template #header>
+							<div class="flex items-center justify-between">
+								<div class="flex items-center gap-3">
+									<UIcon
+										name="i-heroicons-folder"
+										class="w-5 h-5 text-primary-600"
+									/>
+									<h2 class="text-base font-semibold text-gray-900">
+										我的简历
+									</h2>
+									<span
+										class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
+									>
+										{{ userStore.resumes.length }}/5
+									</span>
+								</div>
+								<div class="flex items-center">
+									<UButton
+										v-if="userStore.canAddResume"
+										color="primary"
+										variant="solid"
+										@click="uploadResumeModal = true"
+									>
+										<UIcon name="i-heroicons-plus" class="w-4 h-4 mr-1" />
+										上传简历
+									</UButton>
+									<span v-else class="text-sm text-gray-500">
+										最多上传 5 份简历
+									</span>
+								</div>
+							</div>
+						</template>
+
+						<!-- 简历列表 -->
+						<ResumeList />
+					</UCard>
+
+					<!-- 消费与充值记录 -->
 					<UCard
 						class="rounded-2xl shadow-md hover:shadow-lg transition-all border-0 bg-white/80 backdrop-blur-sm"
 					>
@@ -244,7 +285,7 @@
 										class="w-5 h-5 text-primary-600"
 									/>
 									<h2 class="text-base font-semibold text-gray-900">
-										旺旺币记录
+										消费与充值记录
 									</h2>
 								</div>
 							</div>
@@ -301,59 +342,6 @@
 							</div>
 						</div> -->
 					</UCard>
-
-					<!-- 简历管理 -->
-					<UCard
-						class="rounded-2xl shadow-md hover:shadow-lg transition-all border-0 bg-white/80 backdrop-blur-sm"
-					>
-						<template #header>
-							<div class="flex items-center justify-between">
-								<div class="flex items-center gap-3">
-									<UIcon
-										name="i-heroicons-folder"
-										class="w-5 h-5 text-primary-600"
-									/>
-									<h2 class="text-base font-semibold text-gray-900">
-										我的简历
-									</h2>
-									<span
-										class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
-									>
-										{{ userStore.resumes.length }}/5
-									</span>
-								</div>
-								<div class="flex items-center">
-									<NuxtLink
-										to="https://resume.lgdsunday.club/"
-										class="text-[12px] mr-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 hover:text-primary-700 transition-all font-medium border border-primary-200"
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										<span>免费制作简历（简历汪）</span>
-										<UIcon
-											name="i-heroicons-arrow-top-right-on-square"
-											class="w-3.5 h-3.5"
-										/>
-									</NuxtLink>
-									<UButton
-										v-if="userStore.canAddResume"
-										color="primary"
-										variant="solid"
-										@click="uploadResumeModal = true"
-									>
-										<UIcon name="i-heroicons-plus" class="w-4 h-4 mr-1" />
-										上传简历
-									</UButton>
-									<span v-else class="text-sm text-gray-500">
-										最多上传 5 份简历
-									</span>
-								</div>
-							</div>
-						</template>
-
-						<!-- 简历列表 -->
-						<ResumeList />
-					</UCard>
 				</div>
 			</div>
 		</div>
@@ -375,8 +363,7 @@
 		<RechargeModal
 			v-model:open="rechargeModal"
 			:balance="userStore.walletBalance"
-			@recharge="handleRecharge"
-			@redeem="handleRedeem"
+			@recharge="initUserInfo"
 		/>
 	</div>
 </template>
@@ -426,10 +413,7 @@ const paymentLabelMap = {
  * 获取用户信息
  */
 const initUserInfo = async () => {
-	const res = await getUserInfoAPI($api)
-	// if (res.success) {
-	// 	userStore.userInfo = res.data
-	// }
+	userStore.userInfo = await getUserInfoAPI($api)
 }
 initUserInfo()
 
@@ -475,66 +459,6 @@ const handleResumeDelete = (index) => {
 	userStore.removeResume(index)
 	toast.add({
 		title: '删除成功',
-		color: 'success'
-	})
-}
-
-// 处理充值
-const handleRecharge = (rechargeData) => {
-	// 更新余额
-	userStore.updateWalletBalance(userStore.walletBalance + rechargeData.amount)
-
-	const planLabel = rechargeData.planName || '自定义充值'
-	// 添加充值记录
-	userStore.addRechargeRecord({
-		amount: rechargeData.amount,
-		orderNo: rechargeData.orderNo,
-		createTime: new Date().toISOString(),
-		planName: planLabel,
-		price: rechargeData.price,
-		originalPrice: rechargeData.originalPrice,
-		saving: rechargeData.saving,
-		validDays: rechargeData.validDays,
-		paymentMethod: rechargeData.paymentMethod,
-		paymentLabel: rechargeData.paymentLabel
-	})
-
-	const paymentName =
-		rechargeData.paymentLabel ||
-		paymentLabelMap[rechargeData.paymentMethod] ||
-		''
-
-	toast.add({
-		title: '充值成功',
-		description: `${planLabel}：到账 ${rechargeData.amount} 旺旺币${
-			paymentName ? ` · ${paymentName}` : ''
-		}`,
-		color: 'success'
-	})
-}
-
-const handleRedeem = (payload) => {
-	if (userStore.walletBalance < SERVICE_REDEEM_COST) {
-		toast.add({
-			title: '旺旺币不足',
-			description: '余额不足，无法兑换该服务',
-			color: 'warning'
-		})
-		return
-	}
-
-	userStore.updateWalletBalance(userStore.walletBalance - SERVICE_REDEEM_COST)
-
-	userStore.addConsumptionRecord({
-		type: payload.serviceType,
-		amount: SERVICE_REDEEM_COST,
-		description: `${payload.serviceLabel}兑换一次服务`,
-		createTime: new Date().toISOString()
-	})
-
-	toast.add({
-		title: '兑换成功',
-		description: `已使用 ${SERVICE_REDEEM_COST} 旺旺币兑换 ${payload.serviceLabel} 1 次`,
 		color: 'success'
 	})
 }

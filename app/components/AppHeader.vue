@@ -158,6 +158,8 @@ const userMenuItems = [
 
 const handleConfirmLogout = () => {
 	userStore.logout()
+	confirmLogoutOpen.value = false
+	navigateTo('/')
 }
 
 const scrolled = ref(false)
