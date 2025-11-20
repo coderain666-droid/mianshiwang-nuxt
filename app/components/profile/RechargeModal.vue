@@ -481,10 +481,6 @@ const queryOrderStatus = async () => {
 			title: '支付成功',
 			color: 'success'
 		})
-		// 3 秒后关闭弹窗
-		setTimeout(() => {
-			isOpen.value = false
-		}, 3000)
 	}
 }
 

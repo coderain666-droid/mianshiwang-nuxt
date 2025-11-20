@@ -278,7 +278,7 @@
 						class="rounded-2xl shadow-md hover:shadow-lg transition-all border-0 bg-white/80 backdrop-blur-sm"
 					>
 						<template #header>
-							<div class="flex items-center justify-between">
+							<div class="flex flex-wrap items-center justify-between gap-4">
 								<div class="flex items-center gap-2">
 									<UIcon
 										name="i-heroicons-chart-bar"
@@ -288,59 +288,88 @@
 										消费与充值记录
 									</h2>
 								</div>
+								<div
+									class="inline-flex rounded-full border border-gray-200 bg-white/70 p-0.5 shadow-inner"
+								>
+									<button
+										type="button"
+										class="px-3 py-1.5 text-xs font-medium rounded-full transition-all"
+										:class="
+											activeRecordTab === 'recharge'
+												? 'bg-primary-600 text-white shadow-sm'
+												: 'text-gray-500 hover:text-primary-600'
+										"
+										@click="activeRecordTab = 'recharge'"
+									>
+										充值记录
+									</button>
+									<button
+										type="button"
+										class="px-3 py-1.5 text-xs font-medium rounded-full transition-all"
+										:class="
+											activeRecordTab === 'consumption'
+												? 'bg-primary-600 text-white shadow-sm'
+												: 'text-gray-500 hover:text-primary-600'
+										"
+										@click="activeRecordTab = 'consumption'"
+									>
+										消费记录
+									</button>
+								</div>
 							</div>
 						</template>
 
-						<!-- 充值记录 -->
-						<!-- <div class="space-y-4">
+						<div class="space-y-4">
 							<div
-								v-if="userStore.wallet.rechargeRecords.length === 0"
+								v-if="displayedRecords.length === 0"
 								class="flex flex-col justify-center items-center py-12 text-gray-500"
 							>
 								<UIcon
 									name="i-heroicons-wallet"
 									class="w-12 h-12 mx-auto mb-4 text-gray-300"
 								/>
-								<p>暂无充值记录</p>
+								<p>{{ recordMeta.emptyText }}</p>
 							</div>
-							<div v-else class="space-y-3">
+							<div v-else class="space-y-2 overflow-y-auto max-h-[300px]">
 								<div
-									v-for="(record, index) in userStore.wallet.rechargeRecords"
-									:key="index"
-									class="flex items-center justify-between p-4 bg-linear-to-r from-green-50 to-white rounded-xl hover:from-green-100 hover:shadow-md transition-all border border-green-100/50"
+									v-for="(record, index) in displayedRecords"
+									:key="record.outTradeNo || index"
+									class="rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow"
 								>
-									<div class="flex items-center gap-4">
-										<div
-											class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center"
-										>
-											<UIcon
-												name="i-heroicons-arrow-down-circle"
-												class="w-5 h-5 text-green-600"
-											/>
-										</div>
-										<div>
-											<p class="font-medium text-gray-900">
-												{{ record.planName || '充值' }}
-											</p>
-											<p class="text-xs text-gray-500 flex items-center gap-1">
-												<span>{{ formatDate(record.createTime) }}</span>
-												<span v-if="getPaymentLabel(record)">
-													· {{ getPaymentLabel(record) }}
+									<div class="flex items-center justify-between gap-4">
+										<div class="min-w-0">
+											<p class="text-sm font-semibold text-gray-900 truncate">
+												{{ record.planName }}
+												<span class="ml-2 text-xs text-gray-500">
+													{{ record.description || '暂无备注' }}
 												</span>
 											</p>
+
+											<p class="text-[11px] text-gray-500">
+												订单号：{{ record.outTradeNo || '—' }}
+											</p>
 										</div>
-									</div>
-									<div class="text-right">
-										<p class="font-semibold text-green-600">
-											+{{ record.amount }}
-										</p>
-										<p class="text-xs text-gray-500">
-											订单号: {{ record.orderNo }}
-										</p>
+										<div
+											class="text-right shrink-0 flex flex-col justify-between h-full"
+										>
+											<p
+												class="text-xs font-semibold"
+												:class="recordMeta.amountClass"
+											>
+												金额：{{ record.amount }} 元
+											</p>
+
+											<p
+												class="inline-flex items-center gap-1 text-[11px] text-gray-500"
+											>
+												<UIcon name="i-heroicons-clock" class="w-3.5 h-3.5" />
+												{{ formatDate(record.paidAt) }}
+											</p>
+										</div>
 									</div>
 								</div>
 							</div>
-						</div> -->
+						</div>
 					</UCard>
 				</div>
 			</div>
@@ -363,13 +392,13 @@
 		<RechargeModal
 			v-model:open="rechargeModal"
 			:balance="userStore.walletBalance"
-			@recharge="initUserInfo"
+			@recharge="handleRecharge"
 		/>
 	</div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useToast } from '#imports'
 import EditProfileModal from '@/components/profile/EditProfileModal.vue'
@@ -377,7 +406,7 @@ import UploadResumeModal from '@/components/profile/UploadResumeModal.vue'
 import ResumeList from '@/components/profile/ResumeList.vue'
 import RechargeModal from '@/components/profile/RechargeModal.vue'
 import { getResumeListAPI } from '@/api/resume'
-import { getUserInfoAPI } from '@/api/user'
+import { getUserInfoAPI, getPaymentRecordsAPI } from '@/api/user'
 import dayjs from 'dayjs'
 
 definePageMeta({
@@ -400,14 +429,7 @@ const { $api } = useNuxtApp()
 const editProfileModal = ref(false)
 const uploadResumeModal = ref(false)
 const rechargeModal = ref(false)
-
-const SERVICE_REDEEM_COST = 20
-
-const paymentLabelMap = {
-	wechat: '微信支付',
-	alipay: '支付宝',
-	bank: '银行卡'
-}
+const activeRecordTab = ref('recharge')
 
 /**
  * 获取用户信息
@@ -416,11 +438,6 @@ const initUserInfo = async () => {
 	userStore.userInfo = await getUserInfoAPI($api)
 }
 initUserInfo()
-
-const getPaymentLabel = (record) => {
-	if (!record) return ''
-	return record.paymentLabel || paymentLabelMap[record.paymentMethod] || ''
-}
 
 // 格式化日期
 const formatDate = (date) => {
@@ -448,7 +465,6 @@ const handleProfileUpdate = async (updatedInfo) => {
 
 // 简历上传成功之后的回调
 const handleResumeUploaded = async () => {
-	// TODO：重新获取简历列表
 	const res = await getResumeListAPI($api)
 
 	userStore.resumes = res || []
@@ -462,6 +478,50 @@ const handleResumeDelete = (index) => {
 		color: 'success'
 	})
 }
+
+/**
+ * 处理充值
+ */
+const handleRecharge = async () => {
+	initUserInfo()
+	getPaymentRecords()
+}
+
+/**
+ * 获取充值与消费记录
+ */
+const paymentRecords = ref([])
+const consumptionRecords = ref([])
+const displayedRecords = computed(() =>
+	activeRecordTab.value === 'recharge'
+		? paymentRecords.value
+		: consumptionRecords.value
+)
+const recordMeta = computed(() => {
+	const isRecharge = activeRecordTab.value === 'recharge'
+	return {
+		emptyText: isRecharge ? '暂无充值记录' : '暂无消费记录',
+		defaultTitle: isRecharge ? '充值' : '消费',
+		amountClass: isRecharge ? 'text-emerald-600' : 'text-rose-600',
+		amountPrefix: isRecharge ? '+' : '-',
+		showTypeTag: !isRecharge,
+		typeLabel: isRecharge ? '' : '消费'
+	}
+})
+
+/**
+ * 获取充值与消费记录
+ */
+const getPaymentRecords = async () => {
+	try {
+		const res = await getPaymentRecordsAPI($api)
+		paymentRecords.value = Array.isArray(res) ? res : []
+	} catch (error) {
+		paymentRecords.value = []
+		console.error('获取充值记录失败', error)
+	}
+}
+getPaymentRecords()
 </script>
 
 <style scoped></style>

@@ -17,3 +17,13 @@ export const getUserInfoAPI = ($api) => {
 		method: 'GET'
 	})
 }
+
+/**
+ * 获取支付记录
+ */
+export const getPaymentRecordsAPI = ($api, body) => {
+	return $api('/user/transactions', {
+		method: 'GET',
+		body
+	})
+}
