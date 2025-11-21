@@ -139,7 +139,7 @@
 <script setup>
 import { SEO } from '@/constants/seo'
 import { useHead } from 'nuxt/app'
-import wechatQRCode from '@/assets/imgs/sunday-gong-zhong-hao.jpg'
+import wechatQRCode from '@/assets/imgs/sunday.jpg'
 
 const email = 'lgd_sunday@163.com'
 const wechatId = 'LGD_Sunday'
