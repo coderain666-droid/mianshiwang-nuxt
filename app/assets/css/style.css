@@ -49,8 +49,9 @@
 }
 
 /* 全局排版与可用性基础 */
-html {
-  color-scheme: light;
+html,
+body {
+  color-scheme: normal;
 }
 
 body {
