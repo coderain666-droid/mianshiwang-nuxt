@@ -50,17 +50,35 @@
 						>
 							{{ category.label }}
 						</UButton>
-						<UButton
+						<button
 							v-if="categories.length > 6"
-							variant="ghost"
-							color="gray"
-							size="xs"
+							:class="[
+								'inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-all duration-200',
+								'border border-dashed',
+								showAllCategories
+									? 'border-primary-300 text-primary-700 bg-primary-50/50'
+									: 'border-gray-300 text-neutral-600 hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50/30'
+							]"
 							@click="showAllCategories = !showAllCategories"
 						>
-							{{ showAllCategories ? '收起' : '更多' }}
-						</UButton>
+							<UIcon
+								:name="
+									showAllCategories
+										? 'i-heroicons-chevron-up'
+										: 'i-heroicons-chevron-down'
+								"
+								class="w-3.5 h-3.5 transition-transform duration-200"
+							/>
+							<span>{{ showAllCategories ? '收起' : '更多' }}</span>
+							<span class="text-[10px] opacity-60 ml-0.5">
+								({{ categories.length - 6 }})
+							</span>
+						</button>
 					</div>
-					<div v-if="showAllCategories" class="flex flex-wrap gap-2 mt-2">
+					<div
+						v-if="showAllCategories"
+						class="flex flex-wrap gap-2 mt-2 animate-in"
+					>
 						<UButton
 							v-for="category in categories.slice(6)"
 							:key="category.key"
@@ -114,40 +132,72 @@
 
 				<!-- 岗位列表（可选，用于浏览） -->
 				<div
-					v-if="!selectedPosition && filteredPositions.length > 0"
-					class="flex-1 min-h-0 overflow-hidden"
+					v-if="!selectedPosition"
+					class="flex-1 min-h-0 overflow-hidden flex flex-col"
 				>
 					<p class="text-xs text-neutral-500 mb-2">
-						或从下方列表中选择（{{ filteredPositions.length }} 个岗位）
+						<span v-if="filteredPositions.length > 0">
+							或从下方列表中选择（{{ filteredPositions.length }} 个岗位）
+						</span>
+						<span v-else class="text-neutral-400">
+							暂无匹配的岗位，请尝试其他搜索条件
+						</span>
 					</p>
-					<div class="space-y-2 h-full overflow-y-auto pr-1">
+					<div
+						v-if="filteredPositions.length > 0"
+						class="space-y-2 flex-1 overflow-y-auto pr-1 custom-scrollbar"
+					>
 						<div
-							v-for="position in filteredPositions.slice(0, 10)"
+							v-for="position in filteredPositions"
 							:key="position.id"
 							:class="[
 								'p-3 rounded-lg border cursor-pointer transition-all',
-								'border-gray-200 hover:border-primary-300 hover:bg-primary-50/50'
+								'border-gray-200 hover:border-primary-300 hover:bg-primary-50/50',
+								'hover:shadow-sm'
 							]"
 							@click="selectPosition(position)"
 						>
-							<div class="flex items-start justify-between">
+							<div class="flex items-start justify-between gap-2">
 								<div class="flex-1 min-w-0">
 									<h3
 										class="font-medium text-neutral-900 text-sm mb-1 truncate"
 									>
 										{{ position.name }}
 									</h3>
-									<p class="text-xs text-neutral-600 line-clamp-1">
+									<p class="text-xs text-neutral-600 line-clamp-1 mb-1">
 										{{ position.description }}
 									</p>
+									<div
+										class="flex items-center gap-2 text-[10px] text-neutral-500"
+									>
+										<span
+											v-if="getCategoryLabel(position.category)"
+											class="px-1.5 py-0.5 rounded bg-gray-100"
+										>
+											{{ getCategoryLabel(position.category) }}
+										</span>
+										<span v-if="position.level" class="opacity-70">
+											{{ position.level }}
+										</span>
+									</div>
 								</div>
+								<UIcon
+									name="i-heroicons-chevron-right"
+									class="w-4 h-4 text-neutral-400 shrink-0 mt-0.5"
+								/>
 							</div>
 						</div>
-						<div
-							v-if="filteredPositions.length > 10"
-							class="text-center py-2 text-xs text-neutral-500"
-						>
-							还有 {{ filteredPositions.length - 10 }} 个岗位，请使用搜索查找
+					</div>
+					<div v-else class="flex-1 flex items-center justify-center py-8">
+						<div class="text-center">
+							<UIcon
+								name="i-heroicons-magnifying-glass"
+								class="w-10 h-10 text-gray-300 mx-auto mb-2"
+							/>
+							<p class="text-sm text-neutral-400">未找到匹配的岗位</p>
+							<p class="text-xs text-neutral-400 mt-1">
+								尝试调整搜索关键词或选择其他分类
+							</p>
 						</div>
 					</div>
 				</div>
@@ -298,4 +348,23 @@ const handleNext = async () => {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+/* 自定义滚动条样式 */
+.custom-scrollbar::-webkit-scrollbar {
+	width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+	background: transparent;
+	border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+	background: #d1d5db;
+	border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+	background: #9ca3af;
+}
+</style>
