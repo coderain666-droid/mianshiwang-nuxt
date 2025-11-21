@@ -1,17 +1,24 @@
 <template>
-	<div class="max-w-7xl mx-auto">
-		<div class="text-center mb-6">
-			<h1 class="text-2xl font-bold text-neutral-900 mb-2">AI 模拟面试</h1>
-			<p class="text-neutral-600">
-				与 AI 面试官对话，展示你的专业能力和沟通技巧
-			</p>
+	<div class="h-full flex flex-col gap-6">
+		<div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+			<div>
+				<h1 class="text-2xl font-bold text-neutral-900">AI 模拟面试</h1>
+				<p class="text-neutral-600 text-sm mt-1">
+					与 AI 面试官实时对话，展示你的专业能力和沟通技巧
+				</p>
+			</div>
+			<div class="text-xs text-neutral-500 flex items-center gap-2">
+				<UIcon name="i-heroicons-clock" class="w-4 h-4 text-primary-500" />
+				平均面试时长 10-15 分钟
+			</div>
 		</div>
 
-		<div class="grid lg:grid-cols-3 gap-6">
+		<div
+			class="grid lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-6 flex-1 min-h-0"
+		>
 			<!-- 左侧：对话区域（占2列） -->
 			<div
-				class="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col"
-				style="height: calc(100vh - 250px)"
+				class="bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col min-h-0"
 			>
 				<!-- 对话消息列表 -->
 				<div
@@ -139,8 +146,7 @@
 
 			<!-- 右侧：3D 数字人（占1列） -->
 			<div
-				class="lg:col-span-1 bg-white rounded-xl border border-gray-200 shadow-sm flex flex-col"
-				style="height: calc(100vh - 250px)"
+				class="bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col min-h-0"
 			>
 				<div class="p-4 border-b border-gray-200">
 					<h3 class="font-semibold text-neutral-900">AI 面试官</h3>

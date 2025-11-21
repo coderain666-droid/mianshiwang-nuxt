@@ -1,183 +1,190 @@
 <template>
-	<div class="max-w-6xl mx-auto">
-		<div class="text-center mb-8">
-			<div class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-full mb-4">
-				<UIcon name="i-heroicons-check-circle" class="w-5 h-5" />
-				<span class="font-medium">面试已完成</span>
+	<div class="h-full flex flex-col gap-6">
+		<div
+			class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
+		>
+			<div>
+				<div
+					class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-full mb-3"
+				>
+					<UIcon name="i-heroicons-check-circle" class="w-5 h-5" />
+					<span class="font-medium">面试已完成</span>
+				</div>
+				<h1 class="text-3xl font-bold text-neutral-900">面试评估报告</h1>
+				<p class="text-neutral-600 mt-2 text-sm">
+					基于你的面试表现生成的个性化评估和强化建议
+				</p>
 			</div>
-			<h1 class="text-3xl font-bold text-neutral-900 mb-2">面试评估报告</h1>
-			<p class="text-neutral-600">
-				基于你的面试表现生成的个性化评估报告和提升建议
-			</p>
-		</div>
-
-		<!-- 操作栏 -->
-		<div class="flex items-center justify-end gap-3 mb-6">
-			<UButton color="gray" variant="ghost" icon="i-heroicons-arrow-left" @click="handleRestart">
-				重新开始
-			</UButton>
-			<UButton
-				color="primary"
-				icon="i-heroicons-arrow-down-tray"
-				:loading="isGeneratingPDF"
-				@click="handleDownloadPDF"
-			>
-				下载 PDF 报告
-			</UButton>
-		</div>
-
-		<!-- 综合评分卡片 -->
-		<div class="bg-gradient-to-br from-primary-50 to-blue-50 rounded-xl border border-primary-200 p-8 mb-6">
-			<div class="flex items-center justify-between">
-				<div>
-					<h2 class="text-xl font-semibold text-neutral-900 mb-2">综合评分</h2>
-					<p class="text-neutral-600">
-						{{ report?.overall?.summary || '基于你在面试中的整体表现进行评估' }}
-					</p>
-				</div>
-				<div class="text-right">
-					<div class="text-5xl font-bold text-primary-600 mb-1">
-						{{ report?.overall?.score || 0 }}
-					</div>
-					<div class="text-sm text-neutral-600">分</div>
-					<div class="mt-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-medium inline-block">
-						{{ report?.overall?.level || '良好' }}
-					</div>
-				</div>
+			<div class="flex flex-wrap items-center justify-start lg:justify-end gap-3">
+				<UButton color="gray" variant="ghost" icon="i-heroicons-arrow-left" @click="handleRestart">
+					重新开始
+				</UButton>
+				<UButton
+					color="primary"
+					icon="i-heroicons-arrow-down-tray"
+					:loading="isGeneratingPDF"
+					@click="handleDownloadPDF"
+				>
+					下载 PDF 报告
+				</UButton>
 			</div>
 		</div>
 
-		<div class="grid lg:grid-cols-2 gap-6">
-			<!-- 左侧：STAR 分析 -->
-			<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-				<h2 class="text-lg font-semibold text-neutral-900 mb-4">STAR 模型分析</h2>
-				<div class="space-y-4">
-					<div
-						v-for="(star, index) in starItems"
-						:key="index"
-						class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
-					>
-						<div
-							class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-sm font-semibold"
-						>
-							{{ star.letter }}
+		<div class="flex-1 min-h-0 overflow-hidden">
+			<div class="h-full overflow-y-auto pr-1 space-y-6">
+				<!-- 综合评分卡片 -->
+				<div class="bg-gradient-to-br from-primary-50 to-blue-50 rounded-xl border border-primary-200 p-8">
+					<div class="flex items-center justify-between flex-wrap gap-4">
+						<div class="max-w-xl">
+							<h2 class="text-xl font-semibold text-neutral-900 mb-2">综合评分</h2>
+							<p class="text-neutral-600">
+								{{ report?.overall?.summary || '基于你在面试中的整体表现进行评估' }}
+							</p>
 						</div>
-						<div class="flex-1">
-							<div class="font-medium text-neutral-900 mb-1">{{ star.name }}</div>
-							<div class="text-sm text-neutral-600">{{ star.description }}</div>
-							<div class="mt-2 text-sm text-neutral-500">{{ star.feedback }}</div>
-						</div>
-					</div>
-				</div>
-				<div class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-					<div class="flex items-start gap-2">
-						<UIcon name="i-heroicons-light-bulb" class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-						<div>
-							<div class="font-medium text-amber-900 mb-1">评分：{{ report?.star?.score || 0 }} 分</div>
-							<div class="text-sm text-amber-700">
-								{{ report?.star?.feedback || '能够使用 STAR 方法回答问题，但可以进一步优化' }}
+						<div class="text-right">
+							<div class="text-5xl font-bold text-primary-600 mb-1">
+								{{ report?.overall?.score || 0 }}
+							</div>
+							<div class="text-sm text-neutral-600">分</div>
+							<div class="mt-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-medium inline-block">
+								{{ report?.overall?.level || '良好' }}
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
 
-			<!-- 右侧：技能矩阵 -->
-			<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-				<h2 class="text-lg font-semibold text-neutral-900 mb-4">技能矩阵</h2>
-				<div class="space-y-4">
-					<div
-						v-for="(skill, index) in report?.skills || []"
-						:key="index"
-						class="space-y-2"
-					>
-						<div class="flex items-center justify-between">
-							<span class="font-medium text-neutral-900">{{ skill.name }}</span>
-							<span class="text-sm font-semibold text-primary-600">{{ skill.score }} 分</span>
-						</div>
-						<div class="w-full bg-gray-200 rounded-full h-2.5">
+				<div class="grid lg:grid-cols-2 gap-6">
+					<!-- 左侧：STAR 分析 -->
+					<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+						<h2 class="text-lg font-semibold text-neutral-900 mb-4">STAR 模型分析</h2>
+						<div class="space-y-4">
 							<div
-								class="bg-primary-600 h-2.5 rounded-full transition-all"
-								:style="{ width: `${skill.score}%` }"
-							></div>
+								v-for="(star, index) in starItems"
+								:key="index"
+								class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
+							>
+								<div
+									class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-sm font-semibold"
+								>
+									{{ star.letter }}
+								</div>
+								<div class="flex-1">
+									<div class="font-medium text-neutral-900 mb-1">{{ star.name }}</div>
+									<div class="text-sm text-neutral-600">{{ star.description }}</div>
+									<div class="mt-2 text-sm text-neutral-500">{{ star.feedback }}</div>
+								</div>
+							</div>
+						</div>
+						<div class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+							<div class="flex items-start gap-2">
+								<UIcon name="i-heroicons-light-bulb" class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+								<div>
+									<div class="font-medium text-amber-900 mb-1">评分：{{ report?.star?.score || 0 }} 分</div>
+									<div class="text-sm text-amber-700">
+										{{ report?.star?.feedback || '能够使用 STAR 方法回答问题，但可以进一步优化' }}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- 右侧：技能矩阵 -->
+					<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+						<h2 class="text-lg font-semibold text-neutral-900 mb-4">技能矩阵</h2>
+						<div class="space-y-4">
+							<div
+								v-for="(skill, index) in report?.skills || []"
+								:key="index"
+								class="space-y-2"
+							>
+								<div class="flex items-center justify-between">
+									<span class="font-medium text-neutral-900">{{ skill.name }}</span>
+									<span class="text-sm font-semibold text-primary-600">{{ skill.score }} 分</span>
+								</div>
+								<div class="w-full bg-gray-200 rounded-full h-2.5">
+									<div
+										class="bg-primary-600 h-2.5 rounded-full transition-all"
+										:style="{ width: `${skill.score}%` }"
+									></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 风险点识别 -->
+				<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+					<h2 class="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2">
+						<UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-amber-600" />
+						风险点识别
+					</h2>
+					<ul class="space-y-2">
+						<li
+							v-for="(risk, index) in report?.risks || []"
+							:key="index"
+							class="flex items-start gap-3 p-3 bg-red-50 border border-red-100 rounded-lg"
+						>
+							<UIcon
+								name="i-heroicons-x-circle"
+								class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"
+							/>
+							<span class="text-neutral-900">{{ risk }}</span>
+						</li>
+					</ul>
+				</div>
+
+				<!-- 改进建议 -->
+				<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+					<h2 class="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2">
+						<UIcon name="i-heroicons-light-bulb" class="w-5 h-5 text-primary-600" />
+						改进建议
+					</h2>
+					<ul class="space-y-2">
+						<li
+							v-for="(suggestion, index) in report?.suggestions || []"
+							:key="index"
+							class="flex items-start gap-3 p-3 bg-green-50 border border-green-100 rounded-lg"
+						>
+							<UIcon
+								name="i-heroicons-check-circle"
+								class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5"
+							/>
+							<span class="text-neutral-900">{{ suggestion }}</span>
+						</li>
+					</ul>
+				</div>
+
+				<!-- 7 天强化练习计划 -->
+				<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+					<h2 class="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2">
+						<UIcon name="i-heroicons-calendar-days" class="w-5 h-5 text-primary-600" />
+						7 天强化练习计划
+					</h2>
+					<div class="grid md:grid-cols-7 gap-4">
+						<div
+							v-for="(day, index) in plan7Days?.days || []"
+							:key="index"
+							class="border border-gray-200 rounded-lg p-4 hover:border-primary-300 hover:shadow-md transition-all"
+						>
+							<div class="text-xs text-neutral-500 mb-1">第 {{ day.day }} 天</div>
+							<div class="font-semibold text-neutral-900 mb-2">{{ day.date }}</div>
+							<ul class="space-y-1.5 text-sm text-neutral-600">
+								<li
+									v-for="(task, taskIndex) in day.tasks"
+									:key="taskIndex"
+									class="flex items-start gap-1.5"
+								>
+									<UIcon name="i-heroicons-check" class="w-4 h-4 text-primary-600 flex-shrink-0 mt-0.5" />
+									<span>{{ task }}</span>
+								</li>
+							</ul>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<!-- 风险点识别 -->
-		<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mt-6">
-			<h2 class="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2">
-				<UIcon name="i-heroicons-exclamation-triangle" class="w-5 h-5 text-amber-600" />
-				风险点识别
-			</h2>
-			<ul class="space-y-2">
-				<li
-					v-for="(risk, index) in report?.risks || []"
-					:key="index"
-					class="flex items-start gap-3 p-3 bg-red-50 border border-red-100 rounded-lg"
-				>
-					<UIcon
-						name="i-heroicons-x-circle"
-						class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"
-					/>
-					<span class="text-neutral-900">{{ risk }}</span>
-				</li>
-			</ul>
-		</div>
-
-		<!-- 改进建议 -->
-		<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mt-6">
-			<h2 class="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2">
-				<UIcon name="i-heroicons-light-bulb" class="w-5 h-5 text-primary-600" />
-				改进建议
-			</h2>
-			<ul class="space-y-2">
-				<li
-					v-for="(suggestion, index) in report?.suggestions || []"
-					:key="index"
-					class="flex items-start gap-3 p-3 bg-green-50 border border-green-100 rounded-lg"
-				>
-					<UIcon
-						name="i-heroicons-check-circle"
-						class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5"
-					/>
-					<span class="text-neutral-900">{{ suggestion }}</span>
-				</li>
-			</ul>
-		</div>
-
-		<!-- 7 天强化练习计划 -->
-		<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm mt-6">
-			<h2 class="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2">
-				<UIcon name="i-heroicons-calendar-days" class="w-5 h-5 text-primary-600" />
-				7 天强化练习计划
-			</h2>
-			<div class="grid md:grid-cols-7 gap-4">
-				<div
-					v-for="(day, index) in plan7Days?.days || []"
-					:key="index"
-					class="border border-gray-200 rounded-lg p-4 hover:border-primary-300 hover:shadow-md transition-all"
-				>
-					<div class="text-xs text-neutral-500 mb-1">第 {{ day.day }} 天</div>
-					<div class="font-semibold text-neutral-900 mb-2">{{ day.date }}</div>
-					<ul class="space-y-1.5 text-sm text-neutral-600">
-						<li
-							v-for="(task, taskIndex) in day.tasks"
-							:key="taskIndex"
-							class="flex items-start gap-1.5"
-						>
-							<UIcon name="i-heroicons-check" class="w-4 h-4 text-primary-600 flex-shrink-0 mt-0.5" />
-							<span>{{ task }}</span>
-						</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-
-		<!-- 底部操作 -->
-		<div class="flex items-center justify-center gap-4 mt-8 pt-8 border-t border-gray-200">
+		<div class="flex items-center justify-center gap-4 pt-4 border-t border-gray-200">
 			<UButton color="primary" size="lg" @click="handleRestart">
 				开始新的面试
 			</UButton>

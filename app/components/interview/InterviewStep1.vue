@@ -1,17 +1,29 @@
 <template>
-	<div class="max-w-6xl mx-auto">
-		<div class="text-center mb-8">
-			<h1 class="text-3xl font-bold text-neutral-900 mb-2">
-				选择岗位和导入简历
-			</h1>
-			<p class="text-neutral-600">
-				选择你的目标岗位，并上传简历，系统将为你生成专属面试题集
-			</p>
+	<div class="h-full flex flex-col gap-6">
+		<div
+			class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 text-center lg:text-left"
+		>
+			<div>
+				<h1 class="text-2xl font-bold text-neutral-900 mb-1">
+					选择岗位和导入简历
+				</h1>
+				<p class="text-neutral-600 text-sm">
+					锁定目标岗位并导入简历，AI 将定制专属题库
+				</p>
+			</div>
+			<div
+				class="inline-flex items-center gap-2 text-xs text-neutral-500 justify-center"
+			>
+				<UIcon name="i-heroicons-sparkles" class="w-4 h-4 text-primary-500" />
+				一步完成岗位筛选与资料上传
+			</div>
 		</div>
 
-		<div class="grid lg:grid-cols-2 gap-8">
+		<div class="grid lg:grid-cols-2 gap-6 flex-1 min-h-0 auto-rows-fr">
 			<!-- 左侧：岗位选择 -->
-			<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+			<div
+				class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm flex flex-col min-h-0"
+			>
 				<h2 class="text-xl font-semibold text-neutral-900 mb-4">选择岗位</h2>
 
 				<!-- 搜索框 -->
@@ -38,122 +50,131 @@
 				</div>
 
 				<!-- 岗位列表 -->
-				<div class="space-y-2 max-h-[500px] overflow-y-auto">
-					<div
-						v-for="position in filteredPositions"
-						:key="position.id"
-						:class="[
-							'p-4 rounded-lg border-2 cursor-pointer transition-all',
-							selectedPosition?.id === position.id
-								? 'border-primary-500 bg-primary-50'
-								: 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
-						]"
-						@click="selectPosition(position)"
-					>
-						<div class="flex items-start justify-between">
-							<div class="flex-1">
-								<h3 class="font-semibold text-neutral-900 mb-1">
-									{{ position.name }}
-								</h3>
-								<p class="text-sm text-neutral-600 mb-2">
-									{{ position.description }}
-								</p>
-								<div class="flex items-center gap-2 text-xs text-neutral-500">
-									<span class="px-2 py-0.5 rounded bg-gray-100">
-										{{ getCategoryLabel(position.category) }}
-									</span>
-									<span v-if="position.level">· {{ position.level }}</span>
+				<div class="flex-1 min-h-0 overflow-hidden">
+					<div class="space-y-2 h-full overflow-y-auto pr-1">
+						<div
+							v-for="position in filteredPositions"
+							:key="position.id"
+							:class="[
+								'p-4 rounded-lg border-2 cursor-pointer transition-all',
+								selectedPosition?.id === position.id
+									? 'border-primary-500 bg-primary-50'
+									: 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
+							]"
+							@click="selectPosition(position)"
+						>
+							<div class="flex items-start justify-between">
+								<div class="flex-1">
+									<h3 class="font-semibold text-neutral-900 mb-1">
+										{{ position.name }}
+									</h3>
+									<p class="text-sm text-neutral-600 mb-2">
+										{{ position.description }}
+									</p>
+									<div class="flex items-center gap-2 text-xs text-neutral-500">
+										<span class="px-2 py-0.5 rounded bg-gray-100">
+											{{ getCategoryLabel(position.category) }}
+										</span>
+										<span v-if="position.level">· {{ position.level }}</span>
+									</div>
 								</div>
+								<UIcon
+									v-if="selectedPosition?.id === position.id"
+									name="i-heroicons-check-circle"
+									class="w-6 h-6 text-primary-600 shrink-0 ml-2"
+								/>
 							</div>
-							<UIcon
-								v-if="selectedPosition?.id === position.id"
-								name="i-heroicons-check-circle"
-								class="w-6 h-6 text-primary-600 shrink-0 ml-2"
-							/>
 						</div>
 					</div>
 				</div>
 			</div>
 
 			<!-- 右侧：简历上传 -->
-			<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+			<div
+				class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm flex flex-col min-h-0"
+			>
 				<h2 class="text-xl font-semibold text-neutral-900 mb-4">导入简历</h2>
 
-				<!-- 上传区域 -->
-				<div
-					class="border-2 border-dashed rounded-lg p-8 text-center transition-colors"
-					:class="[
-						isDragging
-							? 'border-primary-500 bg-primary-50'
-							: 'border-gray-300 hover:border-primary-300'
-					]"
-					@drop="handleDrop"
-					@dragover.prevent="isDragging = true"
-					@dragleave="isDragging = false"
-					@click="triggerFileInput"
-				>
-					<input
-						ref="fileInputRef"
-						type="file"
-						accept=".pdf,.doc,.docx,.txt"
-						class="hidden"
-						@change="handleFileSelect"
-					/>
+				<div class="flex-1 min-h-0 flex flex-col gap-6 overflow-hidden">
+					<!-- 上传区域 -->
+					<div
+						class="border-2 border-dashed rounded-lg p-6 text-center transition-colors flex flex-col justify-center"
+						:class="[
+							isDragging
+								? 'border-primary-500 bg-primary-50'
+								: 'border-gray-300 hover:border-primary-300'
+						]"
+						@drop="handleDrop"
+						@dragover.prevent="isDragging = true"
+						@dragleave="isDragging = false"
+						@click="triggerFileInput"
+					>
+						<input
+							ref="fileInputRef"
+							type="file"
+							accept=".pdf,.doc,.docx,.txt"
+							class="hidden"
+							@change="handleFileSelect"
+						/>
 
-					<UIcon
-						name="i-heroicons-document-arrow-up"
-						class="w-12 h-12 text-gray-400 mx-auto mb-4"
-					/>
-					<p class="text-neutral-900 font-medium mb-2">
-						点击上传或拖拽文件到此处
-					</p>
-					<p class="text-sm text-neutral-500">
-						支持 PDF、Word、TXT 格式，最大 10MB
-					</p>
-				</div>
+						<UIcon
+							name="i-heroicons-document-arrow-up"
+							class="w-12 h-12 text-gray-400 mx-auto mb-4"
+						/>
+						<p class="text-neutral-900 font-medium mb-2">
+							点击上传或拖拽文件到此处
+						</p>
+						<p class="text-sm text-neutral-500">
+							支持 PDF、Word、TXT 格式，最大 10MB
+						</p>
+					</div>
 
-				<!-- 已上传的文件 -->
-				<div v-if="resumeFile" class="mt-4 p-4 bg-gray-50 rounded-lg">
-					<div class="flex items-center justify-between">
-						<div class="flex items-center gap-3 flex-1">
-							<UIcon
-								name="i-heroicons-document-text"
-								class="w-8 h-8 text-primary-600"
-							/>
-							<div class="flex-1 min-w-0">
-								<p class="font-medium text-neutral-900 truncate">
-									{{ resumeFile.name }}
-								</p>
-								<p class="text-sm text-neutral-500">
-									{{ formatFileSize(resumeFile.size) }}
-								</p>
+					<!-- 已上传的文件 -->
+					<div
+						v-if="resumeFile"
+						class="p-4 bg-gray-50 rounded-lg border border-gray-200"
+					>
+						<div class="flex items-center justify-between">
+							<div class="flex items-center gap-3 flex-1 min-w-0">
+								<UIcon
+									name="i-heroicons-document-text"
+									class="w-8 h-8 text-primary-600"
+								/>
+								<div class="flex-1 min-w-0">
+									<p class="font-medium text-neutral-900 truncate">
+										{{ resumeFile.name }}
+									</p>
+									<p class="text-sm text-neutral-500">
+										{{ formatFileSize(resumeFile.size) }}
+									</p>
+								</div>
 							</div>
+							<UButton
+								color="red"
+								variant="ghost"
+								size="sm"
+								icon="i-heroicons-trash"
+								@click="removeResume"
+							/>
 						</div>
-						<UButton
-							color="red"
-							variant="ghost"
-							size="sm"
-							icon="i-heroicons-trash"
-							@click="removeResume"
+					</div>
+
+					<!-- 或者手动输入 -->
+					<div class="pt-4 border-t border-gray-200">
+						<h3 class="font-medium text-neutral-900 mb-3">
+							或者手动输入简历内容
+						</h3>
+						<UTextarea
+							v-model="resumeText"
+							placeholder="粘贴你的简历内容..."
+							rows="6"
+							class="w-full"
 						/>
 					</div>
 				</div>
 
-				<!-- 或者手动输入 -->
-				<div class="mt-6 pt-6 border-t border-gray-200">
-					<h3 class="font-medium text-neutral-900 mb-3">
-						或者手动输入简历内容
-					</h3>
-					<UTextarea
-						v-model="resumeText"
-						placeholder="粘贴你的简历内容..."
-						rows="8"
-						class="w-full"
-					/>
-				</div>
-
 				<!-- 下一步按钮 -->
-				<div class="mt-6">
+				<div class="pt-4 border-t border-gray-200 mt-4">
 					<UButton
 						color="primary"
 						size="lg"
