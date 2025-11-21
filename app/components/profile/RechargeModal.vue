@@ -391,6 +391,9 @@ const selectedPaymentInfo = computed(() =>
 	paymentMethods.find((method) => method.id === selectedPayment.value)
 )
 
+// 定时查询订单状态的定时器
+let interval = null
+
 // 监听弹窗打开，重置表单
 watch(isOpen, (open) => {
 	if (open) {
@@ -402,6 +405,8 @@ watch(isOpen, (open) => {
 		customAmount.value = ''
 		// 生成订单二维码
 		generateOrderQRCode()
+		// 定时查询订单状态
+		interval = setInterval(queryOrderStatus, 3000)
 	} else {
 		handleClose()
 	}
@@ -483,11 +488,6 @@ const queryOrderStatus = async () => {
 		})
 	}
 }
-
-let interval = null
-onMounted(() => {
-	interval = setInterval(queryOrderStatus, 3000)
-})
 
 /**
  * 关闭弹窗，清除定时器

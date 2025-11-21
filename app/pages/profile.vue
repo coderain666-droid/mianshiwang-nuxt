@@ -338,7 +338,9 @@
 								>
 									<div class="flex items-center justify-between gap-4">
 										<div class="min-w-0">
-											<p class="text-sm font-semibold text-gray-900 truncate">
+											<p
+												class="text-sm font-semibold text-gray-900 truncate mb-1"
+											>
 												{{ record.planName }}
 												<span class="ml-2 text-xs text-gray-500">
 													{{ record.description || '暂无备注' }}
@@ -353,10 +355,11 @@
 											class="text-right shrink-0 flex flex-col justify-between h-full"
 										>
 											<p
-												class="text-xs font-semibold"
+												class="text-xs font-semibold flex gap-2 mb-1"
 												:class="recordMeta.amountClass"
 											>
-												金额：{{ record.amount }} 元
+												<ww-svg-icon :name="record.channel" class="w-4 h-4" />
+												<span>金额：{{ record.amount }} 元</span>
 											</p>
 
 											<p
