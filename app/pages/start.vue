@@ -7,50 +7,21 @@
 				class="max-w-6xl mx-auto w-full px-6 py-4 flex items-center justify-between gap-6"
 			>
 				<div>
-					<p class="text-xs font-semibold tracking-[0.3em] text-primary-500 mb-1">
-						AI INTERVIEW LAB
-					</p>
-					<h1 class="text-2xl font-bold text-neutral-900 flex items-center gap-3">
-						智能面试训练室
+					<h1
+						class="text-2xl font-bold text-neutral-900 flex items-center gap-3"
+					>
+						超智能面试训练室
 						<span
 							class="hidden sm:inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-primary-100 text-primary-700"
 						>
 							{{ currentStepInfo.title }}
 						</span>
 					</h1>
-					<p class="text-sm text-neutral-500 mt-1">
-						{{ currentStepInfo.description }}
-					</p>
-				</div>
-				<div class="flex items-center gap-6 shrink-0">
-					<div class="hidden md:flex flex-col items-end">
-						<span class="text-xs text-gray-500">完成度</span>
-						<div class="flex items-center gap-2">
-							<div class="w-28 h-2 bg-gray-200 rounded-full overflow-hidden">
-								<div
-									class="h-full bg-primary-500 rounded-full transition-all"
-									:style="{ width: `${progress}%` }"
-								></div>
-							</div>
-							<span class="text-sm font-semibold text-neutral-900">
-								{{ Math.round(progress) }}%
-							</span>
-						</div>
-					</div>
-					<UButton
-						v-if="currentStep > 1"
-						color="gray"
-						variant="ghost"
-						icon="i-heroicons-arrow-uturn-left"
-						@click="handleRestart"
-					>
-						重置流程
-					</UButton>
 				</div>
 			</div>
 		</header>
 
-		<main class="flex-1 overflow-hidden">
+		<main class="flex-1 overflow-hidden bg-gray-50">
 			<div
 				class="max-w-6xl mx-auto h-full px-4 lg:px-6 py-4 lg:py-6 flex gap-6"
 			>
@@ -76,12 +47,12 @@
 							>
 								<div
 									:class="[
-										'w-10 h-10 rounded-2xl flex items-center justify-center text-sm font-semibold transition-all',
+										'w-8 h-8 flex-shrink-0 rounded-2xl flex items-center justify-center text-sm font-semibold transition-all',
 										step.id === currentStep
 											? 'bg-primary-600 text-white shadow-lg shadow-primary-500/40'
 											: step.id < currentStep
-												? 'bg-green-100 text-green-700'
-												: 'bg-gray-100 text-gray-400'
+											? 'bg-green-100 text-green-700'
+											: 'bg-gray-100 text-gray-400'
 									]"
 								>
 									<span v-if="step.id < currentStep">✓</span>
@@ -97,13 +68,15 @@
 							<div
 								v-if="step.id !== steps.length"
 								:class="[
-									'h-10 w-px ml-5',
-									step.id < currentStep ? 'bg-primary-200' : 'bg-gray-100'
+									'h-10 w-px ml-4',
+									step.id < currentStep ? 'bg-primary-200' : 'bg-gray-200'
 								]"
 							></div>
 						</div>
 					</div>
-					<div class="p-6 bg-gradient-to-br from-primary-600 to-blue-600 text-white">
+					<div
+						class="p-6 bg-gradient-to-br from-primary-600 to-blue-600 text-white"
+					>
 						<p class="text-sm uppercase tracking-[0.2em] mb-2 text-white/70">
 							TIPS
 						</p>
@@ -112,16 +85,16 @@
 						</p>
 						<ul class="mt-3 space-y-2 text-sm text-white/80">
 							<li>· 准备好典型项目案例</li>
-							<li>· 构建结构化回答</li>
+							<li>· 构建结构化回答，采用 <StarMethodModal />法则</li>
 							<li>· 关注语速和逻辑</li>
 						</ul>
 					</div>
 				</aside>
 
 				<section
-					class="flex-1 h-full rounded-3xl border border-white/60 bg-white/90 shadow-xl shadow-primary-100/70 p-3"
+					class="flex-1 h-full rounded-3xl bg-white/90 shadow-xl shadow-primary-100/70 p-4"
 				>
-					<div class="w-full h-full rounded-2xl bg-white border border-gray-100">
+					<div class="w-full h-full rounded-2xl bg-white">
 						<InterviewStep1
 							v-if="currentStep === 1"
 							class="h-full"
@@ -132,11 +105,7 @@
 							class="h-full"
 							@complete="handleStep2Complete"
 						/>
-						<InterviewStep3
-							v-else
-							class="h-full"
-							@restart="handleRestart"
-						/>
+						<InterviewStep3 v-else class="h-full" @restart="handleRestart" />
 					</div>
 				</section>
 			</div>
@@ -222,4 +191,3 @@ useHead({
 </script>
 
 <style scoped></style>
-

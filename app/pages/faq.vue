@@ -93,15 +93,25 @@
 
 			<!-- 如果没有找到结果 -->
 			<div v-if="filteredFaqs.length === 0" class="text-center py-12">
-				<UIcon name="i-heroicons-question-mark-circle" class="w-16 h-16 text-neutral-300 mx-auto mb-4" />
+				<UIcon
+					name="i-heroicons-question-mark-circle"
+					class="w-16 h-16 text-neutral-300 mx-auto mb-4"
+				/>
 				<p class="text-neutral-500">未找到相关问题</p>
 				<p class="text-sm text-neutral-400 mt-2">请尝试使用其他关键词搜索</p>
 			</div>
 
 			<!-- 联系支持 -->
-			<div class="mt-12 bg-gradient-to-br from-primary-50 to-blue-50 rounded-xl border border-primary-200 p-8 text-center">
-				<UIcon name="i-heroicons-chat-bubble-left-right" class="w-12 h-12 text-primary-600 mx-auto mb-4" />
-				<h2 class="text-xl font-semibold text-neutral-900 mb-2">还有其他问题？</h2>
+			<div
+				class="mt-12 bg-gradient-to-br from-primary-50 to-blue-50 rounded-xl border border-primary-200 p-8 text-center"
+			>
+				<UIcon
+					name="i-heroicons-chat-bubble-left-right"
+					class="w-12 h-12 text-primary-600 mx-auto mb-4"
+				/>
+				<h2 class="text-xl font-semibold text-neutral-900 mb-2">
+					还有其他问题？
+				</h2>
 				<p class="text-neutral-600 mb-6">
 					如果这里没有找到你想要的答案，欢迎通过以下方式联系我们
 				</p>
@@ -167,7 +177,7 @@ const faqs = [
 		question: '如何开始使用面试汪？需要注册账号吗？',
 		answer: `使用面试汪非常简单，只需三个步骤：
 
-<strong>第一步：选择岗位与目标</strong>
+<strong>第一步：选择岗位与简历</strong>
 设置你的目标岗位/公司，并导入简历，系统会自动生成专属题集。
 
 <strong>第二步：开启多轮模拟面试</strong>
@@ -252,10 +262,10 @@ const faqs = [
 我们提供多种订阅方案，你可以根据需求选择合适的套餐。首次注册用户通常可以享受免费试用期。`,
 		defaultOpen: false
 	},
-		{
-			category: 'pricing',
-			question: '如何取消订阅？支持退款吗？',
-			answer: `你可以在账户设置中随时取消订阅：
+	{
+		category: 'pricing',
+		question: '如何取消订阅？支持退款吗？',
+		answer: `你可以在账户设置中随时取消订阅：
 
 • 取消后，已付费的服务在订阅期内仍可正常使用，到期后自动降级为免费版
 • 订阅取消后不会自动续费，但也不会立即停止当前服务
@@ -266,8 +276,8 @@ const faqs = [
 • 具体退款政策请参考《服务协议》
 
 如有任何疑问，请通过 <a href="/contact" class="text-primary-600 hover:underline">联系我们</a> 页面联系客服。`,
-			defaultOpen: false
-		},
+		defaultOpen: false
+	},
 	{
 		category: 'security',
 		question: '我的个人信息和数据安全如何保障？',
@@ -364,14 +374,14 @@ const filteredFaqs = computed(() => {
 
 	// 按分类过滤
 	if (activeCategory.value !== 'all') {
-		result = result.filter(item => item.category === activeCategory.value)
+		result = result.filter((item) => item.category === activeCategory.value)
 	}
 
 	// 按搜索关键词过滤
 	if (searchQuery.value.trim()) {
 		const query = searchQuery.value.toLowerCase().trim()
 		result = result.filter(
-			item =>
+			(item) =>
 				item.question.toLowerCase().includes(query) ||
 				item.answer.toLowerCase().includes(query)
 		)
@@ -381,7 +391,7 @@ const filteredFaqs = computed(() => {
 })
 
 // 获取分类颜色
-const getCategoryColor = category => {
+const getCategoryColor = (category) => {
 	const colors = {
 		general: 'bg-blue-100',
 		usage: 'bg-green-100',
@@ -393,7 +403,7 @@ const getCategoryColor = category => {
 }
 
 // 获取分类图标颜色
-const getCategoryIconColor = category => {
+const getCategoryIconColor = (category) => {
 	const colors = {
 		general: 'text-blue-600',
 		usage: 'text-green-600',
@@ -405,7 +415,7 @@ const getCategoryIconColor = category => {
 }
 
 // 获取分类图标
-const getCategoryIcon = category => {
+const getCategoryIcon = (category) => {
 	const icons = {
 		general: 'i-heroicons-question-mark-circle',
 		usage: 'i-heroicons-rocket-launch',
@@ -417,39 +427,41 @@ const getCategoryIcon = category => {
 }
 
 // 格式化答案（支持 HTML）
-const formatAnswer = answer => {
+const formatAnswer = (answer) => {
 	if (!answer) return ''
-	
+
 	// 将加粗标记转换为 HTML
 	let formatted = answer.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-	
+
 	// 按段落分割（双换行符）
-	const paragraphs = formatted.split(/\n\n+/).filter(p => p.trim())
-	
+	const paragraphs = formatted.split(/\n\n+/).filter((p) => p.trim())
+
 	// 处理每个段落
-	const processedParagraphs = paragraphs.map(para => {
+	const processedParagraphs = paragraphs.map((para) => {
 		para = para.trim()
-		
+
 		// 检查是否是列表项
 		if (para.includes('\n• ') || para.startsWith('• ')) {
 			// 处理列表
 			const listItems = para
 				.split(/\n/)
-				.map(line => line.trim())
-				.filter(line => line.startsWith('• '))
-				.map(line => line.replace(/^• /, '').trim())
+				.map((line) => line.trim())
+				.filter((line) => line.startsWith('• '))
+				.map((line) => line.replace(/^• /, '').trim())
 				.filter(Boolean)
-				.map(item => `<li>${item}</li>`)
+				.map((item) => `<li>${item}</li>`)
 				.join('')
-			
-			return listItems ? `<ul class="list-disc list-inside space-y-2 my-3 ml-2">${listItems}</ul>` : ''
+
+			return listItems
+				? `<ul class="list-disc list-inside space-y-2 my-3 ml-2">${listItems}</ul>`
+				: ''
 		}
-		
+
 		// 处理普通段落，将单换行符转换为 <br>
 		para = para.replace(/\n/g, '<br>')
 		return para ? `<p class="my-3">${para}</p>` : ''
 	})
-	
+
 	return processedParagraphs.filter(Boolean).join('')
 }
 

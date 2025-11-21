@@ -4,7 +4,7 @@
 			class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 text-center lg:text-left"
 		>
 			<div>
-				<h1 class="text-2xl font-bold text-neutral-900 mb-1">
+				<h1 class="text-xl font-bold text-neutral-900 mb-1">
 					选择岗位和导入简历
 				</h1>
 				<p class="text-neutral-600 text-sm">
