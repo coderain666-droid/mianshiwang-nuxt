@@ -68,7 +68,7 @@
 							<UIcon
 								v-if="selectedPosition?.id === position.id"
 								name="i-heroicons-check-circle"
-								class="w-6 h-6 text-primary-600 flex-shrink-0 ml-2"
+								class="w-6 h-6 text-primary-600 shrink-0 ml-2"
 							/>
 						</div>
 					</div>
@@ -171,6 +171,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import jobCatalog from '@/data/job-categories.json'
 import { useInterviewStore } from '@/stores/interview'
 import { useToast } from '#imports'
 
@@ -186,93 +187,22 @@ const fileInputRef = ref(null)
 const resumeFile = ref(null)
 const resumeText = ref('')
 
-// 岗位分类
+const catalogCategories = jobCatalog.categories ?? []
+
 const categories = [
 	{ key: 'all', label: '全部' },
-	{ key: 'tech', label: '技术' },
-	{ key: 'product', label: '产品' },
-	{ key: 'design', label: '设计' },
-	{ key: 'operation', label: '运营' },
-	{ key: 'sales', label: '销售' },
-	{ key: 'marketing', label: '市场' },
-	{ key: 'hr', label: '人力' },
-	{ key: 'finance', label: '财务' },
-	{ key: 'other', label: '其他' }
+	...catalogCategories.map((category) => ({
+		key: category.key,
+		label: category.label
+	}))
 ]
 
-// 岗位列表（示例数据，实际应从 API 获取）
-const positions = ref([
-	{
-		id: 1,
-		name: '前端开发工程师',
-		category: 'tech',
-		level: '中级',
-		description: '负责 Web 前端开发和用户界面实现'
-	},
-	{
-		id: 2,
-		name: '后端开发工程师',
-		category: 'tech',
-		level: '中级',
-		description: '负责服务器端开发和 API 设计'
-	},
-	{
-		id: 3,
-		name: '全栈开发工程师',
-		category: 'tech',
-		level: '高级',
-		description: '负责前后端全栈开发'
-	},
-	{
-		id: 4,
-		name: '产品经理',
-		category: 'product',
-		level: '中级',
-		description: '负责产品规划和需求管理'
-	},
-	{
-		id: 5,
-		name: 'UI/UX 设计师',
-		category: 'design',
-		level: '中级',
-		description: '负责用户界面和体验设计'
-	},
-	{
-		id: 6,
-		name: '运营专员',
-		category: 'operation',
-		level: '初级',
-		description: '负责产品运营和用户增长'
-	},
-	{
-		id: 7,
-		name: '销售代表',
-		category: 'sales',
-		level: '初级',
-		description: '负责客户开发和业务拓展'
-	},
-	{
-		id: 8,
-		name: '市场专员',
-		category: 'marketing',
-		level: '初级',
-		description: '负责市场营销和品牌推广'
-	},
-	{
-		id: 9,
-		name: 'HR 专员',
-		category: 'hr',
-		level: '初级',
-		description: '负责招聘和人事管理'
-	},
-	{
-		id: 10,
-		name: '财务专员',
-		category: 'finance',
-		level: '初级',
-		description: '负责财务核算和报表管理'
-	}
-])
+const positions = ref(
+	(jobCatalog.positions ?? []).map((position, index) => ({
+		...position,
+		id: position.id || `position-${index}`
+	}))
+)
 
 const selectedPosition = computed(() => interviewStore.selectedPosition)
 
