@@ -12,62 +12,75 @@
 			暂无简历
 		</div>
 
-		<div v-else>
+		<div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3">
 			<div
 				v-for="(resume, index) in userStore.resumes"
 				:key="resume.id"
-				class="flex items-center gap-4 p-4 mb-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
+				class="group relative flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all cursor-pointer"
 				@click="handlePreview(resume)"
 			>
 				<!-- 简历图标 -->
 				<div
-					class="w-12 h-12 rounded-lg bg-primary-100 flex items-center justify-center shrink-0"
+					class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center shrink-0 group-hover:from-primary-200 group-hover:to-primary-100 transition-colors"
 				>
 					<UIcon
 						name="i-heroicons-document-text"
-						class="w-6 h-6 text-primary-600"
+						class="w-7 h-7 text-primary-600"
 					/>
 				</div>
 
 				<!-- 简历信息 -->
 				<div class="flex-1 min-w-0">
-					<p class="font-medium text-gray-900 truncate">
+					<p class="font-semibold text-gray-900 truncate text-sm mb-1">
 						{{ resume.resumeName }}
 					</p>
-					<div class="flex items-center gap-3 mt-1 text-xs text-gray-500">
-						<span v-if="resume.jobInfo?.jobIntention">{{
-							resume.jobInfo?.jobIntention
+					<div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
+						<span
+							v-if="resume.jobInfo?.jobIntention"
+							class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
+						>
+							{{ resume.jobInfo?.jobIntention }}
+						</span>
+						<span
+							v-if="resume.jobInfo?.cityIntention"
+							class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
+						>
+							{{ resume.jobInfo?.cityIntention }}
+						</span>
+						<span class="text-gray-400">{{
+							formatDate(resume.createTime)
 						}}</span>
-						<span v-if="resume.jobInfo?.cityIntention">{{
-							resume.jobInfo?.cityIntention
-						}}</span>
-						<span>{{ formatDate(resume.createTime) }}</span>
 					</div>
 				</div>
 
 				<!-- 操作按钮 -->
-				<div class="flex items-center gap-2 shrink-0">
-					<!-- 修改简历名 -->
+				<div
+					class="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+					@click.stop
+				>
 					<UButton
 						color="neutral"
 						variant="ghost"
 						size="sm"
 						icon="i-heroicons-pencil"
-						@click.stop="handleEditName(index, resume)"
+						class="!p-2"
+						@click="handleEditName(index, resume)"
 					/>
 					<UButton
 						color="neutral"
 						variant="ghost"
 						size="sm"
 						icon="i-heroicons-eye"
-						@click.stop="handlePreview(resume)"
+						class="!p-2"
+						@click="handlePreview(resume)"
 					/>
 					<UButton
-						color="neutral"
+						color="red"
 						variant="ghost"
 						size="sm"
 						icon="i-heroicons-trash"
-						@click.stop="handleDelete(index, resume)"
+						class="!p-2"
+						@click="handleDelete(index, resume)"
 					/>
 				</div>
 			</div>

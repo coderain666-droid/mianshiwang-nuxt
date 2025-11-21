@@ -34,6 +34,8 @@
 						</p>
 						<p class="text-xs text-gray-500">
 							支持 PDF、DOC、DOCX 格式，文件大小不超过 5MB
+							<br />
+							（简历最多支持 5 份）
 						</p>
 					</div>
 

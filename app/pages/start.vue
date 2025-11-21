@@ -2,31 +2,12 @@
 	<div
 		class="h-screen bg-gradient-to-br from-gray-50 via-white to-slate-100 flex flex-col overflow-hidden"
 	>
-		<header class="shrink-0 border-b border-white/40 bg-white/70 backdrop-blur">
-			<div
-				class="max-w-6xl mx-auto w-full px-6 py-4 flex items-center justify-between gap-6"
-			>
-				<div>
-					<h1
-						class="text-2xl font-bold text-neutral-900 flex items-center gap-3"
-					>
-						超智能面试训练室
-						<span
-							class="hidden sm:inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-primary-100 text-primary-700"
-						>
-							{{ currentStepInfo.title }}
-						</span>
-					</h1>
-				</div>
-			</div>
-		</header>
-
 		<main class="flex-1 overflow-hidden bg-gray-50">
 			<div
-				class="max-w-6xl mx-auto h-full px-4 lg:px-6 py-4 lg:py-6 flex gap-6"
+				class="max-w-7xl mx-auto h-full px-4 lg:px-6 py-4 lg:py-6 flex gap-6"
 			>
 				<aside
-					class="hidden lg:flex w-72 h-full flex-col rounded-3xl border border-white/60 bg-white/80 backdrop-blur shadow-sm overflow-hidden"
+					class="hidden lg:flex w-72 h-full flex-col rounded-3xl border border-gray-200 bg-white/80 backdrop-blur overflow-hidden"
 				>
 					<div class="p-6 border-b border-gray-100">
 						<p class="text-sm font-semibold text-neutral-900 mb-2">流程导航</p>
@@ -92,7 +73,7 @@
 				</aside>
 
 				<section
-					class="flex-1 h-full rounded-3xl bg-white/90 shadow-xl shadow-primary-100/70 p-4"
+					class="flex-1 h-full rounded-3xl bg-white border border-gray-200 p-4"
 				>
 					<div class="w-full h-full rounded-2xl bg-white">
 						<InterviewStep1

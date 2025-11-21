@@ -2,7 +2,7 @@
 	<div
 		class="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-50 py-8"
 	>
-		<div class="container px-4 mx-auto max-w-6xl">
+		<div class="container px-4 mx-auto max-w-7xl">
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				<!-- 左侧：用户信息卡片 -->
 				<div class="lg:col-span-1">
@@ -257,7 +257,7 @@
 										v-if="userStore.canAddResume"
 										color="primary"
 										variant="solid"
-										@click="uploadResumeModal = true"
+										@click="isUploadResumeModalVisible = true"
 									>
 										<UIcon name="i-heroicons-plus" class="w-4 h-4 mr-1" />
 										上传简历
@@ -387,7 +387,7 @@
 
 		<!-- 上传简历弹窗 -->
 		<UploadResumeModal
-			v-model:open="uploadResumeModal"
+			v-model:open="isUploadResumeModalVisible"
 			@uploaded="handleResumeUploaded"
 		/>
 
@@ -430,7 +430,7 @@ const toast = useToast()
 const { $api } = useNuxtApp()
 
 const editProfileModal = ref(false)
-const uploadResumeModal = ref(false)
+const isUploadResumeModalVisible = ref(false)
 const rechargeModal = ref(false)
 const activeRecordTab = ref('recharge')
 
