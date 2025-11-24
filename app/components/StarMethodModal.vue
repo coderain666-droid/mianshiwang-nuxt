@@ -1,10 +1,15 @@
 <template>
-	<UModal title="STAR 法则" description="结构化回答行为类面试题的方法">
-		<span
-			class="cursor-pointer text-emerald-500 font-bold underline decoration-dotted"
-		>
-			STAR
-		</span>
+	<span
+		class="cursor-pointer text-emerald-500 font-bold underline decoration-dotted"
+		@click="isOpen = true"
+	>
+		STAR
+	</span>
+	<UModal
+		v-model:open="isOpen"
+		title="STAR 法则"
+		description="结构化回答行为类面试题的方法"
+	>
 		<template #body>
 			<div class="space-y-3 text-sm text-neutral-700">
 				<p>
@@ -18,7 +23,8 @@
 						>：交代背景与环境，说明当时的场景与限制。
 					</li>
 					<li>
-						<span class="font-semibold text-neutral-900">T · Task（任务）</span
+						<span class="font-semibold text-neutral-900"
+							>T · Task（任务）</span
 						>：明确你的目标或职责，为何必须解决这个问题。
 					</li>
 					<li>
@@ -40,6 +46,10 @@
 	</UModal>
 </template>
 
-<script setup></script>
+<script setup>
+import { ref } from 'vue'
+
+const isOpen = ref(false)
+</script>
 
 <style scoped></style>
