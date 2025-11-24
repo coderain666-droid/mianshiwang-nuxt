@@ -24,13 +24,13 @@
 					<h2
 						class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4"
 					>
-						面试流程
+						极简三步，快速开始 AI 面试
 					</h2>
 				</div>
 			</div>
 
 			<!-- Stepper -->
-			<nav class="flex-1 overflow-y-auto px-4 space-y-1 custom-scrollbar">
+			<nav class="flex-1 overflow-y-auto px-4 pt-1 space-y-1 custom-scrollbar">
 				<div
 					v-for="(step, index) in steps"
 					:key="step.id"
@@ -124,7 +124,7 @@
 							<span
 								class="inline-flex items-center px-2 py-1 rounded bg-white/10 text-[10px] text-white/80 border border-white/10"
 							>
-								STAR 法则
+								<StarMethodModal /> 法则
 							</span>
 							<span
 								class="inline-flex items-center px-2 py-1 rounded bg-white/10 text-[10px] text-white/80 border border-white/10"

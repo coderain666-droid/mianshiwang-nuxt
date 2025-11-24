@@ -48,7 +48,8 @@
 					</div>
 					<h3 class="text-xl font-semibold text-neutral-900">结构化评估报告</h3>
 					<p class="mt-3 text-neutral-600 leading-relaxed">
-						覆盖 STAR 模型、技能矩阵、风险点与改进建议，一键导出。
+						覆盖
+						<StarMethodModal /> 模型、技能矩阵、风险点与改进建议，一键导出。
 					</p>
 				</div>
 				<div
