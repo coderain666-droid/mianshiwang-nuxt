@@ -15,7 +15,7 @@
 							<div>
 								<span class="text-sm text-gray-600 mr-2">当前余额</span>
 								<span class="text-2xl font-bold text-primary-600">
-									{{ currentBalance }} 旺旺币
+									{{ userStore.userInfo.wwCoinBalance }} 旺旺币
 								</span>
 								<p class="text-xs text-gray-500 mt-1">
 									充值成功后即时到账，
@@ -326,21 +326,20 @@ import {
 	CUSTOM_RECHARGE_ID
 } from '@/constants/vip'
 import { createOrderAPI, queryOrderStatusAPI } from '@/api/payment'
+import { useUserStore } from '@/stores/user'
 
 const props = defineProps({
 	open: {
 		type: Boolean,
 		default: false
-	},
-	balance: {
-		type: Number,
-		default: 0
 	}
 })
 
 const { $api } = useNuxtApp()
 
 const emit = defineEmits(['update:open', 'recharge'])
+
+const userStore = useUserStore()
 
 const toast = useToast()
 const loading = ref(false)
@@ -356,11 +355,6 @@ const isOpen = computed({
 	set: (value) => emit('update:open', value)
 })
 
-const currentBalance = computed(() => props.balance)
-
-const redeemableCount = computed(() =>
-	Math.floor(Number(currentBalance.value || 0) / REDEEM_COST)
-)
 /**
  * 获取当前选择的套餐
  * 如果选择的套餐不存在，则表示为自定义充值
