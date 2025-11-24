@@ -190,13 +190,7 @@
 
 				<!-- 下一步按钮 -->
 				<div class="pt-4 border-t border-gray-200 mt-4">
-					<UButton
-						color="primary"
-						size="lg"
-						block
-						:disabled="!canProceed"
-						@click="handleNext"
-					>
+					<UButton color="primary" size="lg" block @click="handleNext">
 						下一步：开始面试
 					</UButton>
 				</div>
@@ -211,11 +205,13 @@ import jobCatalog from '@/data/job-categories.json'
 import { useInterviewStore } from '@/stores/interview'
 import { useToast } from '#imports'
 import ResumeSelector from '@/components/interview/ResumeSelector.vue'
+import { useGlobalModal } from '@/composables/useGlobalModal'
 
 const emit = defineEmits(['next'])
 
 const interviewStore = useInterviewStore()
 const toast = useToast()
+const globalModal = useGlobalModal()
 
 const searchQuery = ref('')
 const activeCategory = ref('all')
@@ -297,11 +293,16 @@ const getCategoryLabel = (category) => {
 
 const handleNext = async () => {
 	if (!canProceed.value) {
-		toast.add({
-			title: '请完成必填项',
-			description: '请选择岗位并选择简历或输入简历内容',
-			color: 'warning'
+		console.log('globalModal', globalModal)
+
+		globalModal.showModal({
+			title: '选择「岗位」和「简历」后，即可开始面试'
 		})
+		// toast.add({
+		// 	title: '请完成必填项',
+		// 	description: '请选择岗位并选择简历或输入简历内容',
+		// 	color: 'warning'
+		// })
 		return
 	}
 
