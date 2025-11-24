@@ -9,23 +9,78 @@
 					与 AI 面试官实时对话，展示你的专业能力和沟通技巧
 				</p>
 			</div>
-			<div class="text-xs text-neutral-500 flex items-center gap-2">
-				<UIcon name="i-heroicons-clock" class="w-4 h-4 text-primary-500" />
-				平均面试时长 10-15 分钟
+			<div class="flex items-center gap-4">
+				<div class="text-xs text-neutral-500 flex items-center gap-2">
+					<UIcon name="i-heroicons-clock" class="w-4 h-4 text-primary-500" />
+					平均面试时长 10-15 分钟
+				</div>
+				<!-- 一键沉浸按钮 -->
+				<UButton
+					v-if="interviewStatus !== 'idle'"
+					color="primary"
+					variant="soft"
+					size="sm"
+					:icon="
+						isImmersiveMode
+							? 'i-heroicons-arrows-pointing-in'
+							: 'i-heroicons-arrows-pointing-out'
+					"
+					@click="toggleImmersiveMode"
+					class="immersive-btn"
+				>
+					{{ isImmersiveMode ? '退出沉浸' : '一键沉浸' }}
+				</UButton>
 			</div>
 		</div>
 
+		<!-- 沉浸模式遮罩 -->
+		<Transition name="fade">
+			<div
+				v-if="isImmersiveMode"
+				class="fixed inset-0 bg-gradient-to-br from-purple-900/10 via-blue-900/10 to-indigo-900/10 backdrop-blur-sm z-40"
+				@click="toggleImmersiveMode"
+			></div>
+		</Transition>
+
 		<div
-			class="grid lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-6 flex-1 min-h-0"
+			:class="[
+				'flex-1 min-h-0 transition-all duration-500 ease-in-out',
+				isImmersiveMode
+					? 'fixed inset-4 lg:inset-8 z-50 flex items-center justify-center'
+					: 'grid lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-6'
+			]"
 		>
 			<!-- 左侧：对话区域（占2列） -->
 			<div
-				class="bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col min-h-0"
+				:class="[
+					'bg-white rounded-2xl border shadow-sm flex flex-col min-h-0 transition-all duration-500',
+					isImmersiveMode
+						? 'w-full max-w-5xl h-full border-primary-200 shadow-2xl shadow-primary-500/20'
+						: 'border-gray-200'
+				]"
 			>
+				<!-- 沉浸模式指示器 -->
+				<div
+					v-if="isImmersiveMode"
+					class="absolute top-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 bg-primary-500/10 backdrop-blur-md rounded-full border border-primary-300/30 flex items-center gap-2 text-sm text-primary-700 font-medium shadow-lg animate-fade-in"
+				>
+					<UIcon name="i-heroicons-sparkles" class="w-4 h-4" />
+					沉浸模式已开启
+					<button
+						@click.stop="toggleImmersiveMode"
+						class="ml-2 text-xs text-primary-600 hover:text-primary-800 underline"
+					>
+						ESC 退出
+					</button>
+				</div>
+
 				<!-- 对话消息列表 -->
 				<div
 					ref="messagesContainerRef"
-					class="flex-1 overflow-y-auto p-6 space-y-4"
+					:class="[
+						'flex-1 overflow-y-auto p-6 space-y-4',
+						isImmersiveMode && 'pt-20'
+					]"
 				>
 					<div
 						v-if="messages.length === 0"
@@ -50,9 +105,14 @@
 					>
 						<div
 							:class="[
-								'max-w-[80%] rounded-lg px-4 py-3',
+								'rounded-lg px-4 py-3 transition-all duration-300',
+								isImmersiveMode ? 'max-w-[85%]' : 'max-w-[80%]',
 								message.role === 'user'
-									? 'bg-primary-600 text-white'
+									? isImmersiveMode
+										? 'bg-primary-600 text-white shadow-lg shadow-primary-500/30'
+										: 'bg-primary-600 text-white'
+									: isImmersiveMode
+									? 'bg-gray-100 text-neutral-900 shadow-md'
 									: 'bg-gray-100 text-neutral-900'
 							]"
 						>
@@ -88,21 +148,34 @@
 				</div>
 
 				<!-- 输入区域 -->
-				<div class="border-t border-gray-200 p-4">
+				<div
+					:class="[
+						'border-t p-4 transition-all duration-300',
+						isImmersiveMode
+							? 'border-primary-200/50 bg-gradient-to-t from-gray-50 to-transparent'
+							: 'border-gray-200'
+					]"
+				>
 					<div class="flex gap-3">
 						<UTextarea
 							v-model="inputMessage"
-							placeholder="输入你的回答..."
-							rows="2"
+							:placeholder="
+								isImmersiveMode
+									? '沉浸式回答中... 专注表达你的想法'
+									: '输入你的回答...'
+							"
+							:rows="isImmersiveMode ? 3 : 2"
 							:disabled="!canSendMessage"
-							class="flex-1"
+							class="flex-1 transition-all duration-300"
 							@keydown.enter.exact.prevent="handleSendMessage"
 						/>
 						<UButton
 							color="primary"
 							:disabled="!canSendMessage || !inputMessage.trim()"
 							icon="i-heroicons-paper-airplane"
+							:size="isImmersiveMode ? 'lg' : 'md'"
 							@click="handleSendMessage"
+							:class="isImmersiveMode && 'shadow-lg'"
 						>
 							发送
 						</UButton>
@@ -146,57 +219,62 @@
 				</div>
 			</div>
 
-			<!-- 右侧：3D 数字人（占1列） -->
-			<div
-				class="bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col min-h-0"
-			>
-				<div class="p-4 border-b border-gray-200">
-					<h3 class="font-semibold text-neutral-900">AI 面试官</h3>
-					<p class="text-sm text-neutral-500 mt-1">
-						{{ interviewStore.selectedPosition?.name || '面试官' }}
-					</p>
-				</div>
-
-				<!-- 3D 数字人容器 -->
+			<!-- 右侧：3D 数字人（占1列） - 沉浸模式下隐藏 -->
+			<Transition name="slide-fade">
 				<div
-					class="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden"
+					v-if="!isImmersiveMode"
+					class="bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col min-h-0"
 				>
-					<!-- 占位符：实际应该集成 3D 数字人（如 Ready Player Me、VRoid 等） -->
-					<div class="text-center">
-						<UIcon
-							name="i-heroicons-user-circle"
-							class="w-32 h-32 text-gray-300 mx-auto mb-4"
-						/>
-						<p class="text-sm text-neutral-500">3D 数字人</p>
-						<p class="text-xs text-neutral-400 mt-1">正在倾听你的回答...</p>
+					<div class="p-4 border-b border-gray-200">
+						<h3 class="font-semibold text-neutral-900">AI 面试官</h3>
+						<p class="text-sm text-neutral-500 mt-1">
+							{{ interviewStore.selectedPosition?.name || '面试官' }}
+						</p>
 					</div>
 
-					<!-- 状态指示器 -->
+					<!-- 3D 数字人容器 -->
 					<div
-						v-if="interviewStatus === 'in_progress'"
-						class="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-medium"
+						class="flex-1 flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 relative overflow-hidden"
 					>
-						<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-						正在面试
-					</div>
-				</div>
+						<!-- 占位符：实际应该集成 3D 数字人（如 Ready Player Me、VRoid 等） -->
+						<div class="text-center">
+							<UIcon
+								name="i-heroicons-user-circle"
+								class="w-32 h-32 text-gray-300 mx-auto mb-4"
+							/>
+							<p class="text-sm text-neutral-500">3D 数字人</p>
+							<p class="text-xs text-neutral-400 mt-1">正在倾听你的回答...</p>
+						</div>
 
-				<!-- 底部提示 -->
-				<div class="p-4 border-t border-gray-200 bg-gray-50">
-					<div class="text-xs text-neutral-600 space-y-1">
-						<p class="font-medium mb-2">面试提示：</p>
-						<ul class="list-disc list-inside space-y-1 text-neutral-500">
-							<li>清晰表达你的观点</li>
-							<li>
-								使用
-								<StarMethodModal />
-								法则回答问题
-							</li>
-							<li>保持自信和积极的态度</li>
-						</ul>
+						<!-- 状态指示器 -->
+						<div
+							v-if="interviewStatus === 'in_progress'"
+							class="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-medium"
+						>
+							<div
+								class="w-2 h-2 bg-green-500 rounded-full animate-pulse"
+							></div>
+							正在面试
+						</div>
+					</div>
+
+					<!-- 底部提示 -->
+					<div class="p-4 border-t border-gray-200 bg-gray-50">
+						<div class="text-xs text-neutral-600 space-y-1">
+							<p class="font-medium mb-2">面试提示：</p>
+							<ul class="list-disc list-inside space-y-1 text-neutral-500">
+								<li>清晰表达你的观点</li>
+								<li>
+									使用
+									<StarMethodModal />
+									法则回答问题
+								</li>
+								<li>保持自信和积极的态度</li>
+							</ul>
+						</div>
 					</div>
 				</div>
-			</div>
+			</Transition>
 		</div>
 	</div>
 </template>
@@ -214,6 +292,7 @@ const toast = useToast()
 const inputMessage = ref('')
 const messagesContainerRef = ref(null)
 const eventSource = ref(null)
+const isImmersiveMode = ref(false)
 
 const messages = computed(() => interviewStore.messages)
 const isStreaming = computed(() => interviewStore.isStreaming)
@@ -221,6 +300,18 @@ const interviewStatus = computed(() => interviewStore.interviewStatus)
 const canSendMessage = computed(() => {
 	return interviewStatus.value === 'in_progress' && !isStreaming.value
 })
+
+// 切换沉浸模式
+const toggleImmersiveMode = () => {
+	isImmersiveMode.value = !isImmersiveMode.value
+
+	// 沉浸模式下，滚动到最新消息
+	if (isImmersiveMode.value) {
+		nextTick(() => {
+			scrollToBottom()
+		})
+	}
+}
 
 // 格式化消息内容
 const formatMessage = (content) => {
@@ -457,11 +548,21 @@ const handleComplete = async () => {
 	emit('complete')
 }
 
+// ESC 键退出沉浸模式
+const handleKeyDown = (event) => {
+	if (event.key === 'Escape' && isImmersiveMode.value) {
+		toggleImmersiveMode()
+	}
+}
+
 onMounted(() => {
 	// 如果面试已开始，恢复 SSE 连接
 	if (interviewStore.interviewId && interviewStatus.value === 'in_progress') {
 		connectSSE(interviewStore.interviewId)
 	}
+
+	// 监听键盘事件
+	window.addEventListener('keydown', handleKeyDown)
 })
 
 onUnmounted(() => {
@@ -470,6 +571,9 @@ onUnmounted(() => {
 		eventSource.value.close()
 		eventSource.value = null
 	}
+
+	// 移除键盘监听
+	window.removeEventListener('keydown', handleKeyDown)
 })
 </script>
 
@@ -482,5 +586,80 @@ onUnmounted(() => {
 	50% {
 		transform: translateY(-10px);
 	}
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+		transform: translate(-50%, -10px);
+	}
+	to {
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+}
+
+/* 沉浸模式按钮动画 */
+.immersive-btn {
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	position: relative;
+	overflow: hidden;
+}
+
+.immersive-btn:hover {
+	transform: scale(1.05);
+}
+
+.immersive-btn::before {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.3);
+	transform: translate(-50%, -50%);
+	transition: width 0.6s, height 0.6s;
+}
+
+.immersive-btn:hover::before {
+	width: 300px;
+	height: 300px;
+}
+
+/* 淡入淡出动画 */
+.fade-enter-active,
+.fade-leave-active {
+	transition: opacity 0.4s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+	opacity: 0;
+}
+
+/* 滑动淡入淡出动画 */
+.slide-fade-enter-active {
+	transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-fade-leave-active {
+	transition: all 0.3s cubic-bezier(0.4, 0, 1, 1);
+}
+
+.slide-fade-enter-from {
+	transform: translateX(20px);
+	opacity: 0;
+}
+
+.slide-fade-leave-to {
+	transform: translateX(20px);
+	opacity: 0;
+}
+
+/* 沉浸模式指示器动画 */
+.animate-fade-in {
+	animation: fade-in 0.5s ease-out;
 }
 </style>
