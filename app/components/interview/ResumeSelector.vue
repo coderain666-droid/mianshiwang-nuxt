@@ -28,7 +28,7 @@
 					:key="resume.id"
 					:class="[
 						'flex items-center gap-3 p-3 rounded-lg border-1 cursor-pointer transition-all',
-						selectedResumeId === resume.resumeId
+						interviewStore.resumeId === resume.resumeId
 							? 'border-primary-300 bg-primary-50/50'
 							: 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
 					]"
@@ -51,7 +51,7 @@
 						</p>
 					</div>
 					<UIcon
-						v-if="selectedResumeId === resume.resumeId"
+						v-if="interviewStore.resumeId === resume.resumeId"
 						name="i-heroicons-check-circle"
 						class="w-5 h-5 text-primary-500 shrink-0"
 					/>
@@ -94,7 +94,7 @@
 			<UTextarea
 				v-model="resumeText"
 				placeholder="粘贴你的简历内容..."
-				rows="6"
+				:rows="6"
 				class="w-full"
 				@update:model-value="handleTextChange"
 			/>
@@ -117,6 +117,7 @@ import { useUserStore } from '@/stores/user'
 import UploadResumeModal from '@/components/profile/UploadResumeModal.vue'
 import { getResumeListAPI } from '@/api/resume'
 import dayjs from 'dayjs'
+import { useInterviewStore } from '@/stores/interview'
 
 const props = defineProps({
 	modelValue: {
@@ -128,11 +129,11 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue'])
 
 const userStore = useUserStore()
+const interviewStore = useInterviewStore()
 const { $api } = useNuxtApp()
 
 const isUploadResumeModalVisible = ref(false)
 const resumeText = ref('')
-const selectedResumeId = ref(null)
 
 // 初始化时加载简历列表
 onMounted(async () => {
@@ -154,7 +155,7 @@ const formatDate = (date) => {
 
 // 选择简历
 const selectResume = (resume) => {
-	selectedResumeId.value = resume.resumeId
+	interviewStore.resumeId = resume.resumeId
 	resumeText.value = '' // 清空手动输入
 	emit('update:modelValue', {
 		type: 'resume',
@@ -166,7 +167,7 @@ const selectResume = (resume) => {
 // 手动输入变化
 const handleTextChange = (value) => {
 	if (value.trim()) {
-		selectedResumeId.value = null // 清空选择的简历
+		interviewStore.resumeId = null // 清空选择的简历
 		emit('update:modelValue', {
 			type: 'text',
 			text: value.trim()
@@ -188,13 +189,14 @@ watch(
 	() => props.modelValue,
 	(newValue) => {
 		if (!newValue) {
-			selectedResumeId.value = null
-			resumeText.value = ''
-		} else if (newValue.type === 'text') {
+			return
+		}
+
+		if (newValue.type === 'text') {
 			resumeText.value = newValue.text || ''
-			selectedResumeId.value = null
+			interviewStore.resumeId = null
 		} else if (newValue.type === 'resume') {
-			selectedResumeId.value = newValue.resumeId
+			interviewStore.resumeId = newValue.resumeId
 			resumeText.value = ''
 		}
 	},

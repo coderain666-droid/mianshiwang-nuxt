@@ -6,25 +6,25 @@ export const useInterviewStore = defineStore('interview', {
 		currentStep: 1,
 		selectedService: null,
 		targetCompany: '',
-		
+
 		// 第一步：岗位和简历
 		selectedPosition: null, // { id, name, category, ... }
-		resumeFile: null, // File 对象
-		resumeUrl: null, // 上传后的 URL
-		resumeText: '', // 解析后的简历文本
-		
+		resumeType: null, // 简历类型：resume, text
+		resumeId: null, // 简历 ID
+		resumeText: '', // 简历文本
+
 		// 第二步：面试过程
 		interviewId: null, // 面试会话 ID
 		interviewStatus: 'idle', // idle, starting, in_progress, ended
 		messages: [], // 对话消息列表 [{ role: 'user'|'assistant', content: string, timestamp: Date }]
 		isStreaming: false, // 是否正在流式输出
-		
+
 		// 第三步：报告
 		report: null, // 结构化报告数据
 		plan7Days: null, // 7天强化计划
-		reportGenerated: false, // 是否已生成报告
+		reportGenerated: false // 是否已生成报告
 	}),
-	
+
 	getters: {
 		// 是否可以进入下一步
 		canGoToNextStep: (state) => {
@@ -36,19 +36,22 @@ export const useInterviewStore = defineStore('interview', {
 			}
 			return false
 		},
-		
+
 		// 是否正在进行面试
 		isInterviewing: (state) => {
-			return state.interviewStatus === 'in_progress' || state.interviewStatus === 'starting'
+			return (
+				state.interviewStatus === 'in_progress' ||
+				state.interviewStatus === 'starting'
+			)
 		}
 	},
-	
+
 	actions: {
 		// 设置当前步骤
 		setCurrentStep(step) {
 			this.currentStep = step
 		},
-		
+
 		// 选择岗位
 		selectPosition(position) {
 			this.selectedPosition = position
@@ -63,14 +66,7 @@ export const useInterviewStore = defineStore('interview', {
 		setTargetCompany(company) {
 			this.targetCompany = company
 		},
-		
-		// 设置简历
-		setResume(file, url, text = '') {
-			this.resumeFile = file
-			this.resumeUrl = url
-			this.resumeText = text
-		},
-		
+
 		// 开始面试
 		startInterview(interviewId) {
 			this.interviewId = interviewId
@@ -78,7 +74,7 @@ export const useInterviewStore = defineStore('interview', {
 			this.messages = []
 			this.currentStep = 2
 		},
-		
+
 		// 添加消息
 		addMessage(role, content) {
 			this.messages.push({
@@ -87,27 +83,30 @@ export const useInterviewStore = defineStore('interview', {
 				timestamp: new Date()
 			})
 		},
-		
+
 		// 更新最后一条消息（用于流式输出）
 		updateLastMessage(content) {
-			if (this.messages.length > 0 && this.messages[this.messages.length - 1].role === 'assistant') {
+			if (
+				this.messages.length > 0 &&
+				this.messages[this.messages.length - 1].role === 'assistant'
+			) {
 				this.messages[this.messages.length - 1].content = content
 			} else {
 				this.addMessage('assistant', content)
 			}
 		},
-		
+
 		// 设置流式状态
 		setStreaming(isStreaming) {
 			this.isStreaming = isStreaming
 		},
-		
+
 		// 结束面试
 		endInterview() {
 			this.interviewStatus = 'ended'
 			this.isStreaming = false
 		},
-		
+
 		// 设置报告
 		setReport(report, plan7Days) {
 			this.report = report
@@ -115,7 +114,7 @@ export const useInterviewStore = defineStore('interview', {
 			this.reportGenerated = true
 			this.currentStep = 3
 		},
-		
+
 		// 重置面试数据
 		resetInterview() {
 			this.interviewId = null
@@ -128,18 +127,17 @@ export const useInterviewStore = defineStore('interview', {
 			this.selectedService = null
 			this.targetCompany = ''
 		},
-		
+
 		// 完全重置（重新开始）
 		reset() {
 			this.currentStep = 1
 			this.selectedPosition = null
-			this.resumeFile = null
-			this.resumeUrl = null
+			this.resumeType = null
+			this.resumeId = null
 			this.resumeText = ''
 			this.resetInterview()
 		}
 	},
-	
+
 	persist: true
 })
-

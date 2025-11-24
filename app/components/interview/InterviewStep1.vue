@@ -391,11 +391,12 @@ const handleNext = async () => {
 
 	// 保存简历数据到 store
 	if (resumeData.value) {
-		// TODO：这里还需要进行修改，因为简历分为 用户上传的简历 和 简历汪 制作的简历两种
-		if (resumeData.value.type === 'resume') {
-			interviewStore.setResume(null, resumeData.value.resume.resumeUrl, '')
-		} else if (resumeData.value.type === 'text') {
-			interviewStore.setResume(null, null, resumeData.value.text)
+		const type = resumeData.value.type
+		interviewStore.resumeType = type
+		if (type === 'resume') {
+			interviewStore.resumeId = resumeData.value.resume.resumeId
+		} else if (type === 'text') {
+			interviewStore.resumeText = resumeData.value.text
 		}
 	}
 
