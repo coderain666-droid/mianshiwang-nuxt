@@ -2,6 +2,8 @@ import { useUserStore } from '@/stores/user'
 import { useUIStore } from '@/stores/ui'
 
 export default defineNuxtRouteMiddleware((to) => {
+	console.log('defineNuxtRouteMiddleware~~~~')
+
 	if (!to.meta.requiresAuth) return
 
 	const userStore = useUserStore()
@@ -19,4 +21,3 @@ export default defineNuxtRouteMiddleware((to) => {
 	uiStore.showAuthPrompt(to.fullPath)
 	return abortNavigation()
 })
-

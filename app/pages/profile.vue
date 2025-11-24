@@ -413,7 +413,8 @@ import { getUserInfoAPI, getPaymentRecordsAPI } from '@/api/user'
 import dayjs from 'dayjs'
 
 definePageMeta({
-	requiresAuth: true
+	requiresAuth: true,
+	middleware: 'auth'
 })
 
 useHead({

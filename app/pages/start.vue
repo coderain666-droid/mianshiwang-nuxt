@@ -215,6 +215,7 @@ import { SEO } from '@/constants/seo'
 
 definePageMeta({
 	requiresAuth: true,
+	middleware: 'auth',
 	layout: false // We are defining our own layout structure here
 })
 
