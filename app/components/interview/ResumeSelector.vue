@@ -27,9 +27,9 @@
 					v-for="resume in userStore.resumes"
 					:key="resume.id"
 					:class="[
-						'flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-all',
+						'flex items-center gap-3 p-3 rounded-lg border-1 cursor-pointer transition-all',
 						selectedResumeId === resume.resumeId
-							? 'border-primary-500 bg-primary-50'
+							? 'border-primary-300 bg-primary-50/50'
 							: 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
 					]"
 					@click="selectResume(resume)"
@@ -53,7 +53,7 @@
 					<UIcon
 						v-if="selectedResumeId === resume.resumeId"
 						name="i-heroicons-check-circle"
-						class="w-5 h-5 text-primary-600 shrink-0"
+						class="w-5 h-5 text-primary-500 shrink-0"
 					/>
 				</div>
 			</div>

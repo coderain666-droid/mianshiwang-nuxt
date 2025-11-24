@@ -92,49 +92,8 @@
 					</div>
 				</div>
 
-				<!-- 已选择的岗位展示 -->
-				<div
-					v-if="selectedPosition"
-					class="p-4 rounded-lg border-2 border-primary-500 bg-primary-50 mb-4"
-				>
-					<div class="flex items-start justify-between">
-						<div class="flex-1">
-							<div class="flex items-center gap-2 mb-1">
-								<UIcon
-									name="i-heroicons-check-circle"
-									class="w-5 h-5 text-primary-600"
-								/>
-								<h3 class="font-semibold text-neutral-900">
-									{{ selectedPosition.name }}
-								</h3>
-							</div>
-							<p class="text-sm text-neutral-600 mb-2">
-								{{ selectedPosition.description }}
-							</p>
-							<div class="flex items-center gap-2 text-xs text-neutral-500">
-								<span class="px-2 py-0.5 rounded bg-white/60">
-									{{ getCategoryLabel(selectedPosition.category) }}
-								</span>
-								<span v-if="selectedPosition.level">
-									· {{ selectedPosition.level }}
-								</span>
-							</div>
-						</div>
-						<UButton
-							color="gray"
-							variant="ghost"
-							size="sm"
-							icon="i-heroicons-x-mark"
-							@click="clearPosition"
-						/>
-					</div>
-				</div>
-
 				<!-- 岗位列表（可选，用于浏览） -->
-				<div
-					v-if="!selectedPosition"
-					class="flex-1 min-h-0 overflow-hidden flex flex-col"
-				>
+				<div class="flex-1 min-h-0 overflow-hidden flex flex-col">
 					<p class="text-xs text-neutral-500 mb-2">
 						<span v-if="filteredPositions.length > 0">
 							或从下方列表中选择（{{ filteredPositions.length }} 个岗位）
@@ -150,24 +109,30 @@
 						<div
 							v-for="position in filteredPositions"
 							:key="position.id"
-							:class="[
-								'p-3 rounded-lg border cursor-pointer transition-all',
-								'border-gray-200 hover:border-primary-300 hover:bg-primary-50/50',
-								'hover:shadow-sm'
-							]"
+							class="p-3 rounded-lg border cursor-pointer transition-all border-gray-200 hover:border-primary-300 hover:bg-primary-50/50 hover:shadow-sm"
+							:class="{
+								'border-primary-300 bg-primary-50/50 shadow-sm':
+									position.id === interviewStore.selectedPosition.id
+							}"
 							@click="selectPosition(position)"
 						>
-							<div class="flex items-start justify-between gap-2">
+							<div class="flex items-center justify-between gap-2">
 								<div class="flex-1 min-w-0">
 									<h3
 										class="font-medium text-neutral-900 text-sm mb-1 truncate"
 									>
 										{{ position.name }}
+										<span
+											v-if="getCategoryLabel(position.category)"
+											class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-500"
+										>
+											{{ getCategoryLabel(position.category) }}
+										</span>
 									</h3>
 									<p class="text-xs text-neutral-600 line-clamp-1 mb-1">
 										{{ position.description }}
 									</p>
-									<div
+									<!-- <div
 										class="flex items-center gap-2 text-[10px] text-neutral-500"
 									>
 										<span
@@ -179,11 +144,19 @@
 										<span v-if="position.level" class="opacity-70">
 											{{ position.level }}
 										</span>
-									</div>
+									</div> -->
 								</div>
 								<UIcon
-									name="i-heroicons-chevron-right"
+									:name="
+										position.id === interviewStore.selectedPosition.id
+											? 'i-heroicons-check-circle'
+											: 'i-heroicons-chevron-right'
+									"
 									class="w-4 h-4 text-neutral-400 shrink-0 mt-0.5"
+									:class="{
+										'text-primary-500 w-5 h-5':
+											position.id === interviewStore.selectedPosition.id
+									}"
 								/>
 							</div>
 						</div>
@@ -266,11 +239,8 @@ const positions = ref(
 	}))
 )
 
-const selectedPosition = computed(() => interviewStore.selectedPosition)
-
 const selectPosition = (position) => {
 	interviewStore.selectPosition(position)
-	searchQuery.value = position.name
 }
 
 const handleCategoryFilter = (categoryKey) => {
