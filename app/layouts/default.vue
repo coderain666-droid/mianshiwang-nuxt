@@ -212,8 +212,6 @@
 			</footer>
 			<BackToTop />
 		</div>
-
-		<AuthPromptModal />
 	</UApp>
 </template>
 
@@ -221,7 +219,6 @@
 import { useUIStore } from '@/stores/ui'
 import { navigateTo, useToast } from '#imports'
 import wechatQRCode from '@/assets/imgs/sunday-gong-zhong-hao.png'
-import AuthPromptModal from '@/components/AuthPromptModal.vue'
 
 const toaster = { position: 'top-right' }
 const uiStore = useUIStore()
