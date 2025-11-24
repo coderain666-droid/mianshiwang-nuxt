@@ -2,31 +2,11 @@ import { computed, createApp, defineComponent, h, onMounted, ref } from 'vue'
 import { UModal, UButton, UIcon } from '#components'
 
 const buildFallbackButtons = (options = {}) => {
-	if (Array.isArray(options.buttons) && options.buttons.length > 0) {
+	if (Array.isArray(options.buttons)) {
 		return options.buttons
 	}
 
-	const fallback = []
-
-	if (typeof options.onCancel === 'function') {
-		fallback.push({
-			label: options.cancelText || '取消',
-			color: options.cancelColor || 'gray',
-			variant: options.cancelVariant || 'ghost',
-			closeOnClick: options.cancelCloseOnClick ?? true,
-			onClick: options.onCancel
-		})
-	}
-
-	fallback.push({
-		label: options.confirmText || '确认',
-		color: options.confirmColor || 'primary',
-		variant: options.confirmVariant || 'solid',
-		closeOnClick: options.confirmCloseOnClick ?? true,
-		onClick: options.onConfirm
-	})
-
-	return fallback
+	return []
 }
 
 const createContainer = () => {
