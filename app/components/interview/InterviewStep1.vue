@@ -296,7 +296,8 @@ const handleNext = async () => {
 		console.log('globalModal', globalModal)
 
 		globalModal.showModal({
-			title: '选择「岗位」和「简历」后，即可开始面试'
+			title: '提示',
+			content: '选择「岗位」和「简历」后，即可开始面试'
 		})
 		// toast.add({
 		// 	title: '请完成必填项',

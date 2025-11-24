@@ -137,7 +137,7 @@ const ModalHost = defineComponent({
 				},
 				{
 					body: () =>
-						h('div', { class: 'p-1 space-y-1' }, [
+						h('div', { class: '' }, [
 							props.options.contentComponent
 								? h(
 										props.options.contentComponent,
