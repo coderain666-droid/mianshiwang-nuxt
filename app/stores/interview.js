@@ -4,6 +4,8 @@ export const useInterviewStore = defineStore('interview', {
 	state: () => ({
 		// 当前步骤：1-选择岗位和简历, 2-面试中, 3-查看报告
 		currentStep: 1,
+		selectedService: null,
+		targetCompany: '',
 		
 		// 第一步：岗位和简历
 		selectedPosition: null, // { id, name, category, ... }
@@ -50,6 +52,16 @@ export const useInterviewStore = defineStore('interview', {
 		// 选择岗位
 		selectPosition(position) {
 			this.selectedPosition = position
+		},
+
+		// 选择服务类型
+		setSelectedService(service) {
+			this.selectedService = service
+		},
+
+		// 设置目标公司
+		setTargetCompany(company) {
+			this.targetCompany = company
 		},
 		
 		// 设置简历
@@ -113,6 +125,8 @@ export const useInterviewStore = defineStore('interview', {
 			this.report = null
 			this.plan7Days = null
 			this.reportGenerated = false
+			this.selectedService = null
+			this.targetCompany = ''
 		},
 		
 		// 完全重置（重新开始）

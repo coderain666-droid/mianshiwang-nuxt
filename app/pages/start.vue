@@ -254,7 +254,10 @@ const currentStepComponent = computed(() => {
 	}
 })
 
-const handleStep1Next = () => {
+const handleStep1Next = (serviceId) => {
+	if (serviceId) {
+		interviewStore.setSelectedService(serviceId)
+	}
 	interviewStore.setCurrentStep(2)
 }
 

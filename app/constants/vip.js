@@ -97,16 +97,19 @@ export const paymentMethods = [
 // 服务亮点列表
 export const serviceHighlights = [
 	{
+		id: SERVICE_TAGS.RESUME,
 		title: '简历押题',
 		description: '面试知己知彼，精准拆解岗位需求。',
 		icon: 'i-heroicons-document-text'
 	},
 	{
+		id: SERVICE_TAGS.SPECIAL,
 		title: '专项面试',
 		description: '靶向练习，细分场景训练更高效。', // 针对技术面试、专业场景面试进行训练，提升应对能力。
 		icon: 'i-heroicons-bolt'
 	},
 	{
+		id: SERVICE_TAGS.BEHAVIOR,
 		title: '综合面试',
 		description: '全方位评估与反馈，查漏补缺更全面。', // 适合行测与HR面试，全面评估与反馈，帮助全面提升面试表现。
 		icon: 'i-heroicons-chat-bubble-left-right'

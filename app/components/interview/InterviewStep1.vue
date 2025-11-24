@@ -204,8 +204,11 @@ import { ref, computed } from 'vue'
 import jobCatalog from '@/data/job-categories.json'
 import { useInterviewStore } from '@/stores/interview'
 import { useToast } from '#imports'
+import { navigateTo } from '#app'
 import ResumeSelector from '@/components/interview/ResumeSelector.vue'
 import { useGlobalModal } from '@/composables/useGlobalModal'
+import ServiceSelectionContent from '@/components/interview/ServiceSelectionContent.vue'
+import { serviceHighlights, SERVICE_TAGS } from '@/constants/vip'
 
 const emit = defineEmits(['next'])
 
@@ -291,10 +294,89 @@ const getCategoryLabel = (category) => {
 	return cat ? cat.label : category
 }
 
+const serviceOptionMeta = {
+	[SERVICE_TAGS.RESUME]: {
+		accent: 'bg-blue-50 text-blue-500',
+		points: ['结合岗位 JD 输出押题清单', '附带示范答案与提醒'],
+		cta: '前往简历押题',
+		badge: '洞察岗位',
+		badgeClass: 'text-blue-700 bg-blue-100',
+		badgeIcon: 'i-heroicons-document-text'
+	},
+	[SERVICE_TAGS.SPECIAL]: {
+		accent: 'bg-violet-50 text-violet-600',
+		points: ['模拟真实面试问答', 'AI 即时反馈与追问'],
+		cta: '进入专项面试',
+		badge: '专业技能',
+		badgeClass: 'text-violet-700 bg-violet-100',
+		badgeIcon: 'i-heroicons-sparkles'
+	},
+	[SERVICE_TAGS.BEHAVIOR]: {
+		accent: 'bg-emerald-50 text-emerald-600',
+		points: ['评估沟通与表达', '输出结构化改进建议'],
+		cta: '开启综合面试',
+		badge: '全方位',
+		badgeClass: 'text-emerald-700 bg-emerald-100',
+		badgeIcon: 'i-heroicons-chat-bubble-left-right'
+	}
+}
+
+const serviceOptions = computed(() =>
+	serviceHighlights.map((item) => ({
+		...item,
+		accent: serviceOptionMeta[item.id]?.accent || 'bg-gray-100 text-gray-500',
+		points: serviceOptionMeta[item.id]?.points || [],
+		cta: serviceOptionMeta[item.id]?.cta,
+		badge: serviceOptionMeta[item.id]?.badge,
+		badgeClass: serviceOptionMeta[item.id]?.badgeClass,
+		badgeIcon: serviceOptionMeta[item.id]?.badgeIcon
+	}))
+)
+
+const serviceRouteMap = {
+	[SERVICE_TAGS.RESUME]: '/services/resume',
+	[SERVICE_TAGS.BEHAVIOR]: '/services/behavior'
+}
+
+const presentServiceSelection = () => {
+	let controller = null
+
+	const handleSelection = async (serviceId) => {
+		interviewStore.setSelectedService(serviceId)
+		debugger
+		if (serviceId === SERVICE_TAGS.SPECIAL) {
+			controller?.close('selected')
+			emit('next', serviceId)
+			return
+		}
+
+		const target = serviceRouteMap[serviceId]
+		controller?.close('selected')
+		if (target) {
+			await navigateTo(target)
+		} else {
+			toast.add({
+				title: '暂未开放',
+				description: '该服务暂未配置跳转地址，请稍后再试',
+				color: 'warning'
+			})
+		}
+	}
+
+	controller = globalModal.showModal({
+		title: '选择下一步体验',
+		description: '根据目标需求选择想要开启的服务形态',
+		contentComponent: ServiceSelectionContent,
+		contentProps: {
+			options: serviceOptions.value,
+			onSelect: handleSelection
+		},
+		buttons: []
+	})
+}
+
 const handleNext = async () => {
 	if (!canProceed.value) {
-		console.log('globalModal', globalModal)
-
 		globalModal.showModal({
 			title: '提示',
 			content: '选择「岗位」和「简历」后，即可开始面试'
@@ -309,6 +391,7 @@ const handleNext = async () => {
 
 	// 保存简历数据到 store
 	if (resumeData.value) {
+		// TODO：这里还需要进行修改，因为简历分为 用户上传的简历 和 简历汪 制作的简历两种
 		if (resumeData.value.type === 'resume') {
 			interviewStore.setResume(null, resumeData.value.resume.resumeUrl, '')
 		} else if (resumeData.value.type === 'text') {
@@ -316,7 +399,7 @@ const handleNext = async () => {
 		}
 	}
 
-	emit('next')
+	presentServiceSelection()
 }
 </script>
 
