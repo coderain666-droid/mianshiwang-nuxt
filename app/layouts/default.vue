@@ -35,7 +35,7 @@
 							<ul class="space-y-2 text-sm">
 								<li>
 									<NuxtLink
-										to="/start"
+										to="/interview/start"
 										class="text-neutral-600 hover:text-neutral-900 transition-colors"
 									>
 										开始 AI 面试

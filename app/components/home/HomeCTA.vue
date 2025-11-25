@@ -15,7 +15,7 @@
 						<UButton
 							size="xl"
 							color="primary"
-							to="/start"
+							to="/interview/start"
 							class="px-8 font-semibold shadow-lg shadow-primary-500/20"
 							>免费开始</UButton
 						>

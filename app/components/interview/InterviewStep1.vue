@@ -326,8 +326,9 @@ const serviceOptions = computed(() =>
 )
 
 const serviceRouteMap = {
-	[SERVICE_TAGS.RESUME]: '/services/resume',
-	[SERVICE_TAGS.BEHAVIOR]: '/services/behavior'
+	[SERVICE_TAGS.RESUME]: '/interview/resume',
+	[SERVICE_TAGS.SPECIAL]: '/interview/special',
+	[SERVICE_TAGS.BEHAVIOR]: '/interview/behavior'
 }
 
 const presentServiceSelection = () => {
@@ -335,15 +336,10 @@ const presentServiceSelection = () => {
 
 	const handleSelection = async (serviceId) => {
 		interviewStore.setSelectedService(serviceId)
-		debugger
-		if (serviceId === SERVICE_TAGS.SPECIAL) {
-			controller?.close('selected')
-			emit('next', serviceId)
-			return
-		}
 
 		const target = serviceRouteMap[serviceId]
 		controller?.close('selected')
+
 		if (target) {
 			await navigateTo(target)
 		} else {

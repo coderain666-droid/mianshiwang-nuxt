@@ -43,7 +43,7 @@
 						<UButton
 							size="xl"
 							color="primary"
-							to="/start"
+							to="/interview/start"
 							class="px-8 font-semibold shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 transition-all"
 							>开始一场模拟面试</UButton
 						>

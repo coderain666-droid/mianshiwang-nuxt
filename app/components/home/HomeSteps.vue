@@ -69,7 +69,7 @@
 				<UButton
 					color="primary"
 					size="xl"
-					to="/start"
+					to="/interview/start"
 					class="px-8 shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 transition-all font-semibold"
 					>立即开始 · 免费体验</UButton
 				>

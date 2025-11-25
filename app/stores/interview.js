@@ -9,9 +9,9 @@ export const useInterviewStore = defineStore('interview', {
 
 		// 第一步：岗位和简历
 		selectedPosition: null, // { id, name, category, ... }
-		resumeType: null, // 简历类型：resume, text
-		resumeId: null, // 简历 ID
-		resumeText: '', // 简历文本
+		resumeType: null, // 简历类型：'resume' | 'text'
+		resumeId: null, // 简历 ID（当 type='resume' 时）
+		resumeText: '', // 简历文本（当 type='text' 时）
 
 		// 第二步：面试过程
 		interviewId: null, // 面试会话 ID
@@ -29,7 +29,7 @@ export const useInterviewStore = defineStore('interview', {
 		// 是否可以进入下一步
 		canGoToNextStep: (state) => {
 			if (state.currentStep === 1) {
-				return state.selectedPosition && (state.resumeUrl || state.resumeText)
+				return state.selectedPosition && (state.resumeId || state.resumeText)
 			}
 			if (state.currentStep === 2) {
 				return state.interviewStatus === 'ended'

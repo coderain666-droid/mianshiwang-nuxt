@@ -18,7 +18,7 @@
 			</div>
 			<nav class="hidden md:flex items-center gap-6 text-sm text-neutral-600">
 				<NuxtLink
-					to="/start"
+					to="/interview/start"
 					:class="[
 						'transition-colors',
 						activeNav === 'start'

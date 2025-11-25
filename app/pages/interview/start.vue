@@ -180,23 +180,7 @@
 			<div class="flex-1 overflow-hidden relative w-full flex flex-col">
 				<div class="flex-1 overflow-hidden px-4 py-6 lg:px-8 lg:py-8">
 					<div class="max-w-[1600px] mx-auto h-full w-full">
-						<Transition
-							enter-active-class="transition duration-300 ease-out"
-							enter-from-class="transform translate-y-4 opacity-0"
-							enter-to-class="transform translate-y-0 opacity-100"
-							leave-active-class="transition duration-200 ease-in"
-							leave-from-class="transform translate-y-0 opacity-100"
-							leave-to-class="transform translate-y-4 opacity-0"
-							mode="out-in"
-						>
-							<component
-								:is="currentStepComponent"
-								class="h-full"
-								@next="handleStep1Next"
-								@complete="handleStep2Complete"
-								@restart="handleRestart"
-							/>
-						</Transition>
+						<InterviewStep1 class="h-full" />
 					</div>
 				</div>
 			</div>
@@ -205,11 +189,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useInterviewStore } from '@/stores/interview'
 import InterviewStep1 from '@/components/interview/InterviewStep1.vue'
-import InterviewStep2 from '@/components/interview/InterviewStep2.vue'
-import InterviewStep3 from '@/components/interview/InterviewStep3.vue'
 import { useHead } from 'nuxt/app'
 import { SEO } from '@/constants/seo'
 
@@ -218,8 +198,6 @@ definePageMeta({
 	middleware: 'auth',
 	layout: false // We are defining our own layout structure here
 })
-
-const interviewStore = useInterviewStore()
 
 const steps = [
 	{
@@ -239,40 +217,11 @@ const steps = [
 	}
 ]
 
-const currentStep = computed(() => interviewStore.currentStep)
+// 固定显示第一步
+const currentStep = 1
 
-const currentStepComponent = computed(() => {
-	switch (currentStep.value) {
-		case 1:
-			return InterviewStep1
-		case 2:
-			return InterviewStep2
-		case 3:
-			return InterviewStep3
-		default:
-			return InterviewStep1
-	}
-})
-
-const handleStep1Next = (serviceId) => {
-	if (serviceId) {
-		interviewStore.setSelectedService(serviceId)
-	}
-	interviewStore.setCurrentStep(2)
-}
-
-const handleStep2Complete = () => {
-	interviewStore.setCurrentStep(3)
-}
-
-const handleRestart = () => {
-	interviewStore.reset()
-}
-
-const navigateToStep = (targetStep) => {
-	if (targetStep < currentStep.value) {
-		interviewStore.setCurrentStep(targetStep)
-	}
+const navigateToStep = () => {
+	// 只有第一步，不需要导航
 }
 
 useHead({
