@@ -16,12 +16,12 @@
 			<div
 				v-for="(resume, index) in userStore.resumes"
 				:key="resume.id"
-				class="group relative flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all cursor-pointer"
+				class="group relative flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all cursor-pointer"
 				@click="handlePreview(resume)"
 			>
 				<!-- 简历图标 -->
 				<div
-					class="w-14 h-14 rounded-xl bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center shrink-0 group-hover:from-primary-200 group-hover:to-primary-100 transition-colors"
+					class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center shrink-0 group-hover:from-primary-200 group-hover:to-primary-100 transition-colors"
 				>
 					<UIcon
 						name="i-heroicons-document-text"
@@ -35,7 +35,8 @@
 						{{ resume.resumeName }}
 					</p>
 					<div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
-						<span
+						<!-- TODO：暂时隐藏 -->
+						<!-- <span
 							v-if="resume.jobInfo?.jobIntention"
 							class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
 						>
@@ -46,7 +47,7 @@
 							class="px-2 py-0.5 rounded-full bg-gray-100 text-gray-600"
 						>
 							{{ resume.jobInfo?.cityIntention }}
-						</span>
+						</span> -->
 						<span class="text-gray-400">{{
 							formatDate(resume.createTime)
 						}}</span>

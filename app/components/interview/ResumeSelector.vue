@@ -27,7 +27,7 @@
 					v-for="resume in userStore.resumes"
 					:key="resume.id"
 					:class="[
-						'flex items-center gap-3 p-3 rounded-lg border-1 cursor-pointer transition-all',
+						'group flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all',
 						interviewStore.resumeId === resume.resumeId
 							? 'border-primary-300 bg-primary-50/50'
 							: 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
@@ -50,6 +50,17 @@
 							{{ formatDate(resume.createTime) }}
 						</p>
 					</div>
+
+					<!-- 预览按钮 -->
+					<UButton
+						color="neutral"
+						variant="ghost"
+						size="sm"
+						icon="i-heroicons-eye"
+						class="p-2! opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+						@click.stop="handlePreview(resume)"
+					/>
+
 					<UIcon
 						v-if="interviewStore.resumeId === resume.resumeId"
 						name="i-heroicons-check-circle"
@@ -108,6 +119,27 @@
 			v-model:open="isUploadResumeModalVisible"
 			@uploaded="handleResumeUploaded"
 		/>
+
+		<!-- 预览弹窗 -->
+		<UModal
+			v-model:open="previewModal"
+			:title="previewTitle"
+			:ui="{ content: 'w-[1200px] max-w-[90vw]' }"
+		>
+			<template #body>
+				<div class="border rounded-lg overflow-hidden">
+					<iframe
+						v-if="previewResume?.resumeUrl"
+						:src="previewResume?.resumeUrl"
+						class="w-full h-[600px]"
+						frameborder="0"
+					/>
+					<div v-else class="p-12 text-center text-gray-500">
+						<p>无法预览此文件</p>
+					</div>
+				</div>
+			</template>
+		</UModal>
 	</div>
 </template>
 
@@ -131,9 +163,14 @@ const emit = defineEmits(['update:modelValue'])
 const userStore = useUserStore()
 const interviewStore = useInterviewStore()
 const { $api } = useNuxtApp()
+const config = useRuntimeConfig()
 
 const isUploadResumeModalVisible = ref(false)
 const resumeText = ref('')
+
+// 预览相关
+const previewModal = ref(false)
+const previewResume = ref(null)
 
 // 初始化时加载简历列表
 onMounted(async () => {
@@ -176,6 +213,34 @@ const handleTextChange = (value) => {
 		emit('update:modelValue', null)
 	}
 }
+
+// 预览简历
+const handlePreview = (resume) => {
+	// 判断是否为用户单独上传的简历
+	if (!resume.isJianLiWang) {
+		previewResume.value = resume
+		previewModal.value = true
+		return
+	}
+
+	// 简历汪简历：拼接预览地址
+	previewResume.value = {
+		...resume,
+		resumeUrl: `${config.public.resumePreviewUrl}edit?id=${resume.resumeId}&template=${resume.templateName}`
+	}
+	previewModal.value = true
+}
+
+// 预览标题
+const previewTitle = computed(() => {
+	if (!previewResume.value) return '简历预览'
+
+	if (!previewResume.value.isJianLiWang) {
+		return previewResume.value?.resumeName
+	}
+
+	return previewResume.value?.resumeName + '（支持在线修改，可同步生效）'
+})
 
 // 简历上传成功
 const handleResumeUploaded = async () => {
