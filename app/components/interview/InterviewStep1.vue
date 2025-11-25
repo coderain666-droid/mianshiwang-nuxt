@@ -180,7 +180,7 @@
 			<div
 				class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm flex flex-col min-h-0"
 			>
-				<div class="flex-1 min-h-0 overflow-y-auto pr-1">
+				<div class="flex-1 min-h-0 overflow-y-auto pr-1 custom-scrollbar">
 					<ResumeSelector v-model="resumeData">
 						<template #title>
 							<h2 class="text-lg font-semibold text-neutral-900">选择简历</h2>
@@ -392,23 +392,4 @@ const handleNext = async () => {
 }
 </script>
 
-<style scoped>
-/* 自定义滚动条样式 */
-.custom-scrollbar::-webkit-scrollbar {
-	width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-	background: transparent;
-	border-radius: 3px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-	background: #d1d5db;
-	border-radius: 3px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-	background: #9ca3af;
-}
-</style>
+<style scoped></style>

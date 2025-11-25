@@ -66,18 +66,4 @@ const pageTitle = computed(() => {
 })
 </script>
 
-<style scoped>
-.custom-scrollbar::-webkit-scrollbar {
-	width: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-	background: transparent;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-	background: #cbd5e1;
-	border-radius: 2px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-	background: #94a3b8;
-}
-</style>
+<style scoped></style>
