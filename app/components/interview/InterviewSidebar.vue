@@ -32,7 +32,7 @@
 						</div>
 						<div>
 							<h1 class="font-bold text-slate-900 text-lg leading-tight">
-								AI 模拟面试
+								面试汪：超 AI 服务
 							</h1>
 							<p class="text-xs text-slate-500">Resume Wang Interview</p>
 						</div>

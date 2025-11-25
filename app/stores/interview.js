@@ -6,6 +6,7 @@ export const useInterviewStore = defineStore('interview', {
 		currentStep: 1,
 		// 侧边栏是否打开
 		isSidebarOpen: true,
+		// 选中的服务类型：special, resume, behavior
 		selectedService: null,
 		targetCompany: '',
 
@@ -49,11 +50,6 @@ export const useInterviewStore = defineStore('interview', {
 	},
 
 	actions: {
-		// 设置当前步骤
-		setCurrentStep(step) {
-			this.currentStep = step
-		},
-
 		// 选择岗位
 		selectPosition(position) {
 			this.selectedPosition = position

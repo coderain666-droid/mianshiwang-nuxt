@@ -21,7 +21,7 @@
 						to="/interview/start"
 						class="hover:text-primary-600 transition-colors flex items-center gap-1"
 					>
-						AI 模拟面试
+						开始专项服务
 					</NuxtLink>
 					<span class="text-slate-300">/</span>
 					<span class="text-slate-900 font-medium">{{ pageTitle }}</span>
@@ -52,20 +52,69 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRoute } from '#imports'
+import { computed, onMounted } from 'vue'
+import { useRoute, navigateTo } from '#imports'
+import { useInterviewStore } from '@/stores/interview'
+import { SERVICE_TAGS, serviceHighlights } from '@/constants/vip'
 import InterviewSidebar from '@/components/interview/InterviewSidebar.vue'
 
 const route = useRoute()
+const interviewStore = useInterviewStore()
 
+// 页面标题映射
 const pageTitle = computed(() => {
 	const titleMap = {
-		'/interview/special': '专项面试',
-		'/interview/special/report': '面试报告',
-		'/interview/behavior': '综合面试',
-		'/interview/behavior/report': '面试报告'
+		'/interview/resume': serviceHighlights[0].title,
+		'/interview/special': serviceHighlights[1].title,
+		'/interview/behavior': serviceHighlights[2].title,
+		'/interview/report': '面试报告'
 	}
 	return titleMap[route.path] || '面试'
+})
+
+// 服务路径与服务类型的映射
+const serviceRouteMap = {
+	'/interview/special': SERVICE_TAGS.SPECIAL,
+	'/interview/resume': SERVICE_TAGS.RESUME,
+	'/interview/behavior': SERVICE_TAGS.BEHAVIOR
+}
+
+// 统一的路由守卫逻辑
+onMounted(() => {
+	const currentPath = route.path
+
+	// 报告页面守卫
+	if (currentPath === '/interview/report') {
+		// 检查是否已生成报告
+		if (!interviewStore.report || !interviewStore.reportGenerated) {
+			// 根据当前选择的服务跳转到对应的面试页面
+			const serviceTypeMap = {
+				[SERVICE_TAGS.SPECIAL]: '/interview/special',
+				[SERVICE_TAGS.RESUME]: '/interview/resume',
+				[SERVICE_TAGS.BEHAVIOR]: '/interview/behavior'
+			}
+			const targetPath =
+				serviceTypeMap[interviewStore.selectedService] || '/interview/start'
+			navigateTo(targetPath)
+			return
+		}
+	}
+
+	// 服务页面守卫（special/resume/behavior）
+	const requiredService = serviceRouteMap[currentPath]
+	if (requiredService) {
+		// 检查是否已选择岗位
+		if (!interviewStore.selectedPosition) {
+			navigateTo('/interview/start')
+			return
+		}
+
+		// 检查服务类型是否匹配
+		if (interviewStore.selectedService !== requiredService) {
+			navigateTo('/interview/start')
+			return
+		}
+	}
 })
 </script>
 

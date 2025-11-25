@@ -231,6 +231,9 @@ useHead({
 const emit = defineEmits(['next'])
 
 const interviewStore = useInterviewStore()
+// 确定当前为 第一步
+interviewStore.currentStep = 1
+
 const toast = useToast()
 const globalModal = useGlobalModal()
 
