@@ -177,8 +177,13 @@
 <script setup>
 import { ref } from 'vue'
 import { useInterviewStore } from '@/stores/interview'
+import { navigateTo, useRoute } from '#imports'
+import { SERVICE_TAGS } from '@/constants/vip'
+import { useToast } from '#imports'
 
 const interviewStore = useInterviewStore()
+const route = useRoute()
+const toast = useToast()
 
 const steps = [
 	{
@@ -202,8 +207,79 @@ const toggleSidebar = () => {
 	interviewStore.isSidebarOpen = !interviewStore.isSidebarOpen
 }
 
-// TODO：点击对应步骤的跳转
-const handleStepClick = (stepId) => {}
+/**
+ * 处理步骤点击事件
+ * 规则：
+ * 1. 只能点击已完成或当前步骤
+ * 2. Step 1: 总是跳转到 /interview/start
+ * 3. Step 2: 根据选择的服务类型跳转到对应页面
+ * 4. Step 3: 只有在报告生成后才能访问
+ */
+const handleStepClick = (stepId) => {
+	// 禁止点击未解锁的步骤
+	if (stepId > interviewStore.currentStep) {
+		toast.add({
+			title: '步骤未解锁',
+			description: '请先完成当前步骤',
+			color: 'warning',
+			icon: 'i-heroicons-lock-closed'
+		})
+		return
+	}
+
+	// Step 1: 返回开始页面
+	if (stepId === 1) {
+		navigateTo('/interview/start')
+		return
+	}
+
+	// Step 2: 根据服务类型跳转
+	if (stepId === 2) {
+		const serviceRouteMap = {
+			[SERVICE_TAGS.SPECIAL]: '/interview/special',
+			[SERVICE_TAGS.RESUME]: '/interview/resume',
+			[SERVICE_TAGS.BEHAVIOR]: '/interview/behavior'
+		}
+
+		const targetPath = serviceRouteMap[interviewStore.selectedService]
+
+		if (!targetPath) {
+			toast.add({
+				title: '未选择服务',
+				description: '请先在第一步选择服务类型',
+				color: 'warning'
+			})
+			navigateTo('/interview/start')
+			return
+		}
+
+		// 避免重复跳转到当前页面
+		if (route.path !== targetPath) {
+			navigateTo(targetPath)
+		}
+		return
+	}
+
+	// Step 3: 跳转到报告页面
+	if (stepId === 3) {
+		// 检查报告是否已生成
+		if (!interviewStore.report || !interviewStore.reportGenerated) {
+			toast.add({
+				title: '报告未生成',
+				description: '请先完成面试以生成报告',
+				color: 'warning',
+				icon: 'i-heroicons-document-text'
+			})
+			return
+		}
+
+		// 避免重复跳转到当前页面
+		if (route.path !== '/interview/report') {
+			navigateTo('/interview/report')
+		}
+		return
+	}
+}
 </script>
 
 <style scoped>
