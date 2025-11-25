@@ -112,7 +112,7 @@
 							class="p-3 rounded-lg border cursor-pointer transition-all border-gray-200 hover:border-primary-300 hover:bg-primary-50/50 hover:shadow-sm"
 							:class="{
 								'border-primary-300 bg-primary-50/50 shadow-sm':
-									position.id === interviewStore.selectedPosition.id
+									position.id === interviewStore.selectedPosition?.id
 							}"
 							@click="selectPosition(position)"
 						>
@@ -148,14 +148,14 @@
 								</div>
 								<UIcon
 									:name="
-										position.id === interviewStore.selectedPosition.id
+										position.id === interviewStore.selectedPosition?.id
 											? 'i-heroicons-check-circle'
 											: 'i-heroicons-chevron-right'
 									"
 									class="w-4 h-4 text-neutral-400 shrink-0 mt-0.5"
 									:class="{
 										'text-primary-500 w-5 h-5':
-											position.id === interviewStore.selectedPosition.id
+											position.id === interviewStore.selectedPosition?.id
 									}"
 								/>
 							</div>
