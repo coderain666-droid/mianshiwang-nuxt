@@ -65,14 +65,13 @@
 							}"
 						></div>
 
-						<button
-							class="group w-full text-left relative z-10 flex gap-4"
+						<div
+							class="group w-full text-left relative z-10 flex gap-4 transition-opacity"
 							:class="[
 								step.id <= interviewStore.currentStep
-									? 'cursor-pointer'
-									: 'cursor-not-allowed'
+									? 'cursor-pointer hover:opacity-80'
+									: 'cursor-not-allowed opacity-70'
 							]"
-							:disabled="step.id > interviewStore.currentStep"
 							@click="handleStepClick(step.id)"
 						>
 							<!-- Icon/Number -->
@@ -90,6 +89,11 @@
 									v-if="step.id < interviewStore.currentStep"
 									name="i-heroicons-check"
 									class="w-4 h-4"
+								/>
+								<UIcon
+									v-else-if="step.id > interviewStore.currentStep"
+									name="i-heroicons-lock-closed"
+									class="w-3.5 h-3.5"
 								/>
 								<span v-else>{{ step.id }}</span>
 							</div>
@@ -119,7 +123,7 @@
 									{{ step.summary }}
 								</p>
 							</div>
-						</button>
+						</div>
 					</div>
 				</nav>
 
