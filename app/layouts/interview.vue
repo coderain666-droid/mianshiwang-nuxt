@@ -1,5 +1,7 @@
 <template>
 	<div class="h-screen bg-slate-50 flex overflow-hidden font-sans">
+		<!-- Sidebar -->
+		<InterviewSidebar />
 		<!-- Main Content -->
 		<main class="flex-1 min-w-0 bg-slate-50 flex flex-col h-full relative">
 			<!-- Top Navigation / Status Bar -->
@@ -52,6 +54,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from '#imports'
+import InterviewSidebar from '@/components/interview/InterviewSidebar.vue'
 
 const route = useRoute()
 
