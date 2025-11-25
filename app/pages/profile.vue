@@ -118,7 +118,9 @@
 												{{ userStore.userInfo.wwCoinBalance }}
 											</span>
 											<p class="mt-1 text-[11px] text-white/70">
-												20 旺旺币可兑换一次简历押题 / 专项面试 / 综合面试
+												20 旺旺币可兑换一次 {{ serviceHighlights[0].title }} /
+												{{ serviceHighlights[1].title }} /
+												{{ serviceHighlights[2].title }}
 											</p>
 										</div>
 
@@ -126,22 +128,22 @@
 											<div
 												v-for="stat in [
 													{
-														label: '简历押题',
+														label: serviceHighlights[0].title,
 														value: userStore.userInfo.resumeRemainingCount,
 														icon: 'i-heroicons-document-text',
-														desc: '剩余押题次数'
+														desc: `剩余${serviceHighlights[0].title}次数`
 													},
 													{
-														label: '专项面试',
+														label: serviceHighlights[1].title,
 														value: userStore.userInfo.specialRemainingCount,
 														icon: 'i-heroicons-light-bulb',
-														desc: '专项演练次数'
+														desc: `剩余${serviceHighlights[1].title}次数`
 													},
 													{
-														label: '综合面试',
+														label: serviceHighlights[2].title,
 														value: userStore.userInfo.behaviorRemainingCount,
 														icon: 'i-heroicons-users',
-														desc: '综合面试次数'
+														desc: `剩余${serviceHighlights[2].title}次数`
 													}
 												]"
 												:key="stat.label"
@@ -402,6 +404,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import { serviceHighlights } from '@/constants/vip'
 import { useUserStore } from '@/stores/user'
 import { useToast } from '#imports'
 import EditProfileModal from '@/components/profile/EditProfileModal.vue'

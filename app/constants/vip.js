@@ -10,6 +10,39 @@ export const SERVICE_TAGS = {
 	BEHAVIOR: 'behavior'
 }
 
+// 服务亮点列表
+export const serviceHighlights = [
+	{
+		id: SERVICE_TAGS.RESUME,
+		title: '简历押题',
+
+		badge: '洞察岗位',
+		description: '面试知己知彼，精准拆解岗位需求。',
+		points: ['结合岗位 JD 输出押题清单', '附带示范答案与提醒'],
+		icon: 'i-heroicons-document-text'
+	},
+	{
+		id: SERVICE_TAGS.SPECIAL,
+		title: '专项面试',
+		badge: '专业技能',
+		description: '靶向练习，技术+专业场景训练更高效。', // 针对技术面试、专业场景面试进行训练，提升应对能力。
+		points: ['模拟真实面试问答', 'AI 即时反馈与追问'],
+		icon: 'i-heroicons-bolt'
+	},
+	{
+		id: SERVICE_TAGS.BEHAVIOR,
+		title: '行测 + HR 面试',
+		badge: '全方位',
+		description: '全面评估应试者的基础素质与软技能，帮助提升面试全局表现。',
+		points: [
+			'行测题库与模拟测试',
+			'HR 面试软技能评估与反馈',
+			'评估沟通与表达能力'
+		],
+		icon: 'i-heroicons-chat-bubble-left-right'
+	}
+]
+
 // 充值套餐列表
 // 需要和 后端套餐验证一致才有效。不从后端获取数据的原因为：尽量减少接口请求次数
 export const rechargePlans = [
@@ -24,9 +57,17 @@ export const rechargePlans = [
 		coins: 18.8,
 		badge: '',
 		perks: [
-			{ key: SERVICE_TAGS.RESUME, label: '简历押题', count: 0 },
-			{ key: SERVICE_TAGS.SPECIAL, label: '专项面试', count: 1 },
-			{ key: SERVICE_TAGS.BEHAVIOR, label: '综合面试', count: 0 }
+			{ key: SERVICE_TAGS.RESUME, label: serviceHighlights[0].title, count: 0 },
+			{
+				key: SERVICE_TAGS.SPECIAL,
+				label: serviceHighlights[1].title,
+				count: 1
+			},
+			{
+				key: SERVICE_TAGS.BEHAVIOR,
+				label: serviceHighlights[2].title,
+				count: 0
+			}
 		]
 	},
 	{
@@ -40,9 +81,17 @@ export const rechargePlans = [
 		coins: 28.8,
 		badge: '热销',
 		perks: [
-			{ key: SERVICE_TAGS.RESUME, label: '简历押题', count: 1 },
-			{ key: SERVICE_TAGS.SPECIAL, label: '专项面试', count: 1 },
-			{ key: SERVICE_TAGS.BEHAVIOR, label: '综合面试', count: 1 }
+			{ key: SERVICE_TAGS.RESUME, label: serviceHighlights[0].title, count: 1 },
+			{
+				key: SERVICE_TAGS.SPECIAL,
+				label: serviceHighlights[1].title,
+				count: 1
+			},
+			{
+				key: SERVICE_TAGS.BEHAVIOR,
+				label: serviceHighlights[2].title,
+				count: 1
+			}
 		]
 	},
 	{
@@ -55,9 +104,17 @@ export const rechargePlans = [
 		saving: 111.2,
 		coins: 68.8,
 		perks: [
-			{ key: SERVICE_TAGS.RESUME, label: '简历押题', count: 3 },
-			{ key: SERVICE_TAGS.SPECIAL, label: '专项面试', count: 3 },
-			{ key: SERVICE_TAGS.BEHAVIOR, label: '综合面试', count: 3 }
+			{ key: SERVICE_TAGS.RESUME, label: serviceHighlights[0].title, count: 3 },
+			{
+				key: SERVICE_TAGS.SPECIAL,
+				label: serviceHighlights[1].title,
+				count: 3
+			},
+			{
+				key: SERVICE_TAGS.BEHAVIOR,
+				label: serviceHighlights[2].title,
+				count: 3
+			}
 		]
 	},
 	{
@@ -71,9 +128,17 @@ export const rechargePlans = [
 		coins: 128.8,
 		badge: '高性价比',
 		perks: [
-			{ key: SERVICE_TAGS.RESUME, label: '简历押题', count: 6 },
-			{ key: SERVICE_TAGS.SPECIAL, label: '专项面试', count: 16 },
-			{ key: SERVICE_TAGS.BEHAVIOR, label: '综合面试', count: 8 }
+			{ key: SERVICE_TAGS.RESUME, label: serviceHighlights[0].title, count: 6 },
+			{
+				key: SERVICE_TAGS.SPECIAL,
+				label: serviceHighlights[1].title,
+				count: 16
+			},
+			{
+				key: SERVICE_TAGS.BEHAVIOR,
+				label: serviceHighlights[2].title,
+				count: 8
+			}
 		]
 	}
 ]
@@ -94,31 +159,9 @@ export const paymentMethods = [
 	}
 ]
 
-// 服务亮点列表
-export const serviceHighlights = [
-	{
-		id: SERVICE_TAGS.RESUME,
-		title: '简历押题',
-		description: '面试知己知彼，精准拆解岗位需求。',
-		icon: 'i-heroicons-document-text'
-	},
-	{
-		id: SERVICE_TAGS.SPECIAL,
-		title: '专项面试',
-		description: '靶向练习，细分场景训练更高效。', // 针对技术面试、专业场景面试进行训练，提升应对能力。
-		icon: 'i-heroicons-bolt'
-	},
-	{
-		id: SERVICE_TAGS.BEHAVIOR,
-		title: '综合面试',
-		description: '全方位评估与反馈，查漏补缺更全面。', // 适合行测与HR面试，全面评估与反馈，帮助全面提升面试表现。
-		icon: 'i-heroicons-chat-bubble-left-right'
-	}
-]
-
 // 兑换服务列表
 export const redeemServices = [
-	{ type: SERVICE_TAGS.RESUME, label: '简历押题' },
-	{ type: SERVICE_TAGS.SPECIAL, label: '专项面试' },
-	{ type: SERVICE_TAGS.BEHAVIOR, label: '综合面试' }
+	{ type: SERVICE_TAGS.RESUME, label: serviceHighlights[0].title },
+	{ type: SERVICE_TAGS.SPECIAL, label: serviceHighlights[1].title },
+	{ type: SERVICE_TAGS.BEHAVIOR, label: serviceHighlights[2].title }
 ]

@@ -23,7 +23,9 @@
 										>{{ REDEEM_COST }}
 									</span>
 									<!-- TODO：实现兑换功能 -->
-									旺旺币可兑换一次简历押题 / 专项面试 / 综合面试
+									旺旺币可兑换一次 {{ serviceHighlights[0].title }} /
+									{{ serviceHighlights[1].title }} /
+									{{ serviceHighlights[2].title }}
 									<span class="text-gray-500 text-xs ml-4">
 										目前可兑换
 										<span class="text-primary-600 font-bold text-sm">{{
@@ -66,7 +68,9 @@
 							>
 						</div>
 						<p class="text-[11px] text-gray-500">
-							旺旺币可用于兑换 简历押题 / 专项面试 / 综合面试 等服务
+							旺旺币可用于兑换 {{ serviceHighlights[0].title }} /
+							{{ serviceHighlights[1].title }} /
+							{{ serviceHighlights[2].title }} 等服务
 						</p>
 					</div>
 				</div>

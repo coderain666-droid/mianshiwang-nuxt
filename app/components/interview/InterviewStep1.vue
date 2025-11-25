@@ -284,8 +284,8 @@ const filteredPositions = computed(() => {
 const canProceed = computed(() => {
 	return (
 		interviewStore.selectedPosition &&
-		resumeData.value &&
-		(resumeData.value.type === 'resume' || resumeData.value.type === 'text')
+		interviewStore.resumeType &&
+		(interviewStore.resumeId || interviewStore.resumeText)
 	)
 })
 
@@ -297,25 +297,19 @@ const getCategoryLabel = (category) => {
 const serviceOptionMeta = {
 	[SERVICE_TAGS.RESUME]: {
 		accent: 'bg-blue-50 text-blue-500',
-		points: ['结合岗位 JD 输出押题清单', '附带示范答案与提醒'],
-		cta: '前往简历押题',
-		badge: '洞察岗位',
+		cta: '前往' + serviceHighlights[0].title,
 		badgeClass: 'text-blue-700 bg-blue-100',
 		badgeIcon: 'i-heroicons-document-text'
 	},
 	[SERVICE_TAGS.SPECIAL]: {
 		accent: 'bg-violet-50 text-violet-600',
-		points: ['模拟真实面试问答', 'AI 即时反馈与追问'],
-		cta: '进入专项面试',
-		badge: '专业技能',
+		cta: '进入' + serviceHighlights[1].title,
 		badgeClass: 'text-violet-700 bg-violet-100',
 		badgeIcon: 'i-heroicons-sparkles'
 	},
 	[SERVICE_TAGS.BEHAVIOR]: {
 		accent: 'bg-emerald-50 text-emerald-600',
-		points: ['评估沟通与表达', '输出结构化改进建议'],
-		cta: '开启综合面试',
-		badge: '全方位',
+		cta: '开启' + serviceHighlights[2].title,
 		badgeClass: 'text-emerald-700 bg-emerald-100',
 		badgeIcon: 'i-heroicons-chat-bubble-left-right'
 	}
@@ -325,9 +319,7 @@ const serviceOptions = computed(() =>
 	serviceHighlights.map((item) => ({
 		...item,
 		accent: serviceOptionMeta[item.id]?.accent || 'bg-gray-100 text-gray-500',
-		points: serviceOptionMeta[item.id]?.points || [],
 		cta: serviceOptionMeta[item.id]?.cta,
-		badge: serviceOptionMeta[item.id]?.badge,
 		badgeClass: serviceOptionMeta[item.id]?.badgeClass,
 		badgeIcon: serviceOptionMeta[item.id]?.badgeIcon
 	}))
