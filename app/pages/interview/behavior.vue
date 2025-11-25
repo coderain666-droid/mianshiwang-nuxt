@@ -1,5 +1,9 @@
 <template>
-	<div class="h-full">我是 HR 面试</div>
+	<div class="h-full">
+		<!-- Sidebar -->
+		<InterviewSidebar />
+		我是 HR 面试
+	</div>
 </template>
 
 <script setup>
@@ -9,6 +13,7 @@ import { navigateTo } from '#imports'
 import { useHead } from 'nuxt/app'
 import { SEO } from '@/constants/seo'
 import { SERVICE_TAGS, serviceHighlights } from '@/constants/vip'
+import InterviewSidebar from '@/components/interview/InterviewSidebar.vue'
 
 definePageMeta({
 	requiresAuth: true,

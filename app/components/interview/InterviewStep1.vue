@@ -191,7 +191,7 @@
 				<!-- 下一步按钮 -->
 				<div class="pt-4 border-t border-gray-200 mt-4">
 					<UButton color="primary" size="lg" block @click="handleNext">
-						下一步：开始面试
+						下一步：开启专项服务
 					</UButton>
 				</div>
 			</div>

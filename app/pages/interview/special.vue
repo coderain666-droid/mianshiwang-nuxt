@@ -1,5 +1,7 @@
 <template>
 	<div class="h-full">
+		<!-- Sidebar -->
+		<InterviewSidebar />
 		<InterviewStep2 @complete="handleComplete" />
 	</div>
 </template>
@@ -12,6 +14,7 @@ import InterviewStep2 from '@/components/interview/InterviewStep2.vue'
 import { useHead } from 'nuxt/app'
 import { SEO } from '@/constants/seo'
 import { SERVICE_TAGS, serviceHighlights } from '@/constants/vip'
+import InterviewSidebar from '@/components/interview/InterviewSidebar.vue'
 
 definePageMeta({
 	requiresAuth: true,

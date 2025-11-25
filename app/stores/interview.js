@@ -4,6 +4,8 @@ export const useInterviewStore = defineStore('interview', {
 	state: () => ({
 		// 当前步骤：1-选择岗位和简历, 2-面试中, 3-查看报告
 		currentStep: 1,
+		// 侧边栏是否打开
+		isSidebarOpen: true,
 		selectedService: null,
 		targetCompany: '',
 

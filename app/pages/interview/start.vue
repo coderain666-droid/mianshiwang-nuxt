@@ -1,149 +1,7 @@
 <template>
 	<div class="h-screen bg-slate-50 flex overflow-hidden font-sans">
 		<!-- Sidebar -->
-		<aside
-			class="w-72 lg:w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 z-10"
-		>
-			<!-- Header -->
-			<div class="p-6 pb-2">
-				<div class="flex items-center gap-3 mb-6">
-					<div
-						class="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center text-white shadow-lg shadow-primary-200"
-					>
-						<UIcon name="i-heroicons-academic-cap" class="w-6 h-6" />
-					</div>
-					<div>
-						<h1 class="font-bold text-slate-900 text-lg leading-tight">
-							AI 模拟面试
-						</h1>
-						<p class="text-xs text-slate-500">Resume Wang Interview</p>
-					</div>
-				</div>
-
-				<div class="px-1">
-					<h2
-						class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4"
-					>
-						极简三步，快速开始 AI 面试
-					</h2>
-				</div>
-			</div>
-
-			<!-- Stepper -->
-			<nav class="flex-1 overflow-y-auto px-4 pt-1 space-y-1 custom-scrollbar">
-				<div
-					v-for="(step, index) in steps"
-					:key="step.id"
-					class="relative pb-8 last:pb-0"
-				>
-					<!-- Connecting Line -->
-					<div
-						v-if="index !== steps.length - 1"
-						class="absolute top-8 left-4 bottom-0 w-px bg-slate-100 -ml-0.5"
-						:class="{ 'bg-primary-100': step.id < currentStep }"
-					></div>
-
-					<button
-						class="group w-full text-left relative z-10 flex gap-4"
-						:class="[
-							step.id <= currentStep ? 'cursor-pointer' : 'cursor-not-allowed'
-						]"
-						:disabled="step.id > currentStep"
-						@click="navigateToStep(step.id)"
-					>
-						<!-- Icon/Number -->
-						<div
-							class="shrink-0 w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold transition-all duration-300 bg-white"
-							:class="[
-								step.id === currentStep
-									? 'border-primary-600 text-primary-600 shadow-md scale-110'
-									: step.id < currentStep
-									? 'border-primary-200 bg-primary-50 text-primary-600'
-									: 'border-slate-200 text-slate-300'
-							]"
-						>
-							<UIcon
-								v-if="step.id < currentStep"
-								name="i-heroicons-check"
-								class="w-4 h-4"
-							/>
-							<span v-else>{{ step.id }}</span>
-						</div>
-
-						<!-- Content -->
-						<div class="pt-1">
-							<h3
-								class="text-sm font-semibold transition-colors duration-200"
-								:class="[
-									step.id === currentStep
-										? 'text-slate-900'
-										: step.id < currentStep
-										? 'text-slate-700'
-										: 'text-slate-400'
-								]"
-							>
-								{{ step.title }}
-							</h3>
-							<p
-								class="text-xs mt-1 transition-colors duration-200 pr-2"
-								:class="[
-									step.id === currentStep ? 'text-slate-500' : 'text-slate-400'
-								]"
-							>
-								{{ step.summary }}
-							</p>
-						</div>
-					</button>
-				</div>
-			</nav>
-
-			<!-- Bottom Tips -->
-			<div class="p-4 mt-auto">
-				<div
-					class="rounded-xl bg-linear-to-br from-slate-900 to-slate-800 p-5 text-white shadow-lg relative overflow-hidden group"
-				>
-					<!-- Decorative elements -->
-					<div
-						class="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-2xl transform translate-x-8 -translate-y-8 group-hover:bg-white/10 transition-colors"
-					></div>
-					<div
-						class="absolute bottom-0 left-0 w-20 h-20 bg-primary-500/20 rounded-full blur-xl transform -translate-x-8 translate-y-8"
-					></div>
-
-					<div class="relative z-10">
-						<div class="flex items-center gap-2 mb-2 text-primary-300">
-							<UIcon name="i-heroicons-light-bulb" class="w-4 h-4" />
-							<span class="text-xs font-bold tracking-wider uppercase"
-								>Tips</span
-							>
-						</div>
-						<p class="text-sm font-medium leading-relaxed text-white/90">
-							通过 AI 面试预演，提前暴露问题并快速迭代。
-						</p>
-						<div class="mt-3 flex flex-wrap gap-2">
-							<span
-								class="inline-flex items-center px-2 py-1 rounded bg-white/10 text-[10px] text-white/80 border border-white/10"
-							>
-								<StarMethodModal /> 法则
-							</span>
-							<span
-								class="inline-flex items-center px-2 py-1 rounded bg-white/10 text-[10px] text-white/80 border border-white/10"
-							>
-								结构化回答
-							</span>
-						</div>
-					</div>
-				</div>
-
-				<!-- Footer Info -->
-				<div
-					class="mt-4 px-2 flex justify-between items-center text-[10px] text-slate-400"
-				>
-					<span>© Resume Wang</span>
-					<span>v1.0.0</span>
-				</div>
-			</div>
-		</aside>
+		<InterviewSidebar />
 
 		<!-- Main Content -->
 		<main class="flex-1 min-w-0 bg-slate-50 flex flex-col h-full relative">
@@ -190,6 +48,7 @@
 
 <script setup>
 import InterviewStep1 from '@/components/interview/InterviewStep1.vue'
+import InterviewSidebar from '@/components/interview/InterviewSidebar.vue'
 import { useHead } from 'nuxt/app'
 import { SEO } from '@/constants/seo'
 
@@ -198,31 +57,6 @@ definePageMeta({
 	middleware: 'auth',
 	layout: false // We are defining our own layout structure here
 })
-
-const steps = [
-	{
-		id: 1,
-		title: '选择岗位与简历',
-		summary: '定位目标岗位，导入简历'
-	},
-	{
-		id: 2,
-		title: '开始 AI 面试',
-		summary: '实时对话，模拟真实场景'
-	},
-	{
-		id: 3,
-		title: '查看分析报告',
-		summary: '多维度评估与提升计划'
-	}
-]
-
-// 固定显示第一步
-const currentStep = 1
-
-const navigateToStep = () => {
-	// 只有第一步，不需要导航
-}
 
 useHead({
 	title: `开始 AI 面试 - ${SEO.siteName}`,
@@ -234,5 +68,3 @@ useHead({
 	]
 })
 </script>
-
-<style scoped></style>
