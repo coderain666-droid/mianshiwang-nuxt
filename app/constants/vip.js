@@ -15,7 +15,6 @@ export const serviceHighlights = [
 	{
 		id: SERVICE_TAGS.RESUME,
 		title: '简历押题',
-
 		badge: '洞察岗位',
 		description: '面试知己知彼，精准拆解岗位需求。',
 		points: ['结合岗位 JD 输出押题清单', '附带示范答案与提醒'],

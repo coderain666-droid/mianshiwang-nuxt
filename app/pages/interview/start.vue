@@ -108,11 +108,11 @@
 					>
 						<div
 							v-for="position in filteredPositions"
-							:key="position.id"
+							:key="position.positionId"
 							class="p-3 rounded-lg border cursor-pointer transition-all border-gray-200 hover:border-primary-300 hover:bg-primary-50/50 hover:shadow-sm"
 							:class="{
 								'border-primary-300 bg-primary-50/50 shadow-sm':
-									position.id === interviewStore.selectedPosition?.id
+									position.positionId === interviewStore.selectedPosition?.id
 							}"
 							@click="selectPosition(position)"
 						>
@@ -121,7 +121,7 @@
 									<h3
 										class="font-medium text-neutral-900 text-sm mb-1 truncate"
 									>
-										{{ position.name }}
+										{{ position.positionName }}
 										<span
 											v-if="getCategoryLabel(position.category)"
 											class="ml-2 px-1.5 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-500"
@@ -148,14 +148,15 @@
 								</div>
 								<UIcon
 									:name="
-										position.id === interviewStore.selectedPosition?.id
+										position.positionId === interviewStore.selectedPosition?.id
 											? 'i-heroicons-check-circle'
 											: 'i-heroicons-chevron-right'
 									"
 									class="w-4 h-4 text-neutral-400 shrink-0 mt-0.5"
 									:class="{
 										'text-primary-500 w-5 h-5':
-											position.id === interviewStore.selectedPosition?.id
+											position.positionId ===
+											interviewStore.selectedPosition?.id
 									}"
 								/>
 							</div>
@@ -254,7 +255,7 @@ const categories = [
 const positions = ref(
 	(jobCatalog.positions ?? []).map((position, index) => ({
 		...position,
-		id: position.id || `position-${index}`
+		id: position.positionId || `position-${index}`
 	}))
 )
 

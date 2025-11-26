@@ -30,7 +30,7 @@
 							开启 AI 精准押题
 							<span
 								class="text-[10px] text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded-full border border-primary-100"
-								>采用 Ultra 模型</span
+								>采用 Ultra 级模型</span
 							>
 						</p>
 						<p class="text-neutral-500 text-xs mb-2">
@@ -102,7 +102,7 @@
 							</span>
 						</label>
 						<UInput
-							v-model="interviewStore.selectedPosition.name"
+							v-model="interviewStore.selectedPosition.positionName"
 							class="w-full text-sm"
 							placeholder="请输入岗位名称，如：前端开发工程师"
 							size="lg"
@@ -214,9 +214,10 @@
 						<UTextarea
 							class="w-full"
 							v-model="interviewStore.selectedPosition.jd"
+							maxlength="1000"
 							placeholder="请直接粘贴目标岗位的职位描述（JD）...
 
-💡 提示：越详细的 JD（包含任职要求、技术栈、加分项），生成的押题越准确。
+💡 提示：越详细的 JD（包含任职要求、技术栈、加分项），生成的押题越准确，最大 1000 字。
 
 示例：
 1. 负责前端核心业务功能的开发与维护
@@ -506,7 +507,7 @@ const handlePredictClick = () => {
 		contentComponent: SpecialInterviewConfirm,
 		contentProps: {
 			serviceType: 'resume',
-			positionName: interviewStore.selectedPosition.name || '通用岗位',
+			positionName: interviewStore.selectedPosition.positionName || '通用岗位',
 			company: interviewStore.selectedPosition.company, // 传入表单中的公司
 			remainingCount: resumeBalance.value,
 			onCompanyUpdate: (company) => {
@@ -514,8 +515,12 @@ const handlePredictClick = () => {
 				interviewStore.setTargetCompany(company)
 			},
 			onConfirm: () => {
-				globalModal.closeModal()
-				startPredictionProcess()
+				// TODO：查询
+				console.log(interviewStore.selectedPosition)
+				console.log(interviewStore.resumeId)
+
+				// globalModal.closeModal()
+				// startPredictionProcess()
 			}
 		},
 		buttons: [],

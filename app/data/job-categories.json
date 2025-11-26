@@ -266,505 +266,505 @@
 	],
 	"positions": [
 		{
-			"id": "tech-frontend-mid",
-			"name": "前端开发工程师",
+			"positionId": "tech-frontend-mid",
+			"positionName": "前端开发工程师",
 			"category": "tech",
 			"level": "初级-高级",
 			"description": "负责 Web / 跨端界面开发、组件工程和性能优化"
 		},
 		{
-			"id": "tech-backend-mid",
-			"name": "后端开发工程师",
+			"positionId": "tech-backend-mid",
+			"positionName": "后端开发工程师",
 			"category": "tech",
 			"level": "中级-高级",
 			"description": "负责服务端架构设计、API 开发与高并发系统"
 		},
 		{
-			"id": "tech-fullstack",
-			"name": "全栈 / 平台工程师",
+			"positionId": "tech-fullstack",
+			"positionName": "全栈 / 平台工程师",
 			"category": "tech",
 			"level": "中级-高级",
 			"description": "覆盖前端、后端与基础设施，构建业务与平台能力"
 		},
 		{
-			"id": "tech-mobile",
-			"name": "移动端开发工程师",
+			"positionId": "tech-mobile",
+			"positionName": "移动端开发工程师",
 			"category": "tech",
 			"level": "中级",
 			"description": "负责 iOS / Android 原生或跨端应用开发与发布"
 		},
 		{
-			"id": "tech-qa",
-			"name": "测试 / QA 工程师",
+			"positionId": "tech-qa",
+			"positionName": "测试 / QA 工程师",
 			"category": "tech",
 			"level": "初级-中级",
 			"description": "设计测试计划、构建自动化测试、保障质量"
 		},
 		{
-			"id": "tech-sre",
-			"name": "运维 / SRE 工程师",
+			"positionId": "tech-sre",
+			"positionName": "运维 / SRE 工程师",
 			"category": "tech",
 			"level": "中级-高级",
 			"description": "负责系统稳定性、发布、监控与故障响应"
 		},
 		{
-			"id": "tech-security",
-			"name": "安全工程师",
+			"positionId": "tech-security",
+			"positionName": "安全工程师",
 			"category": "tech",
 			"level": "中级-高级",
 			"description": "负责安全测试、攻防、数据与隐私保护"
 		},
 		{
-			"id": "tech-embedded",
-			"name": "硬件 / 嵌入式工程师",
+			"positionId": "tech-embedded",
+			"positionName": "硬件 / 嵌入式工程师",
 			"category": "tech",
 			"level": "中级",
 			"description": "负责硬件方案、驱动开发与板级调试"
 		},
 		{
-			"id": "data-analyst",
-			"name": "数据分析师",
+			"positionId": "data-analyst",
+			"positionName": "数据分析师",
 			"category": "data",
 			"level": "初级-高级",
 			"description": "构建指标体系，洞察业务数据并产出分析报告"
 		},
 		{
-			"id": "data-bi",
-			"name": "商业智能分析师",
+			"positionId": "data-bi",
+			"positionName": "商业智能分析师",
 			"category": "data",
 			"level": "中级",
 			"description": "搭建数据看板、BI 工具与经营分析体系"
 		},
 		{
-			"id": "data-engineer",
-			"name": "数据工程师",
+			"positionId": "data-engineer",
+			"positionName": "数据工程师",
 			"category": "data",
 			"level": "中级-高级",
 			"description": "负责数据仓库、ETL、实时数仓与数据治理"
 		},
 		{
-			"id": "data-ml",
-			"name": "机器学习 / 算法工程师",
+			"positionId": "data-ml",
+			"positionName": "机器学习 / 算法工程师",
 			"category": "data",
 			"level": "中级-高级",
 			"description": "建立算法模型，服务推荐、搜索、风控或大模型"
 		},
 		{
-			"id": "product-pm",
-			"name": "产品经理（C 端）",
+			"positionId": "product-pm",
+			"positionName": "产品经理（C 端）",
 			"category": "product",
 			"level": "中级",
 			"description": "负责用户需求洞察、产品规划与迭代落地"
 		},
 		{
-			"id": "product-b2b",
-			"name": "产品经理（B 端 / SaaS）",
+			"positionId": "product-b2b",
+			"positionName": "产品经理（B 端 / SaaS）",
 			"category": "product",
 			"level": "中级-高级",
 			"description": "聚焦行业 / 企业产品，驱动方案与交付"
 		},
 		{
-			"id": "product-growth",
-			"name": "增长产品经理",
+			"positionId": "product-growth",
+			"positionName": "增长产品经理",
 			"category": "product",
 			"level": "中级",
 			"description": "负责拉新、促活、留存与转化的策略与实验"
 		},
 		{
-			"id": "product-project",
-			"name": "项目经理 / PMO",
+			"positionId": "product-project",
+			"positionName": "项目经理 / PMO",
 			"category": "product",
 			"level": "中级-高级",
 			"description": "统筹跨团队计划、资源与风险，保证交付"
 		},
 		{
-			"id": "design-ui",
-			"name": "UI / 视觉设计师",
+			"positionId": "design-ui",
+			"positionName": "UI / 视觉设计师",
 			"category": "design",
 			"level": "初级-高级",
 			"description": "负责界面视觉系统、品牌延展与设计规范"
 		},
 		{
-			"id": "design-ux",
-			"name": "UX / 交互设计师",
+			"positionId": "design-ux",
+			"positionName": "UX / 交互设计师",
 			"category": "design",
 			"level": "中级",
 			"description": "负责信息架构、交互流程与体验研究"
 		},
 		{
-			"id": "design-brand",
-			"name": "品牌 / 平面设计师",
+			"positionId": "design-brand",
+			"positionName": "品牌 / 平面设计师",
 			"category": "design",
 			"level": "中级",
 			"description": "负责品牌体系、KV、线下物料与IP打造"
 		},
 		{
-			"id": "operation-user",
-			"name": "用户运营经理",
+			"positionId": "operation-user",
+			"positionName": "用户运营经理",
 			"category": "operation",
 			"level": "中级",
 			"description": "建立用户分层，设计生命周期运营策略"
 		},
 		{
-			"id": "operation-content",
-			"name": "内容运营经理",
+			"positionId": "operation-content",
+			"positionName": "内容运营经理",
 			"category": "operation",
 			"level": "中级",
 			"description": "负责内容供给、审核机制与爆款策划"
 		},
 		{
-			"id": "operation-growth",
-			"name": "增长运营经理",
+			"positionId": "operation-growth",
+			"positionName": "增长运营经理",
 			"category": "operation",
 			"level": "中级-高级",
 			"description": "结合投放、活动、裂变等手段驱动增长指标"
 		},
 		{
-			"id": "marketing-brand",
-			"name": "品牌营销经理",
+			"positionId": "marketing-brand",
+			"positionName": "品牌营销经理",
 			"category": "marketing",
 			"level": "中级",
 			"description": "打造品牌策略、整合传播与大型活动"
 		},
 		{
-			"id": "marketing-digital",
-			"name": "数字营销经理",
+			"positionId": "marketing-digital",
+			"positionName": "数字营销经理",
 			"category": "marketing",
 			"level": "中级",
 			"description": "负责效果投放、渠道优化与数据复盘"
 		},
 		{
-			"id": "marketing-pr",
-			"name": "公关 / 传播经理",
+			"positionId": "marketing-pr",
+			"positionName": "公关 / 传播经理",
 			"category": "marketing",
 			"level": "中级",
 			"description": "媒体关系、危机管理与品牌口碑建设"
 		},
 		{
-			"id": "sales-ka",
-			"name": "大客户销售",
+			"positionId": "sales-ka",
+			"positionName": "大客户销售",
 			"category": "sales",
 			"level": "中级-高级",
 			"description": "面向 KA / 企业客户的解决方案销售与签约"
 		},
 		{
-			"id": "sales-channel",
-			"name": "渠道拓展经理",
+			"positionId": "sales-channel",
+			"positionName": "渠道拓展经理",
 			"category": "sales",
 			"level": "中级",
 			"description": "搭建渠道生态、伙伴赋能与业绩达成"
 		},
 		{
-			"id": "sales-bd",
-			"name": "商务拓展经理",
+			"positionId": "sales-bd",
+			"positionName": "商务拓展经理",
 			"category": "sales",
 			"level": "中级",
 			"description": "开拓合作伙伴、谈判商业条款并推进落地"
 		},
 		{
-			"id": "customer-success",
-			"name": "客户成功经理",
+			"positionId": "customer-success",
+			"positionName": "客户成功经理",
 			"category": "sales",
 			"level": "中级",
 			"description": "维护存量客户、提升续约和增购"
 		},
 		{
-			"id": "customer-support",
-			"name": "客户服务专员",
+			"positionId": "customer-support",
+			"positionName": "客户服务专员",
 			"category": "customer",
 			"level": "初级",
 			"description": "多渠道响应客户问题，保障满意度"
 		},
 		{
-			"id": "customer-techsupport",
-			"name": "技术支持工程师",
+			"positionId": "customer-techsupport",
+			"positionName": "技术支持工程师",
 			"category": "customer",
 			"level": "中级",
 			"description": "为客户提供技术排障、集成与培训"
 		},
 		{
-			"id": "hr-recruiter",
-			"name": "招聘专员 / TA",
+			"positionId": "hr-recruiter",
+			"positionName": "招聘专员 / TA",
 			"category": "hr",
 			"level": "初级-中级",
 			"description": "负责用人需求分析、候选人管理与入职"
 		},
 		{
-			"id": "hr-hrbp",
-			"name": "HRBP",
+			"positionId": "hr-hrbp",
+			"positionName": "HRBP",
 			"category": "hr",
 			"level": "中级-高级",
 			"description": "贴近业务，提供组织发展、绩效与激励方案"
 		},
 		{
-			"id": "hr-ld",
-			"name": "学习与发展经理",
+			"positionId": "hr-ld",
+			"positionName": "学习与发展经理",
 			"category": "hr",
 			"level": "中级",
 			"description": "负责培训体系、课程开发与人才发展项目"
 		},
 		{
-			"id": "finance-accountant",
-			"name": "财务会计",
+			"positionId": "finance-accountant",
+			"positionName": "财务会计",
 			"category": "finance",
 			"level": "初级-中级",
 			"description": "处理账务、编制报表并确保合规"
 		},
 		{
-			"id": "finance-analyst",
-			"name": "财务分析师",
+			"positionId": "finance-analyst",
+			"positionName": "财务分析师",
 			"category": "finance",
 			"level": "中级",
 			"description": "建立经营分析模型，支持预算与决策"
 		},
 		{
-			"id": "finance-audit",
-			"name": "内控 / 审计经理",
+			"positionId": "finance-audit",
+			"positionName": "内控 / 审计经理",
 			"category": "finance",
 			"level": "中级",
 			"description": "负责内控体系、流程审计与风险监控"
 		},
 		{
-			"id": "legal-counsel",
-			"name": "公司法务",
+			"positionId": "legal-counsel",
+			"positionName": "公司法务",
 			"category": "legal",
 			"level": "中级-高级",
 			"description": "提供合同、投融资、资本市场等法律支持"
 		},
 		{
-			"id": "legal-compliance",
-			"name": "合规风控经理",
+			"positionId": "legal-compliance",
+			"positionName": "合规风控经理",
 			"category": "legal",
 			"level": "中级",
 			"description": "建立合规制度、监管政策解读与检查"
 		},
 		{
-			"id": "supply-procurement",
-			"name": "采购经理",
+			"positionId": "supply-procurement",
+			"positionName": "采购经理",
 			"category": "supply",
 			"level": "中级",
 			"description": "负责供应商寻源、成本谈判与合同管理"
 		},
 		{
-			"id": "supply-planner",
-			"name": "供应链计划经理",
+			"positionId": "supply-planner",
+			"positionName": "供应链计划经理",
 			"category": "supply",
 			"level": "中级",
 			"description": "制定需求 / 生产 / 物流计划，保障履约"
 		},
 		{
-			"id": "manufacturing-pe",
-			"name": "制造工艺工程师",
+			"positionId": "manufacturing-pe",
+			"positionName": "制造工艺工程师",
 			"category": "manufacturing",
 			"level": "中级",
 			"description": "负责工艺设计、产线导入与效率优化"
 		},
 		{
-			"id": "manufacturing-quality",
-			"name": "质量工程师",
+			"positionId": "manufacturing-quality",
+			"positionName": "质量工程师",
 			"category": "manufacturing",
 			"level": "中级",
 			"description": "建立质量体系、推进良率与改进项目"
 		},
 		{
-			"id": "content-editor",
-			"name": "内容编辑 / 策划",
+			"positionId": "content-editor",
+			"positionName": "内容编辑 / 策划",
 			"category": "content",
 			"level": "初级-中级",
 			"description": "负责选题策划、稿件撰写与内容排期"
 		},
 		{
-			"id": "content-video",
-			"name": "视频制作人",
+			"positionId": "content-video",
+			"positionName": "视频制作人",
 			"category": "content",
 			"level": "中级",
 			"description": "统筹短视频 / 直播内容拍摄与后期制作"
 		},
 		{
-			"id": "content-game",
-			"name": "游戏策划",
+			"positionId": "content-game",
+			"positionName": "游戏策划",
 			"category": "content",
 			"level": "中级",
 			"description": "负责玩法设计、数值平衡与版本规划"
 		},
 		{
-			"id": "education-instructional",
-			"name": "教研 / 课程设计",
+			"positionId": "education-instructional",
+			"positionName": "教研 / 课程设计",
 			"category": "education",
 			"level": "中级",
 			"description": "设计课程体系、教学大纲和评估标准"
 		},
 		{
-			"id": "education-trainer",
-			"name": "培训讲师",
+			"positionId": "education-trainer",
+			"positionName": "培训讲师",
 			"category": "education",
 			"level": "初级-中级",
 			"description": "负责课堂授课、学员辅导与反馈收集"
 		},
 		{
-			"id": "health-medical-rep",
-			"name": "医药代表",
+			"positionId": "health-medical-rep",
+			"positionName": "医药代表",
 			"category": "healthcare",
 			"level": "初级-中级",
 			"description": "负责医药产品学术推广与医院渠道维护"
 		},
 		{
-			"id": "health-clinical",
-			"name": "临床运营经理",
+			"positionId": "health-clinical",
+			"positionName": "临床运营经理",
 			"category": "healthcare",
 			"level": "中级",
 			"description": "负责临床试验运作、中心管理与稽查"
 		},
 		{
-			"id": "other-realestate",
-			"name": "地产开发经理",
+			"positionId": "other-realestate",
+			"positionName": "地产开发经理",
 			"category": "other",
 			"level": "中级-高级",
 			"description": "负责土地获取、项目策划与开发全流程"
 		},
 		{
-			"id": "other-public",
-			"name": "公共事务经理",
+			"positionId": "other-public",
+			"positionName": "公共事务经理",
 			"category": "other",
 			"level": "中级",
 			"description": "对接政府、协会等外部机构，维护合作关系"
 		},
 		{
-			"id": "academic-defense-speaker",
-			"name": "硕士/博士答辩汇报者",
+			"positionId": "academic-defense-speaker",
+			"positionName": "硕士/博士答辩汇报者",
 			"category": "academic",
 			"level": "准备-答辩",
 			"description": "答辩PPT汇报、核心贡献陈述与问答应对"
 		},
 		{
-			"id": "academic-faculty",
-			"name": "高校教师（讲师/副教授）",
+			"positionId": "academic-faculty",
+			"positionName": "高校教师（讲师/副教授）",
 			"category": "academic",
 			"level": "初级-高级",
 			"description": "承担教学、科研与人才培养"
 		},
 		{
-			"id": "academic-researcher",
-			"name": "研究员 / 博士后",
+			"positionId": "academic-researcher",
+			"positionName": "研究员 / 博士后",
 			"category": "academic",
 			"level": "中级-高级",
 			"description": "主持或参与科研课题与论文产出"
 		},
 		{
-			"id": "academic-lab-tech",
-			"name": "实验室技术员",
+			"positionId": "academic-lab-tech",
+			"positionName": "实验室技术员",
 			"category": "academic",
 			"level": "初级-中级",
 			"description": "实验设备维护、样品处理与安全管理"
 		},
 		{
-			"id": "academic-admin",
-			"name": "教务 / 科研管理",
+			"positionId": "academic-admin",
+			"positionName": "教务 / 科研管理",
 			"category": "academic",
 			"level": "中级",
 			"description": "课程安排、科研项目与学术事务管理"
 		},
 		{
-			"id": "exam-phd-candidate",
-			"name": "考博备考生",
+			"positionId": "exam-phd-candidate",
+			"positionName": "考博备考生",
 			"category": "exam",
 			"level": "备考-应试",
 			"description": "博士招生考试与复试准备"
 		},
 		{
-			"id": "exam-civil-service-candidate",
-			"name": "公务员备考生",
+			"positionId": "exam-civil-service-candidate",
+			"positionName": "公务员备考生",
 			"category": "exam",
 			"level": "备考-应试",
 			"description": "行测、申论与面试准备"
 		},
 		{
-			"id": "exam-postgraduate-candidate",
-			"name": "考研备考生",
+			"positionId": "exam-postgraduate-candidate",
+			"positionName": "考研备考生",
 			"category": "exam",
 			"level": "备考-应试",
 			"description": "初试/复试规划与专业课提问"
 		},
 		{
-			"id": "exam-teacher-cert-candidate",
-			"name": "教师资格证考生",
+			"positionId": "exam-teacher-cert-candidate",
+			"positionName": "教师资格证考生",
 			"category": "exam",
 			"level": "备考-应试",
 			"description": "科目二/三结构化面试与试讲"
 		},
 		{
-			"id": "exam-cpa-candidate",
-			"name": "CPA / ACCA 考生",
+			"positionId": "exam-cpa-candidate",
+			"positionName": "CPA / ACCA 考生",
 			"category": "exam",
 			"level": "备考-应试",
 			"description": "财会执业考试知识点梳理与应试策略"
 		},
 		{
-			"id": "exam-judicial-candidate",
-			"name": "司法考试考生",
+			"positionId": "exam-judicial-candidate",
+			"positionName": "司法考试考生",
 			"category": "exam",
 			"level": "备考-应试",
 			"description": "法条体系、案例分析与论述题训练"
 		},
 		{
-			"id": "exam-it-cert-candidate",
-			"name": "IT 认证考生（软考等）",
+			"positionId": "exam-it-cert-candidate",
+			"positionName": "IT 认证考生（软考等）",
 			"category": "exam",
 			"level": "备考-应试",
 			"description": "软考、云/安全认证要点与实战题"
 		},
 		{
-			"id": "public-civil-servant",
-			"name": "公务员（综合管理岗）",
+			"positionId": "public-civil-servant",
+			"positionName": "公务员（综合管理岗）",
 			"category": "public",
 			"level": "初级-中级",
 			"description": "政策执行、文秘写作与基层治理"
 		},
 		{
-			"id": "public-police",
-			"name": "公安机关人民警察",
+			"positionId": "public-police",
+			"positionName": "公安机关人民警察",
 			"category": "public",
 			"level": "初级-中级",
 			"description": "治安管理、案件办理与执法规范"
 		},
 		{
-			"id": "public-prosecutor-assistant",
-			"name": "检察官助理",
+			"positionId": "public-prosecutor-assistant",
+			"positionName": "检察官助理",
 			"category": "public",
 			"level": "初级-中级",
 			"description": "案件审查、法律文书与庭审协助"
 		},
 		{
-			"id": "public-judge-assistant",
-			"name": "法官助理",
+			"positionId": "public-judge-assistant",
+			"positionName": "法官助理",
 			"category": "public",
 			"level": "初级-中级",
 			"description": "审判事务、文书制作与庭审组织"
 		},
 		{
-			"id": "public-institution-staff",
-			"name": "事业单位职员",
+			"positionId": "public-institution-staff",
+			"positionName": "事业单位职员",
 			"category": "public",
 			"level": "初级-中级",
 			"description": "公文处理、项目执行与公共服务"
 		},
 		{
-			"id": "public-state-enterprise-trainee",
-			"name": "央企 / 国企管理培训生",
+			"positionId": "public-state-enterprise-trainee",
+			"positionName": "央企 / 国企管理培训生",
 			"category": "public",
 			"level": "初级-中级",
 			"description": "轮岗学习、项目协作与经营管理基础"
 		},
 		{
-			"id": "public-community-worker",
-			"name": "社区 / 街道工作人员",
+			"positionId": "public-community-worker",
+			"positionName": "社区 / 街道工作人员",
 			"category": "public",
 			"level": "初级-中级",
 			"description": "居民服务、网格治理与社会事务处理"
 		},
 		{
-			"id": "public-gov-window",
-			"name": "政府窗口服务人员",
+			"positionId": "public-gov-window",
+			"positionName": "政府窗口服务人员",
 			"category": "public",
 			"level": "初级-中级",
 			"description": "行政审批、对外服务与流程优化"
