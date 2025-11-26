@@ -92,7 +92,7 @@
 				</template>
 				<!-- 外部链接：简历汪网站 -->
 				<NuxtLink
-					to="https://resume.lgdsunday.club/"
+					to="https://www.lgdsunday.club/"
 					class="text-[12px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary-50 text-primary-600 hover:bg-primary-100 hover:text-primary-700 transition-all font-medium border border-primary-200"
 					target="_blank"
 					rel="noopener noreferrer"

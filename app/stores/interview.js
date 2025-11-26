@@ -12,7 +12,6 @@ export const useInterviewStore = defineStore('interview', {
 
 		// 第一步：岗位和简历
 		selectedPosition: null, // { id, name, category, ... }
-		resumeType: null, // 简历类型：'resume' | 'text'
 		resumeId: null, // 简历 ID（当 type='resume' 时）
 		resumeText: '', // 简历文本（当 type='text' 时）
 
@@ -29,6 +28,12 @@ export const useInterviewStore = defineStore('interview', {
 	}),
 
 	getters: {
+		// 返回简历选择的类型: 'resume' | 'text'
+		resumeType: (state) => {
+			if (state.resumeId) return 'resume'
+			if (state.resumeText) return 'text'
+			return ''
+		},
 		// 是否可以进入下一步
 		canGoToNextStep: (state) => {
 			if (state.currentStep === 1) {

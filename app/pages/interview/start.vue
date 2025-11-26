@@ -181,7 +181,7 @@
 				class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm flex flex-col min-h-0"
 			>
 				<div class="flex-1 min-h-0 overflow-y-auto pr-1 custom-scrollbar">
-					<ResumeSelector v-model="resumeData">
+					<ResumeSelector>
 						<template #title>
 							<h2 class="text-lg font-semibold text-neutral-900">选择简历</h2>
 						</template>
@@ -240,7 +240,6 @@ const globalModal = useGlobalModal()
 const searchQuery = ref('')
 const activeCategory = ref('all')
 const showAllCategories = ref(false)
-const resumeData = ref(null)
 
 const catalogCategories = jobCatalog.categories ?? []
 
@@ -396,17 +395,6 @@ const handleNext = async () => {
 		// 	color: 'warning'
 		// })
 		return
-	}
-
-	// 保存简历数据到 store
-	if (resumeData.value) {
-		const type = resumeData.value.type
-		interviewStore.resumeType = type
-		if (type === 'resume') {
-			interviewStore.resumeId = resumeData.value.resume.resumeId
-		} else if (type === 'text') {
-			interviewStore.resumeText = resumeData.value.text
-		}
 	}
 
 	presentServiceSelection()
