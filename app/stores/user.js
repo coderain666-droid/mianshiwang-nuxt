@@ -34,7 +34,6 @@ export const useUserStore = defineStore('user', {
 		userInfo: {},
 		isLogin: false,
 		token: '',
-		// 简历列表。TODO：好像是无用的
 		resumes: []
 	}),
 	getters: {

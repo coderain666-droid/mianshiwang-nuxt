@@ -579,7 +579,6 @@ const startPredictionProcess = async (requestId) => {
 		jd: interviewStore.selectedPosition.jd || '',
 		requestId // 使用传入的 requestId（在确认时生成），确保幂等性
 	}
-	debugger
 	// 获取配置
 	const config = useRuntimeConfig()
 
@@ -595,8 +594,12 @@ const startPredictionProcess = async (requestId) => {
 				console.log('SSE Message:', data)
 
 				// 根据后端返回的数据结构处理
-				// 假设后端返回格式为：{ type: 'question', data: { question: '', answer: '' } }
-				// 或者 { type: 'progress', data: { step: 1, percentage: 20 } }
+				// 假设后端返回格式为：data: {"type":"progress","step":1,"label":"正在分析简历亮点","progress":20,"message":"正在分析简历亮点"}
+				// data: {"type":"progress","step":2,"label":"正在深度解析岗位 JD","progress":40,"message":"正在深度解析岗位 JD"}
+				// data: {"type":"progress","step":3,"label":"正在检索行业历史面试数据","progress":60,"message":"正在检索行业历史面试数据"}
+				// data: {"type":"progress","step":4,"label":"正在构建能力评估模型","progress":80,"message":"正在构建能力评估模型"}
+				// data: {"type":"progress","step":5,"label":"正在生成针对性押题结果","progress":95,"message":"正在生成针对性押题结果"}
+				// 注意：在 "step":5 时会请求 AI，速度会比较慢，这里需要给用户进度条在走动的感知
 
 				if (data.type === 'question') {
 					// 接收到一道题目
@@ -622,7 +625,6 @@ const startPredictionProcess = async (requestId) => {
 				}
 			},
 			onError: (error) => {
-				debugger
 				console.error('SSE Error:', error)
 				clearInterval(progressInterval)
 
@@ -636,7 +638,6 @@ const startPredictionProcess = async (requestId) => {
 				step.value = 'input'
 			},
 			onComplete: () => {
-				debugger
 				console.log('SSE Complete')
 				clearInterval(progressInterval)
 
