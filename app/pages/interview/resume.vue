@@ -181,6 +181,7 @@
 								class="text-[10px] font-medium text-red-500 bg-red-50 px-2 py-0.5 rounded-full border border-red-100"
 								>必填</span
 							>
+							<span class="text-xs text-neutral-400">50 ~ 2000 字</span>
 						</label>
 						<div class="flex items-center gap-2">
 							<transition
@@ -214,10 +215,11 @@
 						<UTextarea
 							class="w-full"
 							v-model="interviewStore.selectedPosition.jd"
-							maxlength="1000"
+							minlength="50"
+							maxlength="2000"
 							placeholder="请直接粘贴目标岗位的职位描述（JD）...
 
-💡 提示：越详细的 JD（包含任职要求、技术栈、加分项），生成的押题越准确，最大 1000 字。
+💡 提示：越详细的 JD（包含任职要求、技术栈、加分项），生成的押题越准确，最少 50 字，最大 2000 字。
 
 示例：
 1. 负责前端核心业务功能的开发与维护
@@ -264,7 +266,6 @@
 						size="xl"
 						color="primary"
 						class="w-full sm:w-auto px-12 hover:shadow-primary-500/30 hover:-translate-y-0.5 transition-all duration-300"
-						:disabled="!isFormValid"
 						:loading="step === 'processing'"
 						@click="handlePredictClick"
 						:ui="{ rounded: 'rounded-xl' }"
@@ -446,6 +447,7 @@ import SpecialInterviewConfirm from '@/components/interview/SpecialInterviewConf
 import { useUserStore } from '@/stores/user'
 import { generateResumeQuizSSE } from '@/api/interview'
 import { useToast } from '#imports'
+import { v4 as uuidv4 } from 'uuid'
 
 definePageMeta({
 	requiresAuth: true,
@@ -474,11 +476,6 @@ const userStore = useUserStore()
 const step = ref('input') // input | processing | result
 const sseController = ref(null) // SSE 连接控制器
 
-// 验证
-const isFormValid = computed(() => {
-	return interviewStore.selectedPosition.jd?.trim().length > 0 // 简单验证 JD 长度
-})
-
 const resumeBalance = computed(
 	() => userStore.userInfo?.resumeRemainingCount ?? 0
 )
@@ -504,6 +501,23 @@ const predictionResults = ref([])
 
 // 点击押题按钮
 const handlePredictClick = () => {
+	// JD 字数判断 50 ~ 2000 字之间
+	if (
+		interviewStore.selectedPosition.jd?.trim().length < 50 ||
+		interviewStore.selectedPosition.jd?.trim().length > 2000
+	) {
+		toast.add({
+			title: '请填写更加详细的岗位职责（JD）',
+			description: '以便生成更加准确的押题数据（最少 50 字）',
+			color: 'error'
+		})
+		return
+	}
+
+	// 生成本次提交的唯一请求ID（用于幂等性控制）
+	// 在用户确认前生成，确保同一次确认操作使用相同的 requestId
+	const requestId = uuidv4()
+
 	// 显示确认弹窗
 	globalModal.showModal({
 		title: '准备开始简历押题',
@@ -538,7 +552,8 @@ const handlePredictClick = () => {
 				}
 
 				globalModal.closeModal()
-				startPredictionProcess()
+				// 传递 requestId 到处理函数
+				startPredictionProcess(requestId)
 			}
 		},
 		buttons: [],
@@ -547,8 +562,8 @@ const handlePredictClick = () => {
 }
 
 // 开始预测流程
-const startPredictionProcess = async () => {
-	step.value = 'processing'
+const startPredictionProcess = async (requestId) => {
+	// step.value = 'processing'
 	currentProgressStepIndex.value = 0
 	progressPercentage.value = 0
 	predictionResults.value = []
@@ -556,18 +571,20 @@ const startPredictionProcess = async () => {
 	// 准备请求参数
 	const params = {
 		resumeId: interviewStore.resumeId,
+		resumeContent: interviewStore.resumeText,
 		company: interviewStore.selectedPosition.company || '',
 		positionName: interviewStore.selectedPosition.positionName || '',
 		minSalary: interviewStore.selectedPosition.minSalary || '',
 		maxSalary: interviewStore.selectedPosition.maxSalary || '',
-		jd: interviewStore.selectedPosition.jd || ''
+		jd: interviewStore.selectedPosition.jd || '',
+		requestId // 使用传入的 requestId（在确认时生成），确保幂等性
 	}
-
+	debugger
 	// 获取配置
 	const config = useRuntimeConfig()
 
 	// 模拟进度条（独立于 SSE）
-	const progressInterval = startProgressAnimation()
+	// const progressInterval = startProgressAnimation()
 
 	// 启动 SSE 连接
 	sseController.value = generateResumeQuizSSE(params, {
@@ -605,6 +622,7 @@ const startPredictionProcess = async () => {
 				}
 			},
 			onError: (error) => {
+				debugger
 				console.error('SSE Error:', error)
 				clearInterval(progressInterval)
 
@@ -618,6 +636,7 @@ const startPredictionProcess = async () => {
 				step.value = 'input'
 			},
 			onComplete: () => {
+				debugger
 				console.log('SSE Complete')
 				clearInterval(progressInterval)
 

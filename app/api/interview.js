@@ -12,6 +12,7 @@
  * @param {string} params.minSalary - 最低薪资
  * @param {string} params.maxSalary - 最高薪资
  * @param {string} params.jd - 岗位职责
+ * @param {string} [params.requestId] - 请求ID（用于幂等性，避免重复提交，UUID v4 格式）
  * @param {Object} options - 配置选项
  * @param {string} options.token - 认证 token（从 userStore 传入）
  * @param {string} options.baseURL - API 基础 URL（从 runtimeConfig 传入）
