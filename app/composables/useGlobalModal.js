@@ -224,16 +224,45 @@ export const useGlobalModal = () => {
 		app = createApp(vnode)
 
 		// 获取当前 Nuxt 应用实例，复用其插件和配置
-		const nuxtApp = window?.__NUXT__?.vueApp
+		const nuxtApp = useNuxtApp()
+		
 		if (nuxtApp) {
 			// 复制全局属性和配置
-			app.config.globalProperties = { ...nuxtApp.config.globalProperties }
-			// 如果有全局组件，也复制过来
-			Object.entries(nuxtApp._context.components || {}).forEach(
-				([name, component]) => {
-					app.component(name, component)
+			if (nuxtApp.vueApp?.config?.globalProperties) {
+				app.config.globalProperties = { 
+					...nuxtApp.vueApp.config.globalProperties 
 				}
-			)
+			}
+			
+			// 注册全局组件（包括 NuxtLink/RouterLink）
+			if (nuxtApp.vueApp?._context?.components) {
+				Object.entries(nuxtApp.vueApp._context.components).forEach(
+					([name, component]) => {
+						app.component(name, component)
+					}
+				)
+			}
+			
+			// 注册 Router（解决 RouterLink 问题）
+			if (nuxtApp.$router) {
+				app.use(nuxtApp.$router)
+			}
+			
+			// 注册其他可能需要的插件
+			if (nuxtApp.vueApp?._context?.app) {
+				const nuxtVueApp = nuxtApp.vueApp._context.app
+				// 复制插件
+				if (nuxtVueApp._plugins) {
+					nuxtVueApp._plugins.forEach(plugin => {
+						try {
+							app.use(plugin)
+						} catch (e) {
+							// 某些插件可能不支持重复注册，忽略错误
+							console.debug('Plugin registration skipped:', e)
+						}
+					})
+				}
+			}
 		}
 
 		app.mount(container)
