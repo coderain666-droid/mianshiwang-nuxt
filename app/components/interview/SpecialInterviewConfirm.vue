@@ -47,12 +47,15 @@
 		<!-- 确认按钮 -->
 		<UButton
 			block
+			v-if="remainingCount > 0"
 			color="primary"
 			size="lg"
-			:disabled="remainingCount <= 0"
 			@click="handleConfirm"
 		>
 			{{ serviceConfig.buttonText }}
+		</UButton>
+		<UButton block v-else color="primary" size="lg" @click="handleGoToRecharge">
+			去充值
 		</UButton>
 
 		<!-- 余额不足提示 -->
@@ -198,5 +201,10 @@ const handleConfirm = () => {
 	}
 	props.onCompanyUpdate?.(localCompany.value?.trim() || '')
 	props.onConfirm?.()
+}
+
+const handleGoToRecharge = () => {
+	globalModal.closeModal()
+	navigateTo('/profile')
 }
 </script>

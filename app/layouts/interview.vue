@@ -54,14 +54,18 @@
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useRoute, navigateTo } from '#imports'
 import { useInterviewStore } from '@/stores/interview'
+import { useUserStore } from '@/stores/user'
 import { SERVICE_TAGS, serviceHighlights } from '@/constants/vip'
 import InterviewSidebar from '@/components/interview/InterviewSidebar.vue'
+import { getUserInfoAPI } from '@/api/user'
 
 const route = useRoute()
 const interviewStore = useInterviewStore()
+const userStore = useUserStore()
+const { $api } = useNuxtApp()
 
 // 页面标题映射
 const pageTitle = computed(() => {
@@ -81,9 +85,23 @@ const serviceRouteMap = {
 	'/interview/behavior': SERVICE_TAGS.BEHAVIOR
 }
 
+// 获取用户信息
+const fetchUserInfo = async () => {
+	try {
+		const userInfo = await getUserInfoAPI($api)
+		userStore.updateUserInfo(userInfo)
+		console.log('用户信息已更新:', userInfo)
+	} catch (error) {
+		console.error('获取用户信息失败:', error)
+	}
+}
+
 // 统一的路由守卫逻辑
 onMounted(() => {
 	const currentPath = route.path
+
+	// 获取用户信息
+	fetchUserInfo()
 
 	// 报告页面守卫
 	if (currentPath === '/interview/report') {
@@ -118,6 +136,18 @@ onMounted(() => {
 		}
 	}
 })
+
+// 监听路由变化，每次跳转都获取用户信息
+watch(
+	() => route.path,
+	(newPath, oldPath) => {
+		// 只在 interview 路径下的跳转才获取
+		if (newPath.startsWith('/interview/') && newPath !== oldPath) {
+			console.log(`路由从 ${oldPath} 跳转到 ${newPath}，获取用户信息`)
+			fetchUserInfo()
+		}
+	}
+)
 </script>
 
 <style scoped></style>
