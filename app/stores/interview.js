@@ -11,7 +11,19 @@ export const useInterviewStore = defineStore('interview', {
 		targetCompany: '',
 
 		// 第一步：岗位和简历
-		selectedPosition: null, // { id, name, category, ... }
+		/*
+
+category: "tech"
+description: "负责 Web / 跨端界面开发、组件工程和性能优化"
+id: "tech-frontend-mid"
+level: "初级-高级"
+name: "前端开发工程师"
+company: 字节跳动,
+minSalary: 25,
+maxSalary: 35,
+jd: '' 
+		*/
+		selectedPosition: null,
 		resumeId: null, // 简历 ID（当 type='resume' 时）
 		resumeText: '', // 简历文本（当 type='text' 时）
 

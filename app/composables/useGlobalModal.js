@@ -48,7 +48,7 @@ const ModalHost = defineComponent({
 		const closed = ref(false)
 
 		const modalUi = computed(() => ({
-			content: 'sm:max-w-md max-w-[520px]',
+			content: 'max-w-[560px]',
 			...(props.options.ui || {})
 		}))
 

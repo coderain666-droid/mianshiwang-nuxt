@@ -30,7 +30,7 @@
 							开启 AI 精准押题
 							<span
 								class="text-[10px] text-primary-600 bg-primary-50 px-1.5 py-0.5 rounded-full border border-primary-100"
-								>Pro</span
+								>采用 Ultra 模型</span
 							>
 						</p>
 						<p class="text-neutral-500 text-xs mb-2">
@@ -56,7 +56,7 @@
 					</div>
 				</div>
 
-				<div class="grid gap-8 md:grid-cols-2">
+				<div class="grid gap-8 md:grid-cols-3">
 					<!-- 公司名称 -->
 					<div class="space-y-2.5 group">
 						<label
@@ -69,15 +69,42 @@
 								/>
 								目标公司
 							</span>
-							<span
-								class="text-[10px] font-medium text-neutral-400 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100 group-hover:border-gray-200 transition-colors"
-								>选填</span
-							>
 						</label>
 						<UInput
-							v-model="formData.company"
+							v-model="interviewStore.selectedPosition.company"
 							class="w-full text-sm"
 							placeholder="请输入公司全称，如：字节跳动"
+							size="lg"
+							:ui="{
+								base: 'pl-4',
+								rounded: 'rounded-xl',
+								color: {
+									white: {
+										outline:
+											'shadow-sm focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 border-gray-200 bg-gray-50/30 hover:bg-white focus:bg-white transition-all duration-200'
+									}
+								}
+							}"
+						/>
+					</div>
+
+					<!-- 岗位名称 -->
+					<div class="space-y-2.5 group">
+						<label
+							class="flex items-center justify-between text-sm font-semibold text-neutral-700"
+						>
+							<span class="flex items-center gap-1.5">
+								<UIcon
+									name="i-heroicons-building-office-2"
+									class="w-4 h-4 text-neutral-400 group-focus-within:text-primary-500 transition-colors"
+								/>
+								岗位名称
+							</span>
+						</label>
+						<UInput
+							v-model="interviewStore.selectedPosition.name"
+							class="w-full text-sm"
+							placeholder="请输入岗位名称，如：前端开发工程师"
 							size="lg"
 							:ui="{
 								base: 'pl-4',
@@ -104,15 +131,11 @@
 								/>
 								薪资范围
 							</span>
-							<span
-								class="text-[10px] font-medium text-neutral-400 bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100 group-hover:border-gray-200 transition-colors"
-								>选填</span
-							>
 						</label>
 						<div class="flex items-center gap-3">
 							<div class="relative flex-1">
 								<UInput
-									v-model="formData.minSalary"
+									v-model="interviewStore.selectedPosition.minSalary"
 									class="w-full"
 									placeholder="最低 (k)"
 									size="lg"
@@ -128,7 +151,7 @@
 							</div>
 							<div class="relative flex-1">
 								<UInput
-									v-model="formData.maxSalary"
+									v-model="interviewStore.selectedPosition.maxSalary"
 									class="w-full"
 									placeholder="最高 (k)"
 									size="lg"
@@ -169,7 +192,7 @@
 								leave-to-class="transform scale-95 opacity-0"
 							>
 								<span
-									v-if="formData.jd.length > 0"
+									v-if="interviewStore.selectedPosition?.jd?.length > 0"
 									class="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full border border-green-100 flex items-center gap-1"
 								>
 									<UIcon name="i-heroicons-check" class="w-3 h-3" />
@@ -179,17 +202,18 @@
 							<span
 								class="text-xs text-neutral-400 font-mono"
 								:class="{
-									'text-primary-600 font-medium': formData.jd.length > 0
+									'text-primary-600 font-medium':
+										interviewStore.selectedPosition?.jd?.length > 0
 								}"
 							>
-								{{ formData.jd.length }} 字
+								{{ interviewStore.selectedPosition?.jd?.length }} 字
 							</span>
 						</div>
 					</div>
 					<div class="relative">
 						<UTextarea
 							class="w-full"
-							v-model="formData.jd"
+							v-model="interviewStore.selectedPosition.jd"
 							placeholder="请直接粘贴目标岗位的职位描述（JD）...
 
 💡 提示：越详细的 JD（包含任职要求、技术栈、加分项），生成的押题越准确。
@@ -198,7 +222,7 @@
 1. 负责前端核心业务功能的开发与维护
 2. 熟练掌握 Vue3、TypeScript 等技术栈
 3. 具备良好的跨部门沟通协作能力"
-							:rows="10"
+							:rows="15"
 							size="lg"
 							:ui="{
 								rounded: 'rounded-xl',
@@ -215,7 +239,11 @@
 						<!-- 装饰角标 -->
 						<div
 							class="absolute bottom-4 right-4 pointer-events-none transition-opacity duration-300"
-							:class="formData.jd.length > 0 ? 'opacity-0' : 'opacity-100'"
+							:class="
+								interviewStore.selectedPosition.jd?.length > 0
+									? 'opacity-0'
+									: 'opacity-100'
+							"
 						>
 							<UIcon
 								name="i-heroicons-pencil-square"
@@ -333,6 +361,15 @@
 				</div>
 				<div class="flex items-center gap-3 w-full sm:w-auto">
 					<UButton
+						color="gray"
+						variant="ghost"
+						icon="i-heroicons-arrow-path"
+						class="flex-1 sm:flex-none"
+						@click="handleRetry"
+					>
+						重新押题
+					</UButton>
+					<UButton
 						color="white"
 						variant="solid"
 						icon="i-heroicons-arrow-down-tray"
@@ -426,22 +463,15 @@ const globalModal = useGlobalModal()
 const interviewStore = useInterviewStore()
 // 确定当前为 第二步
 interviewStore.currentStep = 2
+
 const userStore = useUserStore()
 
 // 状态管理
 const step = ref('input') // input | processing | result
-const formData = reactive({
-	company: '',
-	// 最低薪资
-	minSalary: '',
-	// 最高薪资
-	maxSalary: '',
-	jd: ''
-})
 
 // 验证
 const isFormValid = computed(() => {
-	return formData.jd.trim().length > 0 // 简单验证 JD 长度
+	return interviewStore.selectedPosition.jd?.trim().length > 0 // 简单验证 JD 长度
 })
 
 const resumeBalance = computed(
@@ -476,11 +506,11 @@ const handlePredictClick = () => {
 		contentComponent: SpecialInterviewConfirm,
 		contentProps: {
 			serviceType: 'resume',
-			positionName: interviewStore.selectedPosition?.name || '通用岗位',
-			company: formData.company, // 传入表单中的公司
+			positionName: interviewStore.selectedPosition.name || '通用岗位',
+			company: interviewStore.selectedPosition.company, // 传入表单中的公司
 			remainingCount: resumeBalance.value,
 			onCompanyUpdate: (company) => {
-				formData.company = company
+				interviewStore.selectedPosition.company = company
 				interviewStore.setTargetCompany(company)
 			},
 			onConfirm: () => {
@@ -555,7 +585,7 @@ const generateMockResults = () => {
 		},
 		{
 			question: `你觉得你与 ${
-				formData.company || '该公司'
+				interviewStore.selectedPosition.company || '该公司'
 			} 的这个岗位最匹配的点在哪里？`,
 			answer:
 				'分析岗位 JD 中的核心关键词（如团队协作、抗压能力、特定技术栈），结合个人简历中的亮点进行匹配。例如：JD强调跨部门协作，你可以举例说明之前主导过的跨部门项目。'
@@ -576,6 +606,15 @@ const generateMockResults = () => {
 				'展示你的进取心和稳定性。建议回答：1. 短期（1-2年）：深入掌握核心业务和技术，成为团队骨干；2. 中期（3-5年）：在某个细分领域成为专家，或尝试带领小团队；3. 强调与公司共同发展。'
 		}
 	]
+}
+
+// 重新押题
+const handleRetry = () => {
+	step.value = 'input'
+	// 可选：清空之前的结果
+	predictionResults.value = []
+	progressPercentage.value = 0
+	currentProgressStepIndex.value = 0
 }
 
 // 下载 PDF
