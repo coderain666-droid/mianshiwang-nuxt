@@ -230,7 +230,7 @@ const handlePreview = (resume) => {
 
 	// 环境变量的预览地址
 	// 测试环境使用：http://192.168.0.102:3001/
-	// 生成环境使用：https://resume.lgdsunday.club/
+	// 生成环境使用：https://www.lgdsunday.club/
 	const config = useRuntimeConfig()
 
 	previewResume.value = {

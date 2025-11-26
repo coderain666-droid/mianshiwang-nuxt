@@ -59,7 +59,7 @@
 								</li>
 								<li>
 									<a
-										href="https://resume.lgdsunday.club/"
+										href="https://www.lgdsunday.club/"
 										target="_blank"
 										rel="noopener noreferrer"
 										class="text-neutral-600 hover:text-neutral-900 transition-colors inline-flex items-center gap-1"
@@ -149,7 +149,7 @@
 								相关产品
 							</h3>
 							<a
-								href="https://resume.lgdsunday.club/"
+								href="https://www.lgdsunday.club/"
 								target="_blank"
 								rel="noopener noreferrer"
 								class="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900 transition-colors group"

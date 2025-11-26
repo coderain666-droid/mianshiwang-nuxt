@@ -94,7 +94,7 @@ export default defineNuxtConfig({
 			buildTime: new Date().toISOString(),
 			apiBase: process.env.VITE_API_BASE_URL || '/dev-api',
 			resumePreviewUrl:
-				process.env.VITE_RESUME_PREVIEW_URL || 'https://resume.lgdsunday.club/'
+				process.env.VITE_RESUME_PREVIEW_URL || 'https://www.lgdsunday.club/'
 		}
 	},
 
