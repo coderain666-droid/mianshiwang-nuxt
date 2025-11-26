@@ -310,7 +310,7 @@
 				<div class="space-y-2">
 					<UProgress :value="progressPercentage" color="primary" indicator />
 					<p class="text-xs text-neutral-500 text-right">
-						已完成 {{ progressPercentage }}%
+						已完成 {{ progressPercentage.toFixed(2) }}%
 					</p>
 				</div>
 
@@ -563,7 +563,7 @@ const handlePredictClick = () => {
 
 // 开始预测流程
 const startPredictionProcess = async (requestId) => {
-	// step.value = 'processing'
+	step.value = 'processing'
 	currentProgressStepIndex.value = 0
 	progressPercentage.value = 0
 	predictionResults.value = []
@@ -582,8 +582,10 @@ const startPredictionProcess = async (requestId) => {
 	// 获取配置
 	const config = useRuntimeConfig()
 
-	// 模拟进度条（独立于 SSE）
-	// const progressInterval = startProgressAnimation()
+	// 用于在 step 5 时提供持续的进度感知
+	let step5ProgressInterval = null
+	let lastServerProgress = 0
+	let isInStep5 = false
 
 	// 启动 SSE 连接
 	sseController.value = generateResumeQuizSSE(params, {
@@ -593,40 +595,70 @@ const startPredictionProcess = async (requestId) => {
 			onMessage: (data) => {
 				console.log('SSE Message:', data)
 
-				// 根据后端返回的数据结构处理
-				// 假设后端返回格式为：data: {"type":"progress","step":1,"label":"正在分析简历亮点","progress":20,"message":"正在分析简历亮点"}
-				// data: {"type":"progress","step":2,"label":"正在深度解析岗位 JD","progress":40,"message":"正在深度解析岗位 JD"}
-				// data: {"type":"progress","step":3,"label":"正在检索行业历史面试数据","progress":60,"message":"正在检索行业历史面试数据"}
-				// data: {"type":"progress","step":4,"label":"正在构建能力评估模型","progress":80,"message":"正在构建能力评估模型"}
-				// data: {"type":"progress","step":5,"label":"正在生成针对性押题结果","progress":95,"message":"正在生成针对性押题结果"}
-				// 注意：在 "step":5 时会请求 AI，速度会比较慢，这里需要给用户进度条在走动的感知
+				// 处理进度更新
+				// 服务端返回格式：{"type":"progress","step":1,"label":"正在分析简历亮点","progress":20}
+				if (data.type === 'progress') {
+					const { step: currentStep, progress, label, message } = data
 
-				if (data.type === 'question') {
-					// 接收到一道题目
-					predictionResults.value.push({
-						question: data.data.question,
-						answer: data.data.answer
-					})
-				} else if (data.type === 'progress') {
-					// 更新进度
-					if (data.data.step !== undefined) {
+					// 更新当前步骤索引（step 从 1 开始，索引从 0 开始）
+					if (currentStep !== undefined) {
+						const stepIndex = currentStep - 1
 						currentProgressStepIndex.value = Math.min(
-							data.data.step,
+							stepIndex,
 							progressSteps.length - 1
 						)
+
+						// 更新步骤标签（如果服务端提供了自定义标签）
+						if (label && stepIndex >= 0 && stepIndex < progressSteps.length) {
+							progressSteps[stepIndex].label = label
+						}
+
+						// 检测是否进入 step 5
+						if (currentStep === 5 && !isInStep5) {
+							isInStep5 = true
+							console.log('进入 Step 5: AI 生成阶段')
+						}
 					}
-					if (data.data.percentage !== undefined) {
-						progressPercentage.value = Math.min(data.data.percentage, 99)
+
+					// 更新进度百分比
+					if (progress !== undefined) {
+						lastServerProgress = progress
+
+						// 如果在 step 5，不要立即跳到服务端进度，而是平滑过渡
+						if (isInStep5) {
+							// 清除旧的动画
+							if (step5ProgressInterval) {
+								clearInterval(step5ProgressInterval)
+							}
+							// 启动新的平滑动画，从当前进度到服务端进度
+							step5ProgressInterval = startStep5ProgressAnimation(
+								progressPercentage.value,
+								progress
+							)
+						} else {
+							// 非 step 5，直接更新进度
+							progressPercentage.value = Math.min(progress, 99)
+						}
 					}
-				} else if (data.content) {
-					// 兼容简单的文本流
-					// 可以根据实际情况解析
-					console.log('Content:', data.content)
+				}
+				// 处理题目数据
+				else if (data.type === 'question') {
+					const question = data.question || data.data?.question
+					const answer = data.answer || data.data?.answer
+
+					if (question && answer) {
+						predictionResults.value.push({ question, answer })
+					}
 				}
 			},
 			onError: (error) => {
 				console.error('SSE Error:', error)
-				clearInterval(progressInterval)
+
+				// 清除 step 5 的进度动画
+				if (step5ProgressInterval) {
+					clearInterval(step5ProgressInterval)
+					step5ProgressInterval = null
+				}
 
 				toast.add({
 					title: '押题失败',
@@ -639,7 +671,12 @@ const startPredictionProcess = async (requestId) => {
 			},
 			onComplete: () => {
 				console.log('SSE Complete')
-				clearInterval(progressInterval)
+
+				// 清除 step 5 的进度动画
+				if (step5ProgressInterval) {
+					clearInterval(step5ProgressInterval)
+					step5ProgressInterval = null
+				}
 
 				// 确保进度条完成
 				progressPercentage.value = 100
@@ -657,6 +694,65 @@ const startPredictionProcess = async (requestId) => {
 			}
 		}
 	})
+}
+
+/**
+ * Step 5 的平滑进度动画（AI 生成阶段）
+ * 在 AI 请求期间，给用户进度条在缓慢走动的感知
+ *
+ * @param {number} fromProgress - 起始进度
+ * @param {number} toProgress - 目标进度（服务端返回的进度）
+ * @returns {number} interval ID
+ */
+const startStep5ProgressAnimation = (fromProgress, toProgress) => {
+	let currentProgress = fromProgress
+	const targetProgress = Math.min(toProgress, 99) // 不超过 99%
+
+	// 计算需要增长的总量
+	const totalIncrease = targetProgress - currentProgress
+
+	if (totalIncrease <= 0) {
+		// 如果目标进度小于等于当前进度，不需要动画
+		return null
+	}
+
+	// 根据进度差异调整动画速度
+	// 进度差异大：更快的增长速度
+	// 进度差异小：更慢的增长速度（给用户持续进行的感觉）
+	let incrementPerTick
+	let intervalTime
+
+	if (totalIncrease > 10) {
+		// 大跨度：每 200ms 增加 0.5%
+		incrementPerTick = 0.5
+		intervalTime = 200
+	} else if (totalIncrease > 5) {
+		// 中等跨度：每 300ms 增加 0.3%
+		incrementPerTick = 0.3
+		intervalTime = 300
+	} else {
+		// 小跨度或接近完成：每 500ms 增加 0.2%（给用户持续进行的感觉）
+		incrementPerTick = 0.2
+		intervalTime = 500
+	}
+
+	const interval = setInterval(() => {
+		if (currentProgress < targetProgress) {
+			currentProgress = Math.min(
+				currentProgress + incrementPerTick,
+				targetProgress
+			)
+			progressPercentage.value = currentProgress
+		} else {
+			// 达到目标进度后，继续缓慢增长（但不超过 99%）
+			if (currentProgress < 99) {
+				currentProgress = Math.min(currentProgress + 0.1, 99)
+				progressPercentage.value = currentProgress
+			}
+		}
+	}, intervalTime)
+
+	return interval
 }
 
 // 独立的进度条动画（模拟）
