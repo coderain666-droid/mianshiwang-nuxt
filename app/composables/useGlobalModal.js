@@ -186,6 +186,9 @@ const ModalHost = defineComponent({
 	}
 })
 
+// 全局模态框控制器管理
+const modalControllers = new Set()
+
 export const useGlobalModal = () => {
 	const showModal = (options = {}) => {
 		if (typeof window === 'undefined' || typeof document === 'undefined') {
@@ -204,6 +207,7 @@ export const useGlobalModal = () => {
 
 		const handleResolve = (reason) => {
 			options.onClose?.(reason)
+			modalControllers.delete(controller)
 			destroyContainer(container, app)
 		}
 
@@ -212,6 +216,7 @@ export const useGlobalModal = () => {
 			onResolve: handleResolve,
 			onReady: (api) => {
 				controller = api
+				modalControllers.add(controller)
 			}
 		})
 
@@ -236,7 +241,36 @@ export const useGlobalModal = () => {
 		return controller
 	}
 
+	/**
+	 * 关闭最后一个打开的模态框
+	 * @param {string} reason - 关闭原因，默认为 'programmatic'
+	 */
+	const closeModal = (reason = 'programmatic') => {
+		if (modalControllers.size === 0) {
+			console.warn('[useGlobalModal] No modal to close.')
+			return
+		}
+
+		// 获取最后一个打开的模态框（Set 的最后一个元素）
+		const controllers = Array.from(modalControllers)
+		const lastController = controllers[controllers.length - 1]
+		lastController?.close(reason)
+	}
+
+	/**
+	 * 关闭所有打开的模态框
+	 * @param {string} reason - 关闭原因，默认为 'programmatic'
+	 */
+	const closeAllModals = (reason = 'programmatic') => {
+		modalControllers.forEach((controller) => {
+			controller?.close(reason)
+		})
+		modalControllers.clear()
+	}
+
 	return {
-		showModal
+		showModal,
+		closeModal,
+		closeAllModals
 	}
 }

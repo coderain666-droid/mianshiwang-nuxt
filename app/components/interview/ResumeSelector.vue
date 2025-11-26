@@ -2,23 +2,23 @@
 	<div class="space-y-4">
 		<!-- 简历选择区域 -->
 		<div class="space-y-3">
-			<div class="flex items-center justify-between">
-				<slot name="title">
+		<div class="flex items-center justify-between">
+			<slot name="title">
 					<h3 class="text-sm font-semibold text-neutral-900">选择已有简历</h3>
-				</slot>
-				<UButton
-					v-if="userStore.canAddResume"
-					color="primary"
+			</slot>
+			<UButton
+				v-if="userStore.canAddResume"
+				color="primary"
 					variant="ghost"
-					size="sm"
-					icon="i-heroicons-plus"
-					@click="isUploadResumeModalVisible = true"
-				>
-					上传新简历
-				</UButton>
-			</div>
+				size="sm"
+				icon="i-heroicons-plus"
+				@click="isUploadResumeModalVisible = true"
+			>
+				上传新简历
+			</UButton>
+		</div>
 
-			<!-- 简历列表 -->
+		<!-- 简历列表 -->
 			<div
 				v-if="userStore.resumes.length > 0"
 				class="space-y-2 max-h-[300px] overflow-y-auto pr-1"
@@ -40,8 +40,8 @@
 						<UIcon
 							name="i-heroicons-document-text"
 							class="w-5 h-5 text-primary-600"
-						/>
-					</div>
+				/>
+			</div>
 					<div class="flex-1 min-w-0">
 						<p class="font-medium text-neutral-900 truncate text-sm">
 							{{ resume.resumeName }}
@@ -65,54 +65,54 @@
 						v-if="interviewStore.resumeId === resume.resumeId"
 						name="i-heroicons-check-circle"
 						class="w-5 h-5 text-primary-500 shrink-0"
-					/>
-				</div>
+				/>
 			</div>
+		</div>
 
-			<!-- 空状态 -->
-			<div
-				v-else
+		<!-- 空状态 -->
+		<div
+			v-else
 				class="flex flex-col items-center justify-center py-8 text-gray-400 border-2 border-dashed border-gray-200 rounded-lg"
-			>
+		>
 				<UIcon name="i-heroicons-document-text" class="w-10 h-10 mb-2" />
-				<p class="text-sm">暂无简历</p>
-				<UButton
-					v-if="userStore.canAddResume"
-					color="primary"
-					variant="ghost"
-					size="sm"
-					class="mt-2"
-					@click="isUploadResumeModalVisible = true"
-				>
-					立即上传
-				</UButton>
+			<p class="text-sm">暂无简历</p>
+			<UButton
+				v-if="userStore.canAddResume"
+				color="primary"
+				variant="ghost"
+				size="sm"
+				class="mt-2"
+				@click="isUploadResumeModalVisible = true"
+			>
+				立即上传
+			</UButton>
 			</div>
 		</div>
 
 		<!-- 分隔线 -->
-		<div class="relative">
-			<div class="absolute inset-0 flex items-center">
-				<div class="w-full border-t border-gray-200"></div>
+			<div class="relative">
+				<div class="absolute inset-0 flex items-center">
+					<div class="w-full border-t border-gray-200"></div>
+				</div>
+				<div class="relative flex justify-center text-xs">
+					<span class="bg-white px-2 text-gray-500">或</span>
+				</div>
 			</div>
-			<div class="relative flex justify-center text-xs">
-				<span class="bg-white px-2 text-gray-500">或</span>
-			</div>
-		</div>
 
 		<!-- 手动输入 -->
-		<div class="space-y-2">
-			<h3 class="text-sm font-semibold text-neutral-900">手动输入简历内容</h3>
-			<UTextarea
-				v-model="resumeText"
-				placeholder="粘贴你的简历内容..."
-				:rows="6"
-				class="w-full"
-				@update:model-value="handleTextChange"
-			/>
-			<p class="text-xs text-gray-500">
-				支持直接粘贴简历文本内容，系统将自动解析
-			</p>
-		</div>
+			<div class="space-y-2">
+				<h3 class="text-sm font-semibold text-neutral-900">手动输入简历内容</h3>
+				<UTextarea
+					v-model="resumeText"
+					placeholder="粘贴你的简历内容..."
+					:rows="6"
+					class="w-full"
+					@update:model-value="handleTextChange"
+				/>
+				<p class="text-xs text-gray-500">
+					支持直接粘贴简历文本内容，系统将自动解析
+				</p>
+			</div>
 
 		<!-- 上传简历弹窗 -->
 		<UploadResumeModal
@@ -244,9 +244,9 @@ const previewTitle = computed(() => {
 
 // 简历上传成功
 const handleResumeUploaded = async () => {
-	const res = await getResumeListAPI($api)
-	userStore.resumes = res || []
-	isUploadResumeModalVisible.value = false
+		const res = await getResumeListAPI($api)
+		userStore.resumes = res || []
+		isUploadResumeModalVisible.value = false
 }
 
 // 监听外部值变化

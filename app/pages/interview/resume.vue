@@ -48,11 +48,18 @@ onMounted(() => {
 		description: '请确认以下信息后再开始押题流程',
 		contentComponent: SpecialInterviewConfirm,
 		contentProps: {
+			serviceType: 'resume',
 			positionName: positionName.value,
 			company: interviewStore.targetCompany,
 			remainingCount: resumeBalance.value,
-			onCompanyUpdate: () => {},
-			onConfirm: () => {}
+			onCompanyUpdate: (company) => {
+				interviewStore.setTargetCompany(company)
+			},
+			onConfirm: () => {
+				globalModal.closeModal()
+				// TODO: 开始押题流程
+				console.log('开始简历押题')
+			}
 		},
 		buttons: [],
 		preventClose: true
