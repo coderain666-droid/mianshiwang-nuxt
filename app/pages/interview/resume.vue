@@ -56,6 +56,22 @@
 					</div>
 				</div>
 
+				<!-- TODO：隐私安全提示 -->
+				<!-- <div
+					class="flex items-start gap-2 bg-green-50/50 p-3 rounded-lg border border-green-100/50"
+				>
+					<UIcon
+						name="i-heroicons-shield-check"
+						class="w-4 h-4 text-green-600 mt-0.5 shrink-0"
+					/>
+					<p class="text-xs text-green-700 leading-relaxed">
+						我们会为您所有的隐私数据（包括但不局限于：手机号、身份证、邮箱、姓名）进行<span
+							class="font-bold"
+							>加密或脱敏处理</span
+						>，请放心使用。
+					</p>
+				</div> -->
+
 				<div class="grid gap-8 md:grid-cols-3">
 					<!-- 公司名称 -->
 					<div class="space-y-2.5 group">
