@@ -60,22 +60,37 @@
 import { ref, watch } from 'vue'
 
 const props = defineProps({
+	/**
+	 * 目标岗位
+	 */
 	positionName: {
 		type: String,
 		default: ''
 	},
+	/**
+	 * 目标公司
+	 */
 	company: {
 		type: String,
 		default: ''
 	},
+	/**
+	 * 剩余次数
+	 */
 	remainingCount: {
 		type: Number,
 		default: 0
 	},
+	/**
+	 * 目标公司更新回调
+	 */
 	onCompanyUpdate: {
 		type: Function,
 		default: null
 	},
+	/**
+	 * 确认回调
+	 */
 	onConfirm: {
 		type: Function,
 		default: null

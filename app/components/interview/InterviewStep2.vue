@@ -368,9 +368,6 @@ const interviewStatus = computed(() => interviewStore.interviewStatus)
 const positionName = computed(
 	() => interviewStore.selectedPosition?.name || '通用岗位'
 )
-const positionCategory = computed(
-	() => interviewStore.selectedPosition?.category || '泛行业'
-)
 const statusMeta = computed(() => {
 	const map = {
 		idle: {
