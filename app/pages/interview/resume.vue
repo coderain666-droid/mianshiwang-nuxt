@@ -435,7 +435,7 @@
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, onUnmounted } from 'vue'
 import { navigateTo } from '#imports'
 import { useHead } from 'nuxt/app'
 import { SEO } from '@/constants/seo'
@@ -444,6 +444,8 @@ import { useInterviewStore } from '@/stores/interview'
 import { useGlobalModal } from '@/composables/useGlobalModal'
 import SpecialInterviewConfirm from '@/components/interview/SpecialInterviewConfirm.vue'
 import { useUserStore } from '@/stores/user'
+import { generateResumeQuizSSE } from '@/api/interview'
+import { useToast } from '#imports'
 
 definePageMeta({
 	requiresAuth: true,
@@ -462,6 +464,7 @@ useHead({
 
 const globalModal = useGlobalModal()
 const interviewStore = useInterviewStore()
+const toast = useToast()
 // 确定当前为 第二步
 interviewStore.currentStep = 2
 
@@ -469,6 +472,7 @@ const userStore = useUserStore()
 
 // 状态管理
 const step = ref('input') // input | processing | result
+const sseController = ref(null) // SSE 连接控制器
 
 // 验证
 const isFormValid = computed(() => {
@@ -516,7 +520,7 @@ const handlePredictClick = () => {
 			},
 			onConfirm: () => {
 				// 验证是否有面试押题剩余次数
-				if (resumeBalance.value <= 50) {
+				if (resumeBalance.value < 1) {
 					globalModal.closeModal()
 					globalModal.showModal({
 						title: '面试押题次数不足，请先充值',
@@ -533,12 +537,8 @@ const handlePredictClick = () => {
 					return
 				}
 
-				// TODO：查询
-				console.log(interviewStore.selectedPosition)
-				console.log(interviewStore.resumeId)
-
-				// globalModal.closeModal()
-				// startPredictionProcess()
+				globalModal.closeModal()
+				startPredictionProcess()
 			}
 		},
 		buttons: [],
@@ -551,51 +551,121 @@ const startPredictionProcess = async () => {
 	step.value = 'processing'
 	currentProgressStepIndex.value = 0
 	progressPercentage.value = 0
+	predictionResults.value = []
 
-	// 保存 JD 到 store (如果需要)
-	// interviewStore.setJd(formData.jd)
-
-	// 模拟进度条
-	let totalDuration = progressSteps.reduce(
-		(acc, curr) => acc + curr.duration,
-		0
-	)
-	let elapsedTime = 0
-
-	for (let i = 0; i < progressSteps.length; i++) {
-		currentProgressStepIndex.value = i
-		const stepDuration = progressSteps[i].duration
-
-		// 细分进度更新
-		const stepInterval = 50
-		const steps = stepDuration / stepInterval
-		const progressPerStep = 100 / progressSteps.length / steps
-
-		await new Promise((resolve) => {
-			let count = 0
-			const timer = setInterval(() => {
-				count++
-				// 计算总体进度
-				progressPercentage.value = Math.min(
-					99,
-					progressPercentage.value + progressPerStep
-				)
-
-				if (count >= steps) {
-					clearInterval(timer)
-					resolve()
-				}
-			}, stepInterval)
-		})
+	// 准备请求参数
+	const params = {
+		resumeId: interviewStore.resumeId,
+		company: interviewStore.selectedPosition.company || '',
+		positionName: interviewStore.selectedPosition.positionName || '',
+		minSalary: interviewStore.selectedPosition.minSalary || '',
+		maxSalary: interviewStore.selectedPosition.maxSalary || '',
+		jd: interviewStore.selectedPosition.jd || ''
 	}
 
-	progressPercentage.value = 100
-	generateMockResults()
+	// 获取配置
+	const config = useRuntimeConfig()
 
-	// 稍微延迟展示结果
-	setTimeout(() => {
-		step.value = 'result'
-	}, 500)
+	// 模拟进度条（独立于 SSE）
+	const progressInterval = startProgressAnimation()
+
+	// 启动 SSE 连接
+	sseController.value = generateResumeQuizSSE(params, {
+		token: userStore.token,
+		baseURL: config.public.apiBase,
+		callbacks: {
+			onMessage: (data) => {
+				console.log('SSE Message:', data)
+
+				// 根据后端返回的数据结构处理
+				// 假设后端返回格式为：{ type: 'question', data: { question: '', answer: '' } }
+				// 或者 { type: 'progress', data: { step: 1, percentage: 20 } }
+
+				if (data.type === 'question') {
+					// 接收到一道题目
+					predictionResults.value.push({
+						question: data.data.question,
+						answer: data.data.answer
+					})
+				} else if (data.type === 'progress') {
+					// 更新进度
+					if (data.data.step !== undefined) {
+						currentProgressStepIndex.value = Math.min(
+							data.data.step,
+							progressSteps.length - 1
+						)
+					}
+					if (data.data.percentage !== undefined) {
+						progressPercentage.value = Math.min(data.data.percentage, 99)
+					}
+				} else if (data.content) {
+					// 兼容简单的文本流
+					// 可以根据实际情况解析
+					console.log('Content:', data.content)
+				}
+			},
+			onError: (error) => {
+				console.error('SSE Error:', error)
+				clearInterval(progressInterval)
+
+				toast.add({
+					title: '押题失败',
+					description: error.message || '网络错误，请稍后重试',
+					color: 'error'
+				})
+
+				// 回退到输入页面
+				step.value = 'input'
+			},
+			onComplete: () => {
+				console.log('SSE Complete')
+				clearInterval(progressInterval)
+
+				// 确保进度条完成
+				progressPercentage.value = 100
+				currentProgressStepIndex.value = progressSteps.length - 1
+
+				// 如果没有收到任何结果，生成模拟数据（开发阶段）
+				if (predictionResults.value.length === 0) {
+					generateMockResults()
+				}
+
+				// 延迟展示结果
+				setTimeout(() => {
+					step.value = 'result'
+				}, 500)
+			}
+		}
+	})
+}
+
+// 独立的进度条动画（模拟）
+const startProgressAnimation = () => {
+	let stepIndex = 0
+	let stepProgress = 0
+
+	const interval = setInterval(() => {
+		stepProgress += 2
+
+		if (stepProgress >= 100) {
+			stepProgress = 0
+			stepIndex++
+
+			if (stepIndex >= progressSteps.length) {
+				clearInterval(interval)
+				return
+			}
+
+			currentProgressStepIndex.value = stepIndex
+		}
+
+		// 平滑增加进度
+		const baseProgress = (stepIndex / progressSteps.length) * 100
+		const stepContribution = (stepProgress / 100) * (100 / progressSteps.length)
+		progressPercentage.value = Math.min(98, baseProgress + stepContribution)
+	}, 100)
+
+	return interval
 }
 
 // 生成模拟数据
@@ -633,12 +703,26 @@ const generateMockResults = () => {
 
 // 重新押题
 const handleRetry = () => {
+	// 关闭现有的 SSE 连接
+	if (sseController.value) {
+		sseController.value.close()
+		sseController.value = null
+	}
+
 	step.value = 'input'
-	// 可选：清空之前的结果
+	// 清空之前的结果
 	predictionResults.value = []
 	progressPercentage.value = 0
 	currentProgressStepIndex.value = 0
 }
+
+// 组件卸载时清理 SSE 连接
+onUnmounted(() => {
+	if (sseController.value) {
+		sseController.value.close()
+		sseController.value = null
+	}
+})
 
 // 下载 PDF
 const handleDownloadPdf = () => {
