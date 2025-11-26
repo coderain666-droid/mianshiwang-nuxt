@@ -1,72 +1,169 @@
 <template>
-	<div class="h-full flex flex-col gap-6 max-w-4xl mx-auto w-full">
-		<!-- 头部标题 -->
-		<div v-if="step !== 'processing'" class="flex flex-col gap-2">
-			<h1 class="text-2xl font-bold text-neutral-900">简历押题</h1>
-			<p class="text-neutral-600 text-sm">
-				基于您的简历和目标岗位 JD，AI 智能预测面试题目并提供参考答案
-			</p>
-		</div>
-
+	<div class="h-full flex flex-col gap-6 w-full">
 		<!-- 第一步：输入信息 -->
 		<div
 			v-if="step === 'input'"
-			class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6"
+			class="bg-white rounded-2xl border border-gray-100 shadow-lg shadow-gray-100/50 p-8 space-y-8"
 		>
+			<!-- 顶部提示 -->
+			<div
+				class="bg-primary-50/50 rounded-xl p-4 flex gap-3 border border-primary-100"
+			>
+				<UIcon
+					name="i-heroicons-information-circle"
+					class="w-5 h-5 text-primary-500 mt-0.5"
+				/>
+				<div class="text-sm text-neutral-600 leading-relaxed">
+					<p class="font-medium text-neutral-900 mb-1">
+						为了获得更精准的押题结果：
+					</p>
+					<ul class="list-disc list-inside space-y-1 text-xs text-neutral-500">
+						<li>建议完整填写公司名称，AI 将结合该公司历史面试风格进行预测</li>
+						<li>请尽量提供详细的岗位职责（JD），包含任职要求与工作内容</li>
+					</ul>
+				</div>
+			</div>
+
 			<div class="grid gap-6 md:grid-cols-2">
 				<!-- 公司名称 -->
-				<div class="space-y-2">
-					<label class="block text-sm font-medium text-neutral-700"
-						>目标公司
-						<span class="text-neutral-400 font-normal">（选填）</span></label
+				<div class="space-y-2 group">
+					<label
+						class="flex items-center gap-1 text-sm font-semibold text-neutral-700"
 					>
+						目标公司
+						<span
+							class="text-xs font-normal text-neutral-400 bg-gray-100 px-1.5 py-0.5 rounded"
+							>选填</span
+						>
+					</label>
 					<UInput
 						v-model="formData.company"
+						class="w-full"
 						placeholder="例如：字节跳动"
 						size="lg"
 						icon="i-heroicons-building-office-2"
+						:ui="{
+							icon: { trailing: { pointer: '' } },
+							color: {
+								white: {
+									outline:
+										'shadow-none focus:ring-primary-500 focus:border-primary-500 border-gray-200 bg-gray-50/50 focus:bg-white transition-all'
+								}
+							}
+						}"
 					/>
 				</div>
 
 				<!-- 薪资范围 -->
-				<div class="space-y-2">
-					<label class="block text-sm font-medium text-neutral-700"
-						>薪资范围
-						<span class="text-neutral-400 font-normal">（选填）</span></label
+				<div class="space-y-2 group">
+					<label
+						class="block text-sm font-semibold text-neutral-700 flex items-center gap-1"
 					>
+						薪资范围
+						<span
+							class="text-xs font-normal text-neutral-400 bg-gray-100 px-1.5 py-0.5 rounded"
+							>选填</span
+						>
+					</label>
+					<!-- 最低薪资 ～ 最高薪资 -->
 					<UInput
-						v-model="formData.salary"
-						placeholder="例如：25k-35k"
+						v-model="formData.minSalary"
+						placeholder="例如：25k"
 						size="lg"
 						icon="i-heroicons-currency-yen"
+						:ui="{
+							color: {
+								white: {
+									outline:
+										'shadow-none focus:ring-primary-500 focus:border-primary-500 border-gray-200 bg-gray-50/50 focus:bg-white transition-all'
+								}
+							}
+						}"
+					/>
+					<span class="text-neutral-500 text-3xl mx-2">~</span>
+					<UInput
+						v-model="formData.maxSalary"
+						placeholder="例如：35k"
+						size="lg"
+						icon="i-heroicons-currency-yen"
+						:ui="{
+							color: {
+								white: {
+									outline:
+										'shadow-none focus:ring-primary-500 focus:border-primary-500 border-gray-200 bg-gray-50/50 focus:bg-white transition-all'
+								}
+							}
+						}"
 					/>
 				</div>
 			</div>
 
 			<!-- 岗位职责 (JD) -->
-			<div class="space-y-2">
-				<label class="block text-sm font-medium text-neutral-700"
-					>岗位职责 (JD) <span class="text-red-500">*</span></label
-				>
-				<UTextarea
-					v-model="formData.jd"
-					placeholder="请粘贴目标岗位的职位描述（JD），AI 将根据这些信息进行针对性押题..."
-					:rows="8"
-					size="lg"
-					required
-				/>
+			<div class="space-y-3">
+				<div class="flex items-center justify-between">
+					<label
+						class="block text-sm font-semibold text-neutral-700 flex items-center gap-1"
+					>
+						岗位职责 (JD)
+						<span
+							class="text-xs font-medium text-red-500 bg-red-50 px-1.5 py-0.5 rounded border border-red-100"
+							>必填</span
+						>
+					</label>
+					<span
+						class="text-xs text-neutral-400"
+						:class="{ 'text-primary-500': formData.jd.length > 0 }"
+					>
+						{{ formData.jd.length }} 字
+					</span>
+				</div>
+				<div class="relative group">
+					<UTextarea
+						class="w-full"
+						v-model="formData.jd"
+						placeholder="请粘贴目标岗位的职位描述（JD）...
+示例：
+1. 负责前端核心业务功能的开发与维护
+2. 熟练掌握 Vue3、TypeScript 等技术栈
+3. 具备良好的跨部门沟通协作能力"
+						:rows="8"
+						size="lg"
+						:ui="{
+							color: {
+								white: {
+									outline:
+										'shadow-none focus:ring-primary-500 focus:border-primary-500 border-gray-200 bg-gray-50/50 focus:bg-white transition-all'
+								}
+							},
+							padding: { lg: 'p-4' }
+						}"
+						required
+					/>
+					<!-- 装饰角标 -->
+					<div
+						class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+					>
+						<UIcon
+							name="i-heroicons-pencil-square"
+							class="w-4 h-4 text-gray-300"
+						/>
+					</div>
+				</div>
 			</div>
 
-			<div class="flex justify-end pt-4">
+			<div class="flex justify-end pt-2">
 				<UButton
 					size="xl"
 					color="primary"
-					class="w-full md:w-auto px-8"
+					class="w-full md:w-auto px-10 shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 transition-all"
 					:disabled="!isFormValid"
+					:loading="step === 'processing'"
 					@click="handlePredictClick"
 				>
-					立即押题
-					<UIcon name="i-heroicons-sparkles" class="w-5 h-5 ml-2" />
+					<span class="font-bold">立即押题</span>
+					<template #trailing>
+						<UIcon name="i-heroicons-sparkles" class="w-5 h-5" />
+					</template>
 				</UButton>
 			</div>
 		</div>
@@ -251,7 +348,10 @@ const userStore = useUserStore()
 const step = ref('input') // input | processing | result
 const formData = reactive({
 	company: '',
-	salary: '',
+	// 最低薪资
+	minSalary: '',
+	// 最高薪资
+	maxSalary: '',
 	jd: ''
 })
 
