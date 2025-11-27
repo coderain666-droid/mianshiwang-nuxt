@@ -42,7 +42,7 @@
 
 				<!-- Content Area -->
 				<div class="flex-1 overflow-hidden relative w-full flex flex-col">
-					<div class="flex-1 overflow-hidden px-4 py-6 lg:px-8 lg:py-8">
+					<div class="flex-1 overflow-hidden p-4 lg:px-8 lg:py-8">
 						<div class="max-w-[1600px] mx-auto h-full w-full">
 							<slot />
 						</div>
