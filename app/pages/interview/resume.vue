@@ -448,6 +448,52 @@
 				</div>
 			</div>
 		</div>
+
+		<!-- 押题失败的展示 -->
+		<div
+			v-if="step === 'error'"
+			class="flex-1 flex flex-col items-center justify-center min-h-[400px] bg-white rounded-2xl border border-gray-200 shadow-sm p-8"
+		>
+			<div class="w-full max-w-md text-center space-y-6">
+				<!-- 错误图标 -->
+				<div class="relative inline-block">
+					<div
+						class="w-24 h-24 mx-auto bg-red-50 rounded-full flex items-center justify-center relative z-10"
+					>
+						<UIcon
+							name="i-heroicons-exclamation-triangle"
+							class="w-12 h-12 text-red-500"
+						/>
+					</div>
+					<!-- 装饰光晕 -->
+					<div
+						class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-red-400/20 rounded-full animate-pulse"
+					></div>
+				</div>
+
+				<div class="space-y-2">
+					<h2 class="text-xl font-bold text-neutral-900">服务器压力过大</h2>
+					<p class="text-neutral-600">
+						AI 正在处理大量请求，暂时无法响应。<br />
+						<span class="text-green-600 font-medium"
+							>本次押题消费已自动返还</span
+						>，请稍后再试。
+					</p>
+				</div>
+
+				<div class="pt-4">
+					<UButton
+						size="xl"
+						color="primary"
+						class="px-8 shadow-lg shadow-primary-500/20"
+						@click="handleRetry"
+					>
+						<UIcon name="i-heroicons-arrow-path" class="w-5 h-5 mr-2" />
+						重新押题
+					</UButton>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -665,9 +711,18 @@ const startPredictionProcess = async (requestId) => {
 					if (question && answer) {
 						predictionResults.value.push({ question, answer })
 					}
+				} else if (data.type === 'error') {
+					console.error('SSE Error:', data.error)
+					step.value = 'error'
+					toast.add({
+						title: '押题失败',
+						description: data.error.message || '网络错误，请稍后重试',
+						color: 'error'
+					})
 				}
 			},
 			onError: (error) => {
+				step.value = 'error'
 				console.error('SSE Error:', error)
 
 				// 清除 step 5 的进度动画
@@ -681,12 +736,13 @@ const startPredictionProcess = async (requestId) => {
 					description: error.message || '网络错误，请稍后重试',
 					color: 'error'
 				})
-
-				// 回退到输入页面
-				step.value = 'input'
 			},
 			onComplete: () => {
 				console.log('SSE Complete')
+
+				if (step.value === 'error') {
+					return
+				}
 
 				// 清除 step 5 的进度动画
 				if (step5ProgressInterval) {
