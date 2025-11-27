@@ -27,3 +27,12 @@ export const getPaymentRecordsAPI = ($api, body) => {
 		body
 	})
 }
+
+/**
+ * 获取消费记录
+ */
+export const getConsumptionRecordsAPI = ($api) => {
+	return $api('/user/consumption-records', {
+		method: 'GET'
+	})
+}

@@ -335,10 +335,14 @@
 							<div v-else class="space-y-2 overflow-y-auto max-h-[300px]">
 								<div
 									v-for="(record, index) in displayedRecords"
-									:key="record.outTradeNo || index"
+									:key="record.outTradeNo || record.recordId || index"
 									class="rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm hover:shadow-md transition-shadow"
 								>
-									<div class="flex items-center justify-between gap-4">
+									<!-- 充值记录 -->
+									<div
+										v-if="activeRecordTab === 'recharge'"
+										class="flex items-center justify-between gap-4"
+									>
 										<div class="min-w-0">
 											<p
 												class="text-sm font-semibold text-gray-900 truncate mb-1"
@@ -369,6 +373,51 @@
 											>
 												<UIcon name="i-heroicons-clock" class="w-3.5 h-3.5" />
 												{{ formatDate(record.paidAt) }}
+											</p>
+										</div>
+									</div>
+
+									<!-- 消费记录 -->
+									<div v-else class="flex items-center justify-between gap-4">
+										<div class="min-w-0 flex-1">
+											<div class="flex items-center gap-2 mb-1">
+												<p class="text-sm font-semibold text-gray-900 truncate">
+													{{ record.typeName }}
+												</p>
+												<UBadge
+													size="xs"
+													:color="
+														record.status === 'success' ? 'success' : 'error'
+													"
+													variant="subtle"
+													class="font-normal"
+												>
+													{{ record.statusName }}
+												</UBadge>
+												<p
+													class="text-xs text-gray-500 truncate"
+													:title="record.description"
+												></p>
+											</div>
+											<p class="text-xs font-semibold flex items-center">
+												<span class="rounded font-mono text-gray-500">
+													{{ record.description || '暂无备注' }}
+												</span>
+											</p>
+										</div>
+										<div
+											class="text-right shrink-0 flex flex-col justify-between h-full pl-4"
+										>
+											<p
+												class="inline-flex items-center gap-1 text-[11px] text-gray-500"
+											>
+												订单号：{{ record.recordId }}
+											</p>
+											<p
+												class="inline-flex items-center gap-1 text-[11px] text-gray-500 justify-end"
+											>
+												<UIcon name="i-heroicons-clock" class="w-3.5 h-3.5" />
+												{{ formatDate(record.createdAt) }}
 											</p>
 										</div>
 									</div>
@@ -412,7 +461,11 @@ import UploadResumeModal from '@/components/profile/UploadResumeModal.vue'
 import ResumeList from '@/components/profile/ResumeList.vue'
 import RechargeModal from '@/components/profile/RechargeModal.vue'
 import { getResumeListAPI } from '@/api/resume'
-import { getUserInfoAPI, getPaymentRecordsAPI } from '@/api/user'
+import {
+	getUserInfoAPI,
+	getPaymentRecordsAPI,
+	getConsumptionRecordsAPI
+} from '@/api/user'
 import dayjs from 'dayjs'
 
 definePageMeta({
@@ -517,7 +570,7 @@ const recordMeta = computed(() => {
 })
 
 /**
- * 获取充值与消费记录
+ * 获取充值记录
  */
 const getPaymentRecords = async () => {
 	try {
@@ -529,6 +582,20 @@ const getPaymentRecords = async () => {
 	}
 }
 getPaymentRecords()
+
+/**
+ * 获取消费记录
+ */
+const getConsumptionRecords = async () => {
+	try {
+		const res = await getConsumptionRecordsAPI($api)
+		consumptionRecords.value = res.records
+	} catch (error) {
+		consumptionRecords.value = []
+		console.error('获取消费记录失败', error)
+	}
+}
+getConsumptionRecords()
 </script>
 
 <style scoped></style>
