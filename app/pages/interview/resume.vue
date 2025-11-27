@@ -387,7 +387,8 @@
 					>
 						重新押题
 					</UButton>
-					<UButton
+					<!-- TODO：暂时移除 PDF 下载功能 -->
+					<!-- <UButton
 						color="white"
 						variant="solid"
 						icon="i-heroicons-arrow-down-tray"
@@ -395,7 +396,7 @@
 						@click="handleDownloadPdf"
 					>
 						下载 PDF
-					</UButton>
+					</UButton> -->
 					<UButton
 						color="primary"
 						variant="solid"
