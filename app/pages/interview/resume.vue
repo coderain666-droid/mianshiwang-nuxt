@@ -376,6 +376,11 @@
 						class="w-5 h-5 text-green-500"
 					/>
 					<span>押题完成，共生成 {{ predictionResults.length }} 道预测题</span>
+					<span
+						class="text-xs text-success-500 cursor-pointer underline hover:text-success-600 transition-colors"
+						@click="navigateTo('/history')"
+						>后续可在「历史记录」中查看</span
+					>
 				</div>
 				<div class="flex items-center gap-3 w-full sm:w-auto">
 					<UButton
@@ -403,7 +408,7 @@
 						class="flex-1 sm:flex-none"
 						@click="handleNextStep"
 					>
-						下一步：岗位维度分析
+						下一步：查看提升计划
 						<UIcon name="i-heroicons-arrow-right" class="w-4 h-4 ml-1" />
 					</UButton>
 				</div>
