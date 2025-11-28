@@ -220,11 +220,12 @@ definePageMeta({
 })
 
 useHead({
-	title: `开始 AI 面试 - ${SEO.siteName}`,
+	title: `开启 AI 面试服务 - ${SEO.siteName}`,
 	meta: [
 		{
 			name: 'description',
-			content: '开始你的 AI 面试训练，选择岗位、上传简历，开始模拟面试'
+			content:
+				'选择岗位、上传简历，体验面试押题、专项面试模拟、行测+HR面试三大核心服务'
 		}
 	]
 })

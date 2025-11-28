@@ -15,12 +15,11 @@
 					三大核心服务，覆盖面试全流程
 				</h2>
 				<p class="mt-4 text-lg text-neutral-600">
-					不同于市面上单一的 AI
-					面试工具，面试汪提供从<span class="font-semibold text-primary-600"
-						>准备阶段</span
-					>到<span class="font-semibold text-primary-600">实战训练</span>再到<span
+					不同于市面上单一的 AI 面试工具，面试汪提供从<span
 						class="font-semibold text-primary-600"
-						>综合评估</span
+						>准备阶段</span
+					>到<span class="font-semibold text-primary-600">实战训练</span
+					>再到<span class="font-semibold text-primary-600">综合评估</span
 					>的完整服务链条
 				</p>
 			</div>
@@ -29,7 +28,8 @@
 			<div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
 				<!-- 服务 1: 面试押题 -->
 				<div
-					class="relative group bg-gradient-to-br from-blue-50 via-white to-blue-50/30 rounded-3xl border-2 border-blue-100 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
+					class="cursor-pointer relative group bg-gradient-to-br from-blue-50 via-white to-blue-50/30 rounded-3xl border-2 border-blue-100 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
+					@click="navigateTo('/interview/start')"
 				>
 					<!-- 角标 -->
 					<div
@@ -44,16 +44,15 @@
 						>
 							<UIcon name="i-heroicons-document-text" class="w-8 h-8" />
 						</div>
-						<h3 class="text-2xl font-bold text-neutral-900 mb-2">
-							面试押题
-						</h3>
+						<h3 class="text-2xl font-bold text-neutral-900 mb-2">面试押题</h3>
 						<p class="text-sm text-blue-600 font-semibold mb-4">
 							3-5 分钟快速生成 · 命中率 80%+
 						</p>
 					</div>
 
 					<p class="text-neutral-600 leading-relaxed mb-6">
-						基于岗位 JD 和个人简历，AI 智能分析并预测高频面试题，提供参考答案与回答技巧
+						基于岗位 JD 和个人简历，AI
+						智能分析并预测高频面试题，提供参考答案与回答技巧，得到专业反馈报告
 					</p>
 
 					<ul class="space-y-3 mb-6">
@@ -90,7 +89,8 @@
 
 				<!-- 服务 2: 专项面试 -->
 				<div
-					class="relative group bg-gradient-to-br from-emerald-50 via-white to-emerald-50/30 rounded-3xl border-2 border-emerald-100 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ring-4 ring-emerald-100/50"
+					class="cursor-pointer relative group bg-gradient-to-br from-emerald-50 via-white to-emerald-50/30 rounded-3xl border-2 border-emerald-100 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 ring-4 ring-emerald-100/50"
+					@click="navigateTo('/interview/start')"
 				>
 					<!-- 推荐角标 -->
 					<div
@@ -152,7 +152,8 @@
 
 				<!-- 服务 3: 行测 + HR 面试 -->
 				<div
-					class="relative group bg-gradient-to-br from-purple-50 via-white to-purple-50/30 rounded-3xl border-2 border-purple-100 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
+					class="cursor-pointer relative group bg-gradient-to-br from-purple-50 via-white to-purple-50/30 rounded-3xl border-2 border-purple-100 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
+					@click="navigateTo('/interview/start')"
 				>
 					<!-- 角标 -->
 					<div
@@ -165,7 +166,10 @@
 						<div
 							class="w-16 h-16 rounded-2xl bg-purple-500 text-white flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-xl shadow-purple-200"
 						>
-							<UIcon name="i-heroicons-chat-bubble-left-right" class="w-8 h-8" />
+							<UIcon
+								name="i-heroicons-chat-bubble-left-right"
+								class="w-8 h-8"
+							/>
 						</div>
 						<h3 class="text-2xl font-bold text-neutral-900 mb-2">
 							行测 + HR 面试
@@ -176,7 +180,8 @@
 					</div>
 
 					<p class="text-neutral-600 leading-relaxed mb-6">
-						覆盖行政能力测试 + HR 软技能面试，全面评估综合素质与软实力表现
+						覆盖行政能力测试 + HR
+						软技能面试，全面评估综合素质与软实力表现，大幅提升入职率
 					</p>
 
 					<ul class="space-y-3 mb-6">
@@ -286,4 +291,3 @@
 <script setup></script>
 
 <style scoped></style>
-

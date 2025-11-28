@@ -49,7 +49,7 @@
 							color="primary"
 							to="/interview/start"
 							class="px-8 font-semibold shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 transition-all"
-							>开始一场模拟面试</UButton
+							>立即体验三大面试服务</UButton
 						>
 						<UButton
 							size="xl"
@@ -57,7 +57,7 @@
 							variant="ghost"
 							to="/#features"
 							class="px-8 font-medium hover:bg-neutral-100"
-							>看看它如何工作</UButton
+							>了解服务详情</UButton
 						>
 					</div>
 					<div
@@ -83,7 +83,10 @@
 						</div>
 						<div class="flex items-center gap-2">
 							<div class="p-1 rounded bg-purple-100/50 text-purple-600">
-								<UIcon name="i-heroicons-chat-bubble-left-right" class="w-4 h-4" />
+								<UIcon
+									name="i-heroicons-chat-bubble-left-right"
+									class="w-4 h-4"
+								/>
 							</div>
 							<div>
 								<p class="font-semibold text-neutral-700">行测+HR</p>

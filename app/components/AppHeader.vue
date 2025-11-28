@@ -1,7 +1,7 @@
 <template>
 	<header
 		:class="[
-			'w-full sticky top-0 z-50 border-b border-gray-200 bg-white/70 backdrop-blur supports-[backdrop-filter]:bg-white/50',
+			'w-full sticky top-0 z-50 border-b border-gray-200 bg-white/70 backdrop-blur supports-backdrop-filter:bg-white/50',
 			scrolled ? 'shadow-sm bg-white/80 backdrop-blur' : ''
 		]"
 	>
@@ -13,7 +13,7 @@
 				>
 				<span
 					class="hidden sm:inline-block text-xs text-neutral-500 translate-y-px"
-					>极简三步，完成 AI 面试</span
+					>押题·模拟·行测 三位一体</span
 				>
 			</div>
 			<nav class="hidden md:flex items-center gap-6 text-sm text-neutral-600">
@@ -25,7 +25,7 @@
 							? 'text-neutral-900 font-bold'
 							: 'hover:text-neutral-900'
 					]"
-					>开始 AI 面试</NuxtLink
+					>开启 AI 服务</NuxtLink
 				>
 				<NuxtLink
 					to="/#features"
