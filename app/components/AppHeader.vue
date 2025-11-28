@@ -140,7 +140,7 @@ const userMenuItems = [
 	[
 		{ label: '个人中心', icon: 'i-heroicons-user', to: '/profile' },
 		{
-			label: '面试记录',
+			label: '服务记录',
 			icon: 'i-heroicons-chart-bar',
 			to: '/history'
 		}

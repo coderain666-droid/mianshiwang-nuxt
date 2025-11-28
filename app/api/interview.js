@@ -145,6 +145,28 @@ export const getAnalysisReportAPI = ($api, resultId) => {
 }
 
 /**
+ * 获取简历押题历史记录
+ */
+export const getInterviewResumeHistoryAPI = ($api, page, limit) => {
+	return $api('/interview/resume/quiz/history', {
+		method: 'GET',
+		query: {
+			page,
+			limit
+		}
+	})
+}
+
+/**
+ * 获取单个结果详情
+ */
+export const getInterviewResultDetailAPI = ($api, resultId) => {
+	return $api(`/interview/resume/quiz/result/${resultId}`, {
+		method: 'GET'
+	})
+}
+
+/**
  * 使用 $api 的普通接口示例（非 SSE）
  * 如果后端提供了非流式的押题接口，可以这样使用：
  */
