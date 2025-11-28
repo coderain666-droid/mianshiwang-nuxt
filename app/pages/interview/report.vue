@@ -47,7 +47,7 @@
 				<div class="grid lg:grid-cols-2 gap-6">
 					<!-- 左侧：匹配度评分 -->
 					<div
-						class="bg-gradient-to-br from-primary-50 to-white rounded-xl border border-primary-100 p-8 flex flex-col justify-center relative overflow-hidden"
+						class="bg-linear-to-br from-primary-50 to-white rounded-xl border border-primary-100 p-8 flex flex-col justify-center relative overflow-hidden"
 					>
 						<div class="relative z-10">
 							<h2 class="text-lg font-semibold text-neutral-900 mb-6">
@@ -69,6 +69,21 @@
 							<p class="text-neutral-600 leading-relaxed mb-6">
 								{{ reportData.summary }}
 							</p>
+
+							<!-- 私教训练营按钮 -->
+							<div v-if="showTrainingButton" class="mb-6">
+								<UButton
+									color="primary"
+									variant="soft"
+									block
+									class="animate-pulse hover:animate-none font-bold"
+									@click="showTrainingModal = true"
+								>
+									<UIcon name="i-heroicons-sparkles" class="w-5 h-5" />
+									匹配度较低？获取 1v1 私教特训方案
+								</UButton>
+							</div>
+
 							<div class="grid grid-cols-3 gap-4 text-center">
 								<div
 									class="bg-white/60 rounded-lg p-3 border border-primary-100"
@@ -268,6 +283,50 @@
 				</div>
 			</div>
 		</div>
+		<!-- 私教训练营弹窗 -->
+		<UModal v-model:open="showTrainingModal" title="1v1 私教训练营">
+			<template #body>
+				<div class="px-6 text-center space-y-6">
+					<div class="space-y-4">
+						<p class="text-neutral-600 text-sm">
+							针对您的薄弱环节，提供定制化的一对一辅导，助您快速补齐短板，拿下心仪
+							Offer！
+						</p>
+						<div class="flex justify-center">
+							<div
+								class="w-48 h-48 bg-gray-100 rounded-lg overflow-hidden border border-gray-200"
+							>
+								<img
+									:src="sundayImg"
+									alt="私教微信"
+									class="w-full h-full object-cover"
+								/>
+							</div>
+						</div>
+						<p class="text-xs text-neutral-500">
+							扫码添加微信（备注：<span class="font-bold text-neutral-800"
+								>训练营</span
+							>）
+						</p>
+					</div>
+					<div class="pt-2">
+						<UButton
+							to="https://mp.weixin.qq.com/s/q4oxZlVKfz96XqmK2l56iQ"
+							target="_blank"
+							color="primary"
+							block
+							size="lg"
+						>
+							查看训练营详情
+							<UIcon
+								name="i-heroicons-arrow-top-right-on-square"
+								class="w-4 h-4 ml-1"
+							/>
+						</UButton>
+					</div>
+				</div>
+			</template>
+		</UModal>
 	</div>
 </template>
 
@@ -280,6 +339,7 @@ import { ref, computed } from 'vue'
 import { useToast } from '#imports'
 import { getAnalysisReportAPI } from '@/api/interview'
 import { useRoute } from 'vue-router'
+import sundayImg from '@/assets/imgs/sunday.jpg'
 
 // 引入简单的雷达图组件（如果没有外部组件，我们可以在这里定义一个局部组件）
 import RadarChart from '@/components/interview/RadarChart.vue'
@@ -304,6 +364,24 @@ const { $api } = useNuxtApp()
 const route = useRoute()
 const interviewStore = useInterviewStore()
 const toast = useToast()
+
+const showTrainingModal = ref(false)
+
+/**
+ * 是否显示私教训练营按钮
+ */
+const showTrainingButton = computed(() => {
+	// 岗位匹配关键词
+	const keywords = ['前端', 'web', '开发']
+	const position = reportData.value.position?.toLowerCase() || ''
+	const isRelatedPosition = keywords.some((k) => position.includes(k))
+
+	// 分数判断
+	const score = Number(reportData.value.matchScore) || 0
+	const isLowScore = score < 70
+
+	return isRelatedPosition && isLowScore
+})
 
 // 报告数据
 const reportData = ref({
