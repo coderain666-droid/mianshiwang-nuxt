@@ -32,9 +32,9 @@
 						</div>
 						<div>
 							<h1 class="font-bold text-slate-900 text-lg leading-tight">
-								面试汪：超 AI 服务
+								面试汪：全链路 AI 服务
 							</h1>
-							<p class="text-xs text-slate-500">Resume Wang Interview</p>
+							<p class="text-xs text-slate-500">押题·模拟·行测 三位一体</p>
 						</div>
 					</div>
 
@@ -42,7 +42,7 @@
 						<h2
 							class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4"
 						>
-							极简三步，快速开始 AI 面试
+							极简三步，快速开始
 						</h2>
 					</div>
 				</div>

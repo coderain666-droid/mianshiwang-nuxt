@@ -1,43 +1,90 @@
 <template>
 	<section id="features" class="py-10 md:py-32 bg-neutral-50/50">
 		<div class="container px-4">
-			<div class="mx-auto max-w-2xl text-center mb-16">
+			<div class="mx-auto max-w-3xl text-center mb-16">
 				<h2
 					class="text-3xl md:text-4xl font-bold text-neutral-900 tracking-tight"
 				>
-					为面试而生的核心能力
+					三大服务 × 全流程覆盖
 				</h2>
 				<p class="mt-4 text-lg text-neutral-600">
-					支持任何职业方向，从求职到晋升，快速构建你的优势。
+					不同于市面上单一的 AI 面试模拟工具，面试汪提供从<span
+						class="font-semibold text-primary-600"
+						>押题预测</span
+					>到<span class="font-semibold text-primary-600">实战模拟</span>再到<span
+						class="font-semibold text-primary-600"
+						>综合评估</span
+					>的完整解决方案，全方位提升面试竞争力。
 				</p>
 			</div>
 			<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+				<!-- 服务 1: 面试押题 -->
 				<div
-					class="group p-8 bg-white rounded-2xl border border-neutral-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+					class="group p-8 bg-gradient-to-br from-blue-50/50 to-white rounded-2xl border-2 border-blue-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
 				>
 					<div
-						class="h-12 w-12 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+						class="h-12 w-12 rounded-xl bg-blue-500 text-white flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-blue-200"
 					>
-						<UIcon name="i-heroicons-cpu-chip" class="w-6 h-6" />
+						<UIcon name="i-heroicons-document-text" class="w-6 h-6" />
 					</div>
-					<h3 class="text-xl font-semibold text-neutral-900">岗位级知识图谱</h3>
+					<div class="flex items-center gap-2 mb-2">
+						<h3 class="text-xl font-bold text-neutral-900">面试押题</h3>
+						<span
+							class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 text-[10px] font-bold"
+							>核心服务</span
+						>
+					</div>
 					<p class="mt-3 text-neutral-600 leading-relaxed">
-						结合行业语料、JD 解析与经验库，生成贴合场景的面试问题。
+						基于岗位 JD 和简历，AI 智能预测 80%
+						高频面试题，附带参考答案与回答技巧，3 分钟快速生成。
 					</p>
 				</div>
+
+				<!-- 服务 2: 专项面试 -->
 				<div
-					class="group p-8 bg-white rounded-2xl border border-neutral-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+					class="group p-8 bg-gradient-to-br from-emerald-50/50 to-white rounded-2xl border-2 border-emerald-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
 				>
 					<div
-						class="h-12 w-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+						class="h-12 w-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-emerald-200"
 					>
-						<UIcon name="i-heroicons-queue-list" class="w-6 h-6" />
+						<UIcon name="i-heroicons-bolt" class="w-6 h-6" />
 					</div>
-					<h3 class="text-xl font-semibold text-neutral-900">多轮追问与深挖</h3>
+					<div class="flex items-center gap-2 mb-2">
+						<h3 class="text-xl font-bold text-neutral-900">专项面试</h3>
+						<span
+							class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold"
+							>核心服务</span
+						>
+					</div>
 					<p class="mt-3 text-neutral-600 leading-relaxed">
-						动态生成追问与反问，评估深度思考与沟通表达能力。
+						针对技术面、业务面进行深度模拟，AI
+						面试官实时追问与反馈，支持语音/文字，约 1 小时实战训练。
 					</p>
 				</div>
+
+				<!-- 服务 3: 行测 + HR 面试 -->
+				<div
+					class="group p-8 bg-gradient-to-br from-purple-50/50 to-white rounded-2xl border-2 border-purple-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+				>
+					<div
+						class="h-12 w-12 rounded-xl bg-purple-500 text-white flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-lg shadow-purple-200"
+					>
+						<UIcon name="i-heroicons-chat-bubble-left-right" class="w-6 h-6" />
+					</div>
+					<div class="flex items-center gap-2 mb-2">
+						<h3 class="text-xl font-bold text-neutral-900">行测+HR面试</h3>
+						<span
+							class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700 text-[10px] font-bold"
+							>核心服务</span
+						>
+					</div>
+					<p class="mt-3 text-neutral-600 leading-relaxed">
+						覆盖行政能力测试 + HR 软技能面试，评估沟通表达与情商，约 45
+						分钟全面提升综合素质。
+					</p>
+				</div>
+
+				<!-- 补充特性 -->
 				<div
 					class="group p-8 bg-white rounded-2xl border border-neutral-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
 				>
@@ -49,22 +96,10 @@
 					<h3 class="text-xl font-semibold text-neutral-900">结构化评估报告</h3>
 					<p class="mt-3 text-neutral-600 leading-relaxed">
 						覆盖
-						<StarMethodModal /> 模型、技能矩阵、风险点与改进建议，一键导出。
+						<StarMethodModal /> 模型、技能矩阵、雷达图与改进建议，一键导出复盘。
 					</p>
 				</div>
-				<div
-					class="group p-8 bg-white rounded-2xl border border-neutral-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
-				>
-					<div
-						class="h-12 w-12 rounded-xl bg-fuchsia-50 text-fuchsia-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
-					>
-						<UIcon name="i-heroicons-language" class="w-6 h-6" />
-					</div>
-					<h3 class="text-xl font-semibold text-neutral-900">语音与表情分析</h3>
-					<p class="mt-3 text-neutral-600 leading-relaxed">
-						可选语音输入与摄像头，分析语速、情绪与非语言表达。
-					</p>
-				</div>
+
 				<div
 					class="group p-8 bg-white rounded-2xl border border-neutral-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
 				>
@@ -75,9 +110,10 @@
 					</div>
 					<h3 class="text-xl font-semibold text-neutral-900">真实公司风格</h3>
 					<p class="mt-3 text-neutral-600 leading-relaxed">
-						按公司/岗位/等级定制问法与偏好，模拟真实面试氛围。
+						按公司/岗位/等级定制问法与偏好，模拟真实面试氛围与风格。
 					</p>
 				</div>
+
 				<div
 					class="group p-8 bg-white rounded-2xl border border-neutral-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
 				>
@@ -88,7 +124,7 @@
 					</div>
 					<h3 class="text-xl font-semibold text-neutral-900">隐私与数据安全</h3>
 					<p class="mt-3 text-neutral-600 leading-relaxed">
-						本地可控与企业级配置双方案，你的数据只属于你。
+						企业级数据加密，你的简历与面试数据只属于你，安全可控。
 					</p>
 				</div>
 			</div>

@@ -3,10 +3,14 @@
 		<div class="space-y-3">
 			<h1 class="text-white text-3xl md:text-4xl font-semibold">
 				欢迎回来！<br />
-				继续你的 AI 面试训练
+				继续你的全链路 AI 面试训练
 			</h1>
 			<p class="text-sm md:text-base text-white/80 max-w-xl">
-				面试汪为你记录每一次模拟面试结果，提供实时追问与结构化评估报告。现在登录即可同步历史练习数据，并获得针对岗位的最新题库。
+				面试汪提供<span class="font-semibold">面试押题</span>、<span
+					class="font-semibold"
+					>专项面试模拟</span
+				>、<span class="font-semibold">行测+HR面试</span
+				>三大核心服务。登录后同步历史记录，获取针对性题库与实战训练，全方位提升面试竞争力。
 			</p>
 		</div>
 

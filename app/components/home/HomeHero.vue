@@ -22,22 +22,26 @@
 								class="relative inline-flex rounded-full h-2 w-2 bg-primary-500"
 							></span>
 						</span>
-						支持多职业 · 实时评估 · 技能画像
+						押题 · 模拟 · 行测 · 三大服务全覆盖
 					</div>
 					<h1
 						class="text-4xl md:text-6xl font-extrabold tracking-tight text-neutral-900 leading-[1.15]"
 					>
-						用 AI 精准模拟面试<br />
+						全链路 AI 面试服务<br />
 						<span
 							class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-emerald-600"
-							>为你的求职保驾护航</span
+							>从押题到实战，一站式搞定</span
 						>
 					</h1>
 					<p class="mt-6 text-lg text-neutral-600 leading-relaxed">
-						面试汪通过 AI
-						智能模拟面试，根据你的简历，快速模拟真实面试场景。帮助你在短时间内提升面试命中率超
-						<span class="text-emerald-600 font-bold">80%</span
-						>，极简流程，立刻见效。
+						面试汪提供
+						<span class="font-semibold text-primary-600">面试押题</span>、<span
+							class="font-semibold text-primary-600"
+							>专项面试模拟</span
+						>、<span class="font-semibold text-primary-600">行测+HR面试</span>
+						三大核心服务。不同于市面上单一的 AI
+						面试工具，我们覆盖面试全流程，助你面试命中率提升超
+						<span class="text-emerald-600 font-bold">80%</span>。
 					</p>
 					<div class="mt-8 flex flex-col sm:flex-row gap-4">
 						<UButton
@@ -57,25 +61,34 @@
 						>
 					</div>
 					<div
-						class="mt-10 pt-8 border-t border-neutral-100 flex items-center gap-8 text-sm font-medium text-neutral-500"
+						class="mt-10 pt-8 border-t border-neutral-100 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm"
 					>
 						<div class="flex items-center gap-2">
-							<div class="p-1 rounded bg-emerald-100/50 text-emerald-600">
-								<UIcon name="i-heroicons-sparkles" class="w-4 h-4" />
-							</div>
-							生成岗位级题库
-						</div>
-						<div class="flex items-center gap-2">
 							<div class="p-1 rounded bg-blue-100/50 text-blue-600">
-								<UIcon name="i-heroicons-chart-bar" class="w-4 h-4" />
+								<UIcon name="i-heroicons-document-text" class="w-4 h-4" />
 							</div>
-							实时评分
+							<div>
+								<p class="font-semibold text-neutral-700">面试押题</p>
+								<p class="text-xs text-neutral-500">3分钟预测高频题</p>
+							</div>
 						</div>
 						<div class="flex items-center gap-2">
-							<div class="p-1 rounded bg-neutral-100 text-neutral-600">
-								<UIcon name="i-heroicons-lock-closed" class="w-4 h-4" />
+							<div class="p-1 rounded bg-emerald-100/50 text-emerald-600">
+								<UIcon name="i-heroicons-bolt" class="w-4 h-4" />
 							</div>
-							隐私安全
+							<div>
+								<p class="font-semibold text-neutral-700">专项面试</p>
+								<p class="text-xs text-neutral-500">1v1 实战模拟</p>
+							</div>
+						</div>
+						<div class="flex items-center gap-2">
+							<div class="p-1 rounded bg-purple-100/50 text-purple-600">
+								<UIcon name="i-heroicons-chat-bubble-left-right" class="w-4 h-4" />
+							</div>
+							<div>
+								<p class="font-semibold text-neutral-700">行测+HR</p>
+								<p class="text-xs text-neutral-500">综合素质评估</p>
+							</div>
 						</div>
 					</div>
 				</div>

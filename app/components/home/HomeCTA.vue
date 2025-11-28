@@ -6,10 +6,11 @@
 			>
 				<div class="relative mx-auto max-w-2xl text-center z-10">
 					<h3 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-						准备好用 AI 提升你的面试胜率了吗？
+						准备好体验全链路 AI 面试服务了吗？
 					</h3>
 					<p class="mx-auto mt-6 text-lg leading-8 text-neutral-300">
-						现在开始免费试用，5 分钟内完成首次评估，获得个性化建议。
+						从押题预测到实战模拟，再到综合评估，3
+						大服务全覆盖。现在开始，3分钟完成首次押题，立即获得高分参考答案。
 					</p>
 					<div class="mt-10 flex items-center justify-center gap-x-6">
 						<UButton
