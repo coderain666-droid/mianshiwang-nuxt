@@ -23,7 +23,7 @@
 			<!-- Width container to prevent content squeezing during transition -->
 			<div class="w-65 lg:w-72 h-full flex flex-col">
 				<!-- Header -->
-				<div class="p-6 pb-2">
+				<div class="py-6 px-4 pb-2">
 					<div class="flex items-center gap-3 mb-6">
 						<div
 							class="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center text-white shadow-lg shadow-primary-200"
@@ -31,7 +31,7 @@
 							<UIcon name="i-heroicons-academic-cap" class="w-6 h-6" />
 						</div>
 						<div>
-							<h1 class="font-bold text-slate-900 text-lg leading-tight">
+							<h1 class="font-bold text-slate-900 text-lg leading-tight mb-1">
 								面试汪：全链路 AI 服务
 							</h1>
 							<p class="text-xs text-slate-500">押题·模拟·行测 三位一体</p>
