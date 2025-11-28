@@ -324,15 +324,15 @@ const serviceOptionMeta = {
 		badgeIcon: 'i-heroicons-document-text'
 	},
 	[SERVICE_TAGS.SPECIAL]: {
-		accent: 'bg-violet-50 text-violet-600',
-		cta: '进入' + serviceHighlights[1].title,
-		badgeClass: 'text-violet-700 bg-violet-100',
+		accent: 'bg-emerald-50 text-emerald-600',
+		cta: '开启' + serviceHighlights[1].title,
+		badgeClass: 'text-emerald-700 bg-emerald-100',
 		badgeIcon: 'i-heroicons-sparkles'
 	},
 	[SERVICE_TAGS.BEHAVIOR]: {
-		accent: 'bg-emerald-50 text-emerald-600',
-		cta: '开启' + serviceHighlights[2].title,
-		badgeClass: 'text-emerald-700 bg-emerald-100',
+		accent: 'bg-violet-50 text-violet-600',
+		cta: '进入' + serviceHighlights[2].title,
+		badgeClass: 'text-violet-700 bg-violet-100',
 		badgeIcon: 'i-heroicons-chat-bubble-left-right'
 	}
 }
