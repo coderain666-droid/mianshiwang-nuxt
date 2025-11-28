@@ -266,6 +266,8 @@ import { SEO } from '@/constants/seo'
 import { ref, computed } from 'vue'
 import { useToast } from '#imports'
 import { saveAs } from 'file-saver'
+import { getAnalysisReportAPI } from '@/api/interview'
+import { useRoute } from 'vue-router'
 
 definePageMeta({
 	requiresAuth: true,
@@ -283,11 +285,24 @@ useHead({
 	]
 })
 
+const { $api } = useNuxtApp()
+const route = useRoute()
 const interviewStore = useInterviewStore()
 // 确定当前为 第三步
 interviewStore.currentStep = 3
 
 const toast = useToast()
+
+/**
+ * 获取分析报告数据
+ */
+const getAnalysisReport = async () => {
+	const response = await getAnalysisReportAPI($api, route.query.resultId)
+	console.log('response', response)
+
+	interviewStore.report = response.data
+}
+getAnalysisReport()
 
 const isGeneratingPDF = ref(false)
 

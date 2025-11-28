@@ -136,6 +136,15 @@ export const generateResumeQuizSSE = (params, options) => {
 }
 
 /**
+ * 获取分析报告的统一接口
+ */
+export const getAnalysisReportAPI = ($api, resultId) => {
+	return $api(`/interview/analysis/report/${resultId}`, {
+		method: 'GET'
+	})
+}
+
+/**
  * 使用 $api 的普通接口示例（非 SSE）
  * 如果后端提供了非流式的押题接口，可以这样使用：
  */

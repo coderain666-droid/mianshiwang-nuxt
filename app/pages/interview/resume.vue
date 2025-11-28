@@ -197,7 +197,7 @@
 								class="text-[10px] font-medium text-red-500 bg-red-50 px-2 py-0.5 rounded-full border border-red-100"
 								>必填</span
 							>
-							<span class="text-xs text-neutral-400">50 ~ 2000 字</span>
+							<span class="text-xs text-neutral-400">50 ~ 800 字</span>
 						</label>
 						<div class="flex items-center gap-2">
 							<transition
@@ -232,7 +232,7 @@
 							class="w-full"
 							v-model="interviewStore.selectedPosition.jd"
 							minlength="50"
-							maxlength="2000"
+							maxlength="800"
 							placeholder="请直接粘贴目标岗位的职位描述（JD）...
 
 💡 提示：越详细的 JD（包含任职要求、技术栈、加分项），生成的押题越准确，最少 50 字，最大 2000 字。
@@ -672,8 +672,10 @@ interviewStore.currentStep = 2
 
 const userStore = useUserStore()
 
+// 会话 ID
+let resultId = '01e13831-748b-420c-a39e-0e6ac2f38f8e'
 // 状态管理
-const step = ref('input') // input | progress | complete | error
+const step = ref('complete') // input | progress | complete | error
 const sseController = ref(null) // SSE 连接控制器
 
 const resumeBalance = computed(
@@ -717,9 +719,26 @@ watch(uniqueProgressSteps, async () => {
 })
 
 // 预测结果数据
-const predictionResults = ref([])
+const predictionResults = ref([
+	{
+		question:
+			'请介绍一下你最近参与的一个后端项目，你在其中承担了什么角色？使用了哪些技术栈？',
+		answer:
+			'虽然简历中项目经验部分信息有限，但从自我评价可以看出我具备扎实的技术基础和实践能力。在最近的一个项目中，我主要负责后端API的设计与开发，使用了Spring Boot框架搭建微服务架构，MySQL作为主数据库，Redis用于缓存优化。我负责用户管理模块的开发，通过JWT实现身份认证，设计了RESTful API接口。在项目中我积极发现问题，比如发现某个查询接口响应较慢，通过分析SQL执行计划，添加了合适的索引，将响应时间从800ms优化到150ms。整个项目采用Git进行版本控制，通过单元测试保证了代码质量，最终按时完成了开发任务。',
+		category: 'project',
+		difficulty: 'medium',
+		tips: '回答要点：1. 明确项目背景和职责 2. 具体技术栈说明 3. 遇到的挑战和解决方案 4. 量化成果',
+		keywords: ['Spring Boot', 'MySQL', 'Redis', 'API设计', '性能优化'],
+		reasoning:
+			'考察项目经验和实际技术应用能力，了解候选人在真实项目中的贡献和技术选择',
+		isFavorite: false,
+		isPracticed: false
+	}
+])
 // 预测的总结
-const predictionSummary = ref('')
+const predictionSummary = ref(
+	'候选人展现出扎实的技术基础和良好的学习能力，自我评价中体现的责任心和分析能力在技术问题回答中得到验证。优势在于对分布式系统、数据库优化、缓存技术有深入理解，具备解决复杂技术问题的能力。项目经验丰富，能够从技术选型到架构设计全面思考。薄弱点在于简历中缺乏具体项目细节和技术栈说明，需要在实际面试中进一步挖掘真实项目经验。建议面试重点考察分布式场景下的实战经验，同时关注团队协作和项目推进能力。候选人期望薪资30K-50K与目标岗位12K存在较大差距，需要评估其实际能力与岗位匹配度。'
+)
 
 // 难度映射
 const difficultyMap = {
@@ -875,6 +894,8 @@ const startPredictionProcess = async (requestId) => {
 				else if (data.type === 'complete') {
 					// 标记状态
 					step.value = 'complete'
+					// 获取当前会话的 ID
+					resultId = data.data.resultId
 					// 兼容旧结构，如果 data.data.questions 存在则使用它
 					if (data.data?.questions) {
 						predictionResults.value = data.data.questions.map((item) => ({
@@ -996,7 +1017,7 @@ const handleDownloadPdf = () => {
 // 下一步
 const handleNextStep = () => {
 	// 假设跳转到报告页面或其他逻辑
-	navigateTo('/interview/report') // 或者是 /interview/resume/report 如果有的话
+	navigateTo(`/interview/report?resultId=${resultId}`) // 或者是 /interview/resume/report 如果有的话
 }
 </script>
 
