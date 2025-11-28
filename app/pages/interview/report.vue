@@ -1,5 +1,6 @@
 <template>
 	<div class="h-full flex flex-col gap-6">
+		<!-- 头部 -->
 		<div
 			class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
 		>
@@ -8,11 +9,15 @@
 					class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-full mb-3"
 				>
 					<UIcon name="i-heroicons-check-circle" class="w-5 h-5" />
-					<span class="font-medium">面试已完成</span>
+					<span class="font-medium">评估已完成</span>
 				</div>
 				<h1 class="text-3xl font-bold text-neutral-900">面试评估报告</h1>
 				<p class="text-neutral-600 mt-2 text-sm">
-					基于你的面试表现生成的个性化评估和强化建议
+					针对
+					<span class="font-semibold text-primary-600"
+						>{{ reportData.company }} - {{ reportData.position }}</span
+					>
+					岗位的详细评估
 				</p>
 			</div>
 			<div
@@ -22,238 +27,246 @@
 					color="gray"
 					variant="ghost"
 					icon="i-heroicons-arrow-left"
-					@click="handleRestart"
+					to="/"
 				>
-					重新开始
+					返回首页
 				</UButton>
 				<UButton
 					color="primary"
-					icon="i-heroicons-arrow-down-tray"
-					:loading="isGeneratingPDF"
-					@click="handleDownloadPDF"
+					icon="i-heroicons-arrow-path"
+					@click="handleRestart"
 				>
-					下载 PDF 报告
+					重新开始
 				</UButton>
 			</div>
 		</div>
 
 		<div class="flex-1 min-h-0 overflow-hidden">
-			<div class="h-full overflow-y-auto pr-1 space-y-6">
-				<!-- 综合评分卡片 -->
-				<div
-					class="bg-gradient-to-br from-primary-50 to-blue-50 rounded-xl border border-primary-200 p-8"
-				>
-					<div class="flex items-center justify-between flex-wrap gap-4">
-						<div class="max-w-xl">
-							<h2 class="text-xl font-semibold text-neutral-900 mb-2">
-								综合评分
-							</h2>
-							<p class="text-neutral-600">
-								{{
-									report?.overall?.summary || '基于你在面试中的整体表现进行评估'
-								}}
-							</p>
-						</div>
-						<div class="text-right">
-							<div class="text-5xl font-bold text-primary-600 mb-1">
-								{{ report?.overall?.score || 0 }}
-							</div>
-							<div class="text-sm text-neutral-600">分</div>
-							<div
-								class="mt-2 px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-medium inline-block"
-							>
-								{{ report?.overall?.level || '良好' }}
-							</div>
-						</div>
-					</div>
-				</div>
-
+			<div class="h-full overflow-y-auto pr-1 space-y-6 pb-10">
+				<!-- 概览区域：匹配度 & 雷达图 -->
 				<div class="grid lg:grid-cols-2 gap-6">
-					<!-- 左侧：STAR 分析 -->
-					<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-						<h2 class="text-lg font-semibold text-neutral-900 mb-4">
-							STAR 模型分析
-						</h2>
-						<div class="space-y-4">
-							<div
-								v-for="(star, index) in starItems"
-								:key="index"
-								class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
-							>
+					<!-- 左侧：匹配度评分 -->
+					<div
+						class="bg-gradient-to-br from-primary-50 to-white rounded-xl border border-primary-100 p-8 flex flex-col justify-center relative overflow-hidden"
+					>
+						<div class="relative z-10">
+							<h2 class="text-lg font-semibold text-neutral-900 mb-6">
+								岗位匹配度
+							</h2>
+							<div class="flex items-baseline gap-4 mb-4">
+								<span
+									class="text-6xl font-bold text-primary-600 tracking-tight"
+								>
+									{{ reportData.matchScore }}
+								</span>
+								<span class="text-xl text-neutral-600 font-medium">分</span>
+								<span
+									class="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-bold"
+								>
+									{{ reportData.matchLevel }}
+								</span>
+							</div>
+							<p class="text-neutral-600 leading-relaxed mb-6">
+								{{ reportData.summary }}
+							</p>
+							<div class="grid grid-cols-3 gap-4 text-center">
 								<div
-									class="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center text-sm font-semibold"
+									class="bg-white/60 rounded-lg p-3 border border-primary-100"
 								>
-									{{ star.letter }}
+									<div class="text-2xl font-bold text-neutral-900">
+										{{ reportData.matchedSkills.length }}
+									</div>
+									<div class="text-xs text-neutral-500 mt-1">匹配技能</div>
 								</div>
-								<div class="flex-1">
-									<div class="font-medium text-neutral-900 mb-1">
-										{{ star.name }}
+								<div
+									class="bg-white/60 rounded-lg p-3 border border-primary-100"
+								>
+									<div class="text-2xl font-bold text-neutral-900">
+										{{ reportData.missingSkills.length }}
 									</div>
-									<div class="text-sm text-neutral-600">
-										{{ star.description }}
+									<div class="text-xs text-neutral-500 mt-1">缺失技能</div>
+								</div>
+								<div
+									class="bg-white/60 rounded-lg p-3 border border-primary-100"
+								>
+									<div class="text-2xl font-bold text-neutral-900">
+										{{ reportData.knowledgeGaps.length }}
 									</div>
-									<div class="mt-2 text-sm text-neutral-500">
-										{{ star.feedback }}
-									</div>
+									<div class="text-xs text-neutral-500 mt-1">知识缺口</div>
 								</div>
 							</div>
 						</div>
+						<!-- 装饰背景 -->
 						<div
-							class="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg"
-						>
-							<div class="flex items-start gap-2">
-								<UIcon
-									name="i-heroicons-light-bulb"
-									class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"
-								/>
-								<div>
-									<div class="font-medium text-amber-900 mb-1">
-										评分：{{ report?.star?.score || 0 }} 分
-									</div>
-									<div class="text-sm text-amber-700">
-										{{
-											report?.star?.feedback ||
-											'能够使用 STAR 方法回答问题，但可以进一步优化'
-										}}
-									</div>
-								</div>
-							</div>
-						</div>
+							class="absolute -right-10 -bottom-10 w-64 h-64 bg-primary-100/50 rounded-full blur-3xl"
+						></div>
 					</div>
 
-					<!-- 右侧：技能矩阵 -->
-					<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+					<!-- 右侧：能力雷达图 -->
+					<div
+						class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm flex flex-col"
+					>
 						<h2 class="text-lg font-semibold text-neutral-900 mb-4">
-							技能矩阵
+							能力维度分析
+						</h2>
+						<div class="flex-1 flex items-center justify-center min-h-[300px]">
+							<!-- SVG 雷达图 -->
+							<RadarChart :data="reportData.radarData" />
+						</div>
+					</div>
+				</div>
+
+				<!-- 技能分析 -->
+				<div class="grid lg:grid-cols-2 gap-6">
+					<!-- 匹配技能 -->
+					<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+						<h2
+							class="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2"
+						>
+							<UIcon
+								name="i-heroicons-check-badge"
+								class="w-5 h-5 text-green-500"
+							/>
+							已具备技能
 						</h2>
 						<div class="space-y-4">
 							<div
-								v-for="(skill, index) in report?.skills || []"
+								v-for="(skill, index) in reportData.matchedSkills"
 								:key="index"
-								class="space-y-2"
+								class="p-3 bg-green-50/50 rounded-lg border border-green-100"
 							>
-								<div class="flex items-center justify-between">
-									<span class="font-medium text-neutral-900">{{
-										skill.name
+								<div class="flex items-center justify-between mb-1">
+									<span class="font-bold text-green-800">{{
+										skill.skill
 									}}</span>
-									<span class="text-sm font-semibold text-primary-600"
-										>{{ skill.score }} 分</span
-									>
-								</div>
-								<div class="w-full bg-gray-200 rounded-full h-2.5">
-									<div
-										class="bg-primary-600 h-2.5 rounded-full transition-all"
-										:style="{ width: `${skill.score}%` }"
-									></div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- 风险点识别 -->
-				<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-					<h2
-						class="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2"
-					>
-						<UIcon
-							name="i-heroicons-exclamation-triangle"
-							class="w-5 h-5 text-amber-600"
-						/>
-						风险点识别
-					</h2>
-					<ul class="space-y-2">
-						<li
-							v-for="(risk, index) in report?.risks || []"
-							:key="index"
-							class="flex items-start gap-3 p-3 bg-red-50 border border-red-100 rounded-lg"
-						>
-							<UIcon
-								name="i-heroicons-x-circle"
-								class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"
-							/>
-							<span class="text-neutral-900">{{ risk }}</span>
-						</li>
-					</ul>
-				</div>
-
-				<!-- 改进建议 -->
-				<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-					<h2
-						class="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2"
-					>
-						<UIcon
-							name="i-heroicons-light-bulb"
-							class="w-5 h-5 text-primary-600"
-						/>
-						改进建议
-					</h2>
-					<ul class="space-y-2">
-						<li
-							v-for="(suggestion, index) in report?.suggestions || []"
-							:key="index"
-							class="flex items-start gap-3 p-3 bg-green-50 border border-green-100 rounded-lg"
-						>
-							<UIcon
-								name="i-heroicons-check-circle"
-								class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5"
-							/>
-							<span class="text-neutral-900">{{ suggestion }}</span>
-						</li>
-					</ul>
-				</div>
-
-				<!-- 7 天强化练习计划 -->
-				<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-					<h2
-						class="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2"
-					>
-						<UIcon
-							name="i-heroicons-calendar-days"
-							class="w-5 h-5 text-primary-600"
-						/>
-						7 天强化练习计划
-					</h2>
-					<div class="grid md:grid-cols-7 gap-4">
-						<div
-							v-for="(day, index) in plan7Days?.days || []"
-							:key="index"
-							class="border border-gray-200 rounded-lg p-4 hover:border-primary-300 hover:shadow-md transition-all"
-						>
-							<div class="text-xs text-neutral-500 mb-1">
-								第 {{ day.day }} 天
-							</div>
-							<div class="font-semibold text-neutral-900 mb-2">
-								{{ day.date }}
-							</div>
-							<ul class="space-y-1.5 text-sm text-neutral-600">
-								<li
-									v-for="(task, taskIndex) in day.tasks"
-									:key="taskIndex"
-									class="flex items-start gap-1.5"
-								>
 									<UIcon
 										name="i-heroicons-check"
-										class="w-4 h-4 text-primary-600 flex-shrink-0 mt-0.5"
+										class="w-4 h-4 text-green-600"
 									/>
-									<span>{{ task }}</span>
-								</li>
-							</ul>
+								</div>
+								<p class="text-xs text-green-700/80">{{ skill.proficiency }}</p>
+							</div>
+						</div>
+					</div>
+
+					<!-- 缺失技能与知识缺口 -->
+					<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+						<h2
+							class="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2"
+						>
+							<UIcon
+								name="i-heroicons-exclamation-triangle"
+								class="w-5 h-5 text-amber-500"
+							/>
+							需补充技能 & 知识
+						</h2>
+						<div class="space-y-6">
+							<div>
+								<h3 class="text-sm font-medium text-neutral-700 mb-2">
+									缺失技能
+								</h3>
+								<div class="flex flex-wrap gap-2">
+									<span
+										v-for="skill in reportData.missingSkills"
+										:key="skill"
+										class="px-2.5 py-1 bg-red-50 text-red-700 text-xs rounded-md border border-red-100 font-medium"
+									>
+										{{ skill }}
+									</span>
+								</div>
+							</div>
+							<div>
+								<h3 class="text-sm font-medium text-neutral-700 mb-2">
+									知识缺口
+								</h3>
+								<ul class="space-y-2">
+									<li
+										v-for="(gap, index) in reportData.knowledgeGaps"
+										:key="index"
+										class="flex items-start gap-2 text-sm text-neutral-600"
+									>
+										<div
+											class="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0"
+										></div>
+										<span>{{ gap }}</span>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 学习优先级 -->
+				<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+					<h2
+						class="text-lg font-semibold text-neutral-900 mb-6 flex items-center gap-2"
+					>
+						<UIcon
+							name="i-heroicons-academic-cap"
+							class="w-5 h-5 text-primary-600"
+						/>
+						建议学习路径
+					</h2>
+					<div class="space-y-4">
+						<div
+							v-for="(item, index) in reportData.learningPriorities"
+							:key="index"
+							class="flex flex-col sm:flex-row gap-4 p-4 rounded-xl border transition-all hover:shadow-md"
+							:class="
+								item.priority === 'high'
+									? 'bg-red-50/30 border-red-100'
+									: 'bg-blue-50/30 border-blue-100'
+							"
+						>
+							<div class="shrink-0">
+								<span
+									class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium uppercase tracking-wide"
+									:class="
+										item.priority === 'high'
+											? 'bg-red-100 text-red-800'
+											: 'bg-blue-100 text-blue-800'
+									"
+								>
+									{{ item.priority === 'high' ? '高优先级' : '中优先级' }}
+								</span>
+							</div>
+							<div class="flex-1">
+								<h3 class="font-bold text-neutral-900 mb-1">
+									{{ item.topic }}
+								</h3>
+								<p class="text-sm text-neutral-600">{{ item.reason }}</p>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 面试准备建议 -->
+				<div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+					<h2
+						class="text-lg font-semibold text-neutral-900 mb-4 flex items-center gap-2"
+					>
+						<UIcon
+							name="i-heroicons-chat-bubble-bottom-center-text"
+							class="w-5 h-5 text-purple-600"
+						/>
+						面试准备建议
+					</h2>
+					<div class="grid md:grid-cols-2 gap-4">
+						<div
+							v-for="(tip, index) in reportData.interviewTips"
+							:key="index"
+							class="flex gap-3 p-3 bg-purple-50/50 rounded-lg border border-purple-100"
+						>
+							<div
+								class="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 text-xs font-bold"
+							>
+								{{ index + 1 }}
+							</div>
+							<p class="text-sm text-neutral-700 pt-0.5">{{ tip }}</p>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-
-		<div
-			class="flex items-center justify-center gap-4 pt-4 border-t border-gray-200"
-		>
-			<UButton color="primary" size="lg" @click="handleRestart">
-				开始新的面试
-			</UButton>
-			<UButton color="gray" variant="ghost" size="lg" to="/">
-				返回首页
-			</UButton>
 		</div>
 	</div>
 </template>
@@ -265,9 +278,11 @@ import { useHead } from 'nuxt/app'
 import { SEO } from '@/constants/seo'
 import { ref, computed } from 'vue'
 import { useToast } from '#imports'
-import { saveAs } from 'file-saver'
 import { getAnalysisReportAPI } from '@/api/interview'
 import { useRoute } from 'vue-router'
+
+// 引入简单的雷达图组件（如果没有外部组件，我们可以在这里定义一个局部组件）
+import RadarChart from '@/components/interview/RadarChart.vue'
 
 definePageMeta({
 	requiresAuth: true,
@@ -276,7 +291,7 @@ definePageMeta({
 })
 
 useHead({
-	title: `面试报告 - ${SEO.siteName}`,
+	title: `面试评估报告 - ${SEO.siteName}`,
 	meta: [
 		{
 			name: 'description',
@@ -288,94 +303,181 @@ useHead({
 const { $api } = useNuxtApp()
 const route = useRoute()
 const interviewStore = useInterviewStore()
-// 确定当前为 第三步
-interviewStore.currentStep = 3
-
 const toast = useToast()
+
+// 报告数据
+const reportData = ref({
+	resultId: '',
+	type: '',
+	company: '加载中...',
+	position: '加载中...',
+	salaryRange: '',
+	createdAt: '',
+	matchScore: 0,
+	matchLevel: '-',
+	matchedSkills: [],
+	missingSkills: [],
+	knowledgeGaps: [],
+	learningPriorities: [],
+	radarData: [], // 确保雷达图数据初始为空数组
+	strengths: [],
+	weaknesses: [],
+	summary: '正在加载评估报告...',
+	interviewTips: [],
+	totalQuestions: 0,
+	questionDistribution: {},
+	viewCount: 0
+})
 
 /**
  * 获取分析报告数据
  */
 const getAnalysisReport = async () => {
-	const response = await getAnalysisReportAPI($api, route.query.resultId)
-	console.log('response', response)
-
-	interviewStore.report = response.data
+	// 如果路由中有 resultId，则获取真实数据
+	if (route.query.resultId) {
+		try {
+			const res = await getAnalysisReportAPI($api, route.query.resultId)
+			if (res) {
+				reportData.value = res
+			}
+		} catch (error) {
+			toast.add({
+				title: '获取报告失败',
+				description: error.message,
+				color: 'error'
+			})
+		}
+	} else {
+		// Mock 数据（用于开发预览或无 ID 情况）
+		// 注意：实际生产环境应移除或仅在开发环境保留
+		reportData.value = {
+			resultId: 'mock-id',
+			type: 'resume_quiz',
+			company: '字节跳动',
+			position: '前端开发工程师',
+			salaryRange: '12K-15K',
+			createdAt: new Date().toISOString(),
+			matchScore: 45,
+			matchLevel: '较差',
+			matchedSkills: [
+				{
+					skill: '学习能力',
+					matched: true,
+					proficiency: '基于自我评价体现，具备快速学习和适应能力'
+				},
+				{
+					skill: '问题解决能力',
+					matched: true,
+					proficiency: '基于自我评价体现，具备分析和解决问题能力'
+				},
+				{
+					skill: '团队协作',
+					matched: true,
+					proficiency: '基于自我评价体现，具备团队合作精神'
+				}
+			],
+			missingSkills: [
+				'TypeScript',
+				'React',
+				'Vue',
+				'前端工程化',
+				'性能优化',
+				'微前端架构',
+				'大型项目经验',
+				'开源项目贡献'
+			],
+			knowledgeGaps: [
+				'TypeScript深度应用和类型系统设计',
+				'React/Vue大型项目架构经验',
+				'前端工程化工具链完整实践',
+				'性能优化系统化方法论',
+				'微前端架构设计和实施'
+			],
+			learningPriorities: [
+				{
+					topic: 'TypeScript高级特性和大型项目实践',
+					priority: 'high',
+					reason: 'JD明确要求3年以上TypeScript大型项目经验'
+				},
+				{
+					topic: 'React和Vue技术栈深度掌握',
+					priority: 'high',
+					reason: 'JD核心技术要求，需要精通这两个框架'
+				},
+				{
+					topic: '前端工程化和性能优化',
+					priority: 'high',
+					reason: '岗位基本要求，直接影响开发效率和用户体验'
+				},
+				{
+					topic: '微前端架构和跨平台应用',
+					priority: 'medium',
+					reason: 'JD优先考虑技能，提升技术竞争力'
+				}
+			],
+			radarData: [
+				{
+					dimension: '技术能力',
+					score: 35,
+					description:
+						'简历缺乏具体技术栈描述，无法评估对React、Vue、TypeScript等核心技术的掌握程度'
+				},
+				{
+					dimension: '项目经验',
+					score: 30,
+					description: '缺少具体项目经历描述，无法评估项目复杂度和技术深度'
+				},
+				{
+					dimension: '问题解决能力',
+					score: 70,
+					description:
+						'自我评价体现较强的分析力和解决问题能力，但缺乏具体案例支撑'
+				},
+				{
+					dimension: '软技能',
+					score: 75,
+					description: '自我评价体现良好的团队协作、沟通和学习能力'
+				},
+				{
+					dimension: '学习能力',
+					score: 80,
+					description: '明确表达勤奋好学、喜欢迎接新挑战的态度'
+				}
+			],
+			strengths: [
+				'积极认真的工作态度和责任心',
+				'较强的学习能力和适应能力',
+				'良好的问题分析和解决能力',
+				'团队协作和沟通意识'
+			],
+			weaknesses: [
+				'技术栈描述不具体，缺乏核心技术证明',
+				'项目经验描述缺失，无法评估实际能力',
+				'缺乏大型项目和复杂场景实践经验',
+				'薪资期望与当前表现的技术水平不匹配'
+			],
+			summary:
+				'候选人Sunday nihao在简历中展现了积极认真的工作态度和较强的学习能力，但技术细节描述较为欠缺。与字节跳动前端开发工程师岗位要求相比，核心优势在于自我驱动和问题解决能力，但存在明显技能缺口。主要不足包括：缺乏TypeScript大型项目经验、前端工程化实践描述不足、缺少具体项目案例支撑。建议在面试中重点考察实际技术深度和项目经验，同时关注学习能力和技术成长潜力。如能证明快速学习和技术适应能力，仍有录用价值，但需要制定明确的技术提升计划。',
+			interviewTips: [
+				'重点准备具体技术栈的深度问题，证明对React/Vue/TypeScript的掌握程度',
+				'详细准备2-3个完整项目案例，使用STAR法则清晰描述',
+				'针对JD要求的技术点提前准备实践经验和学习计划',
+				'调整薪资期望或准备充分的能力证明支撑当前期望薪资',
+				'了解字节跳动技术栈和产品特点，体现对公司的了解和认同'
+			],
+			totalQuestions: 14,
+			questionDistribution: {
+				technical: 6,
+				project: 4,
+				'problem-solving': 2,
+				'soft-skill': 2
+			},
+			viewCount: 10
+		}
+	}
 }
+
 getAnalysisReport()
-
-const isGeneratingPDF = ref(false)
-
-const report = computed(() => interviewStore.report)
-const plan7Days = computed(() => interviewStore.plan7Days)
-
-const starItems = [
-	{
-		letter: 'S',
-		name: 'Situation（情境）',
-		description: '描述你当时所处的情况和背景',
-		feedback: '能够清晰描述背景情境'
-	},
-	{
-		letter: 'T',
-		name: 'Task（任务）',
-		description: '说明你面临的任务或挑战',
-		feedback: '任务描述明确，目标清晰'
-	},
-	{
-		letter: 'A',
-		name: 'Action（行动）',
-		description: '阐述你采取的具体行动',
-		feedback: '行动描述可以更具体，建议补充更多细节'
-	},
-	{
-		letter: 'R',
-		name: 'Result（结果）',
-		description: '说明行动带来的结果和影响',
-		feedback: '结果描述有数据支撑，很好'
-	}
-]
-
-const handleDownloadPDF = async () => {
-	try {
-		isGeneratingPDF.value = true
-
-		// TODO: 调用 API 生成 PDF
-		// const response = await $api(`/interview/${interviewStore.interviewId}/report/pdf`, {
-		// 	method: 'GET',
-		// 	responseType: 'blob'
-		// })
-
-		// 模拟 PDF 生成
-		await new Promise((resolve) => setTimeout(resolve, 2000))
-
-		// 创建模拟的 PDF Blob
-		// 实际应用中，这里应该是从服务器获取的真实 PDF
-		const pdfContent = `面试评估报告\n\n综合评分：${
-			report.value?.overall?.score || 0
-		} 分\n\n...`
-		const blob = new Blob([pdfContent], { type: 'application/pdf' })
-
-		// 使用 file-saver 下载
-		const fileName = `面试评估报告_${
-			interviewStore.selectedPosition?.name || '未知岗位'
-		}_${new Date().toISOString().split('T')[0]}.pdf`
-		saveAs(blob, fileName)
-
-		toast.add({
-			title: 'PDF 下载成功',
-			color: 'success'
-		})
-	} catch (error) {
-		toast.add({
-			title: 'PDF 生成失败',
-			description: error.message || '请稍后重试',
-			color: 'error'
-		})
-	} finally {
-		isGeneratingPDF.value = false
-	}
-}
 
 const handleRestart = () => {
 	interviewStore.reset()
