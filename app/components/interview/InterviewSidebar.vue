@@ -239,10 +239,12 @@ const handleStepClick = (stepId) => {
 
 	// Step 2: 根据服务类型跳转
 	if (stepId === 2) {
+		const resultId = route.query.resultId
+		const queryString = resultId ? `?resultId=${resultId}` : ''
 		const serviceRouteMap = {
-			[SERVICE_TAGS.SPECIAL]: '/interview/special',
-			[SERVICE_TAGS.RESUME]: '/interview/resume',
-			[SERVICE_TAGS.BEHAVIOR]: '/interview/behavior'
+			[SERVICE_TAGS.SPECIAL]: `/interview/special${queryString}`,
+			[SERVICE_TAGS.RESUME]: `/interview/resume${queryString}`,
+			[SERVICE_TAGS.BEHAVIOR]: `/interview/behavior${queryString}`
 		}
 
 		const targetPath = serviceRouteMap[interviewStore.selectedService]

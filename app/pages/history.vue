@@ -206,7 +206,7 @@ const formatDate = (date) => {
  */
 const handleView = (record) => {
 	if (record.resultId) {
-		navigateTo(`/interview/report?resultId=${record.resultId}`)
+		navigateTo(`/interview/resume?resultId=${record.resultId}`)
 	} else {
 		console.warn('记录缺少 resultId', record)
 	}

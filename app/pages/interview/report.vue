@@ -27,7 +27,7 @@
 					color="gray"
 					variant="ghost"
 					icon="i-heroicons-arrow-left"
-					to="/"
+					@click="handleBackHome"
 				>
 					返回首页
 				</UButton>
@@ -340,6 +340,7 @@ import { useToast } from '#imports'
 import { getAnalysisReportAPI } from '@/api/interview'
 import { useRoute } from 'vue-router'
 import sundayImg from '@/assets/imgs/sunday.jpg'
+import { useGlobalModal } from '@/composables/useGlobalModal'
 
 // 引入简单的雷达图组件（如果没有外部组件，我们可以在这里定义一个局部组件）
 import RadarChart from '@/components/interview/RadarChart.vue'
@@ -363,8 +364,9 @@ useHead({
 const { $api } = useNuxtApp()
 const route = useRoute()
 const interviewStore = useInterviewStore()
+interviewStore.currentStep = 3
 const toast = useToast()
-
+const globalModal = useGlobalModal()
 const showTrainingModal = ref(false)
 
 /**
@@ -411,147 +413,17 @@ const reportData = ref({
  * 获取分析报告数据
  */
 const getAnalysisReport = async () => {
-	// 如果路由中有 resultId，则获取真实数据
-	if (route.query.resultId) {
-		try {
-			const res = await getAnalysisReportAPI($api, route.query.resultId)
-			if (res) {
-				reportData.value = res
-			}
-		} catch (error) {
-			toast.add({
-				title: '获取报告失败',
-				description: error.message,
-				color: 'error'
-			})
+	try {
+		const res = await getAnalysisReportAPI($api, route.query.resultId)
+		if (res) {
+			reportData.value = res
 		}
-	} else {
-		// Mock 数据（用于开发预览或无 ID 情况）
-		// 注意：实际生产环境应移除或仅在开发环境保留
-		reportData.value = {
-			resultId: 'mock-id',
-			type: 'resume_quiz',
-			company: '字节跳动',
-			position: '前端开发工程师',
-			salaryRange: '12K-15K',
-			createdAt: new Date().toISOString(),
-			matchScore: 45,
-			matchLevel: '较差',
-			matchedSkills: [
-				{
-					skill: '学习能力',
-					matched: true,
-					proficiency: '基于自我评价体现，具备快速学习和适应能力'
-				},
-				{
-					skill: '问题解决能力',
-					matched: true,
-					proficiency: '基于自我评价体现，具备分析和解决问题能力'
-				},
-				{
-					skill: '团队协作',
-					matched: true,
-					proficiency: '基于自我评价体现，具备团队合作精神'
-				}
-			],
-			missingSkills: [
-				'TypeScript',
-				'React',
-				'Vue',
-				'前端工程化',
-				'性能优化',
-				'微前端架构',
-				'大型项目经验',
-				'开源项目贡献'
-			],
-			knowledgeGaps: [
-				'TypeScript深度应用和类型系统设计',
-				'React/Vue大型项目架构经验',
-				'前端工程化工具链完整实践',
-				'性能优化系统化方法论',
-				'微前端架构设计和实施'
-			],
-			learningPriorities: [
-				{
-					topic: 'TypeScript高级特性和大型项目实践',
-					priority: 'high',
-					reason: 'JD明确要求3年以上TypeScript大型项目经验'
-				},
-				{
-					topic: 'React和Vue技术栈深度掌握',
-					priority: 'high',
-					reason: 'JD核心技术要求，需要精通这两个框架'
-				},
-				{
-					topic: '前端工程化和性能优化',
-					priority: 'high',
-					reason: '岗位基本要求，直接影响开发效率和用户体验'
-				},
-				{
-					topic: '微前端架构和跨平台应用',
-					priority: 'medium',
-					reason: 'JD优先考虑技能，提升技术竞争力'
-				}
-			],
-			radarData: [
-				{
-					dimension: '技术能力',
-					score: 35,
-					description:
-						'简历缺乏具体技术栈描述，无法评估对React、Vue、TypeScript等核心技术的掌握程度'
-				},
-				{
-					dimension: '项目经验',
-					score: 30,
-					description: '缺少具体项目经历描述，无法评估项目复杂度和技术深度'
-				},
-				{
-					dimension: '问题解决能力',
-					score: 70,
-					description:
-						'自我评价体现较强的分析力和解决问题能力，但缺乏具体案例支撑'
-				},
-				{
-					dimension: '软技能',
-					score: 75,
-					description: '自我评价体现良好的团队协作、沟通和学习能力'
-				},
-				{
-					dimension: '学习能力',
-					score: 80,
-					description: '明确表达勤奋好学、喜欢迎接新挑战的态度'
-				}
-			],
-			strengths: [
-				'积极认真的工作态度和责任心',
-				'较强的学习能力和适应能力',
-				'良好的问题分析和解决能力',
-				'团队协作和沟通意识'
-			],
-			weaknesses: [
-				'技术栈描述不具体，缺乏核心技术证明',
-				'项目经验描述缺失，无法评估实际能力',
-				'缺乏大型项目和复杂场景实践经验',
-				'薪资期望与当前表现的技术水平不匹配'
-			],
-			summary:
-				'候选人Sunday nihao在简历中展现了积极认真的工作态度和较强的学习能力，但技术细节描述较为欠缺。与字节跳动前端开发工程师岗位要求相比，核心优势在于自我驱动和问题解决能力，但存在明显技能缺口。主要不足包括：缺乏TypeScript大型项目经验、前端工程化实践描述不足、缺少具体项目案例支撑。建议在面试中重点考察实际技术深度和项目经验，同时关注学习能力和技术成长潜力。如能证明快速学习和技术适应能力，仍有录用价值，但需要制定明确的技术提升计划。',
-			interviewTips: [
-				'重点准备具体技术栈的深度问题，证明对React/Vue/TypeScript的掌握程度',
-				'详细准备2-3个完整项目案例，使用STAR法则清晰描述',
-				'针对JD要求的技术点提前准备实践经验和学习计划',
-				'调整薪资期望或准备充分的能力证明支撑当前期望薪资',
-				'了解字节跳动技术栈和产品特点，体现对公司的了解和认同'
-			],
-			totalQuestions: 14,
-			questionDistribution: {
-				technical: 6,
-				project: 4,
-				'problem-solving': 2,
-				'soft-skill': 2
-			},
-			viewCount: 10
-		}
+	} catch (error) {
+		toast.add({
+			title: '获取报告失败',
+			description: error.message,
+			color: 'error'
+		})
 	}
 }
 
@@ -560,5 +432,20 @@ getAnalysisReport()
 const handleRestart = () => {
 	interviewStore.reset()
 	navigateTo('/interview/start')
+}
+
+const handleBackHome = () => {
+	globalModal.showModal({
+		title: '确定要返回首页吗？',
+		description: '返回首页后，该次记录可在「服务记录」中查看',
+		buttons: [
+			{
+				label: '确定',
+				onClick: () => {
+					navigateTo('/')
+				}
+			}
+		]
+	})
 }
 </script>
