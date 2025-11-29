@@ -84,7 +84,7 @@ const userStore = useUserStore()
 // 会话 ID
 let resultId = ''
 // 状态管理
-const step = ref('complete') // input | progress | complete | error
+const step = ref('input') // input | progress | complete | error
 const sseController = ref(null) // SSE 连接控制器
 
 const resumeBalance = computed(

@@ -27,7 +27,8 @@
   --ui-border-accented: #AEB8C7;
   /* 背景 */
   --color-bg: #F8FAFC;
-
+  /* progress 的背景色 */
+  --ui-bg-accented: #F3F8F0;
 
   /* 背景 2 */
   --ui-bg: #F8FAFC;

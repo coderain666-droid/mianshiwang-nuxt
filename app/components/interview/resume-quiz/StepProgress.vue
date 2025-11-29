@@ -23,10 +23,24 @@
 			</h2>
 
 			<div class="space-y-2">
-				<UProgress :value="currentProgressStep.progress" color="primary" indicator />
-				<p class="text-xs text-neutral-500 text-right">
-					已完成 {{ currentProgressStep.progress.toFixed(2) }}%
-				</p>
+				<UProgress
+					:value="currentProgressStep.progress"
+					color="success"
+					indicator
+				/>
+				<div
+					class="flex items-center justify-between text-xs text-neutral-500 pt-1"
+				>
+					<span class="flex items-center gap-1.5">
+						<UIcon name="i-heroicons-clock" class="w-3.5 h-3.5" />
+						预计耗时 5 分钟
+					</span>
+					<span class="flex items-center gap-2">
+						<span class="font-mono">已耗时 {{ formattedElapsedTime }}</span>
+						<span class="text-gray-300">|</span>
+						<span>{{ currentProgressStep.progress.toFixed(0) }}%</span>
+					</span>
+				</div>
 			</div>
 
 			<!-- 步骤列表：只显示去重后的关键步骤 -->
@@ -72,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 
 defineProps({
 	currentProgressStep: {
@@ -85,10 +99,29 @@ defineProps({
 	}
 })
 
+// 计时逻辑
+const elapsedSeconds = ref(0)
+let timer = null
+
+const formattedElapsedTime = computed(() => {
+	const m = Math.floor(elapsedSeconds.value / 60)
+	const s = elapsedSeconds.value % 60
+	return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+})
+
+onMounted(() => {
+	timer = setInterval(() => {
+		elapsedSeconds.value++
+	}, 1000)
+})
+
+onUnmounted(() => {
+	if (timer) clearInterval(timer)
+})
+
 const progressStepsContainer = ref(null)
 
 defineExpose({
 	progressStepsContainer
 })
 </script>
-
