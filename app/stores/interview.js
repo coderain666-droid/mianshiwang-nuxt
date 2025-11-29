@@ -68,7 +68,7 @@ jd: ''
 
 	actions: {
 		// 选择岗位
-		selectPosition(position) {
+		setSelectedPosition(position) {
 			this.selectedPosition = position
 		},
 

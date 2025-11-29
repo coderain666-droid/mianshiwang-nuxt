@@ -261,7 +261,7 @@ const positions = ref(
 )
 
 const selectPosition = (position) => {
-	interviewStore.selectPosition(position)
+	interviewStore.setSelectedPosition(position)
 }
 
 const handleCategoryFilter = (categoryKey) => {
@@ -277,7 +277,7 @@ const handleSearch = () => {
 }
 
 const clearPosition = () => {
-	interviewStore.selectPosition(null)
+	interviewStore.setSelectedPosition(null)
 	searchQuery.value = ''
 	activeCategory.value = 'all'
 }
