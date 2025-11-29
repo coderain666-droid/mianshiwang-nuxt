@@ -65,15 +65,13 @@
 							}"
 						></div>
 
-						<!-- 
-						TODO：配合 handleStepClick 使用的，存在逻辑问题，暂时注释
-						:class="[
+						<div
+							class="group w-full text-left relative z-10 flex gap-4 transition-opacity"
+							:class="[
 								step.id <= interviewStore.currentStep
 									? 'cursor-pointer hover:opacity-80'
 									: 'cursor-not-allowed opacity-70'
-							]" -->
-						<div
-							class="group w-full text-left relative z-10 flex gap-4 transition-opacity"
+							]"
 							@click="handleStepClick(step.id)"
 						>
 							<!-- Icon/Number -->
@@ -214,7 +212,6 @@ const toggleSidebar = () => {
 }
 
 /**
- * TODO：存在逻辑处理问题（查看历史报告），所以暂时注释
  * 处理步骤点击事件
  * 规则：
  * 1. 只能点击已完成或当前步骤
@@ -223,64 +220,71 @@ const toggleSidebar = () => {
  * 4. Step 3: 只有在报告生成后才能访问
  */
 const handleStepClick = (stepId) => {
-	// // 禁止点击未解锁的步骤
-	// if (stepId > interviewStore.currentStep) {
-	// 	toast.add({
-	// 		title: '步骤未解锁',
-	// 		description: '请先完成当前步骤',
-	// 		color: 'warning',
-	// 		icon: 'i-heroicons-lock-closed'
-	// 	})
-	// 	return
-	// }
-	// // Step 1: 返回开始页面
-	// if (stepId === 1) {
-	// 	navigateTo('/interview/start')
-	// 	return
-	// }
-	// // Step 2: 根据服务类型跳转
-	// if (stepId === 2) {
-	// 	const resultId = route.query.resultId
-	// 	const queryString = resultId ? `?resultId=${resultId}` : ''
-	// 	const serviceRouteMap = {
-	// 		[SERVICE_TAGS.SPECIAL]: `/interview/special${queryString}`,
-	// 		[SERVICE_TAGS.RESUME]: `/interview/resume${queryString}`,
-	// 		[SERVICE_TAGS.BEHAVIOR]: `/interview/behavior${queryString}`
-	// 	}
-	// 	const targetPath = serviceRouteMap[interviewStore.selectedService]
-	// 	if (!targetPath) {
-	// 		toast.add({
-	// 			title: '未选择服务',
-	// 			description: '请先在第一步选择服务类型',
-	// 			color: 'warning'
-	// 		})
-	// 		navigateTo('/interview/start')
-	// 		return
-	// 	}
-	// 	// 避免重复跳转到当前页面
-	// 	if (route.path !== targetPath) {
-	// 		navigateTo(targetPath)
-	// 	}
-	// 	return
-	// }
-	// // Step 3: 跳转到报告页面
-	// if (stepId === 3) {
-	// 	// 检查报告是否已生成
-	// 	if (!interviewStore.report || !interviewStore.reportGenerated) {
-	// 		toast.add({
-	// 			title: '报告未生成',
-	// 			description: '请先完成面试以生成报告',
-	// 			color: 'warning',
-	// 			icon: 'i-heroicons-document-text'
-	// 		})
-	// 		return
-	// 	}
-	// 	// 避免重复跳转到当前页面
-	// 	if (route.path !== '/interview/report') {
-	// 		navigateTo('/interview/report')
-	// 	}
-	// 	return
-	// }
+	// 禁止点击未解锁的步骤
+	if (stepId > interviewStore.currentStep) {
+		toast.add({
+			title: '步骤未解锁',
+			description: '请先完成当前步骤',
+			color: 'warning',
+			icon: 'i-heroicons-lock-closed'
+		})
+		return
+	}
+
+	// Step 1: 返回开始页面
+	if (stepId === 1) {
+		navigateTo('/interview/start')
+		return
+	}
+
+	// Step 2: 根据服务类型跳转
+	if (stepId === 2) {
+		const resultId = route.query.resultId
+		const queryString = resultId ? `?resultId=${resultId}` : ''
+		const serviceRouteMap = {
+			[SERVICE_TAGS.SPECIAL]: `/interview/special${queryString}`,
+			[SERVICE_TAGS.RESUME]: `/interview/resume${queryString}`,
+			[SERVICE_TAGS.BEHAVIOR]: `/interview/behavior${queryString}`
+		}
+
+		const targetPath = serviceRouteMap[interviewStore.selectedService]
+
+		if (!targetPath) {
+			toast.add({
+				title: '未选择服务',
+				description: '请先在第一步选择服务类型',
+				color: 'warning'
+			})
+			navigateTo('/interview/start')
+			return
+		}
+
+		// 避免重复跳转到当前页面
+		if (route.path !== targetPath) {
+			navigateTo(targetPath)
+		}
+		return
+	}
+
+	// Step 3: 跳转到报告页面
+	if (stepId === 3) {
+		// 检查报告是否已生成
+		if (!interviewStore.report || !interviewStore.reportGenerated) {
+			toast.add({
+				title: '报告未生成',
+				description: '请先完成面试以生成报告',
+				color: 'warning',
+				icon: 'i-heroicons-document-text'
+			})
+			return
+		}
+
+		// 避免重复跳转到当前页面
+		if (route.path !== '/interview/report') {
+			navigateTo('/interview/report')
+		}
+		return
+	}
 }
 </script>
 

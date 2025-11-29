@@ -104,37 +104,37 @@ onMounted(() => {
 	fetchUserInfo()
 
 	// 报告页面守卫
-	// if (currentPath === '/interview/report') {
-	// 	// 检查是否已生成报告
-	// 	if (!interviewStore.report || !interviewStore.reportGenerated) {
-	// 		// 根据当前选择的服务跳转到对应的面试页面
-	// 		const serviceTypeMap = {
-	// 			[SERVICE_TAGS.SPECIAL]: '/interview/special',
-	// 			[SERVICE_TAGS.RESUME]: '/interview/resume',
-	// 			[SERVICE_TAGS.BEHAVIOR]: '/interview/behavior'
-	// 		}
-	// 		const targetPath =
-	// 			serviceTypeMap[interviewStore.selectedService] || '/interview/start'
-	// 		navigateTo(targetPath)
-	// 		return
-	// 	}
-	// }
+	if (currentPath === '/interview/report') {
+		// 检查是否已生成报告
+		if (!interviewStore.report || !interviewStore.reportGenerated) {
+			// 根据当前选择的服务跳转到对应的面试页面
+			const serviceTypeMap = {
+				[SERVICE_TAGS.SPECIAL]: '/interview/special',
+				[SERVICE_TAGS.RESUME]: '/interview/resume',
+				[SERVICE_TAGS.BEHAVIOR]: '/interview/behavior'
+			}
+			const targetPath =
+				serviceTypeMap[interviewStore.selectedService] || '/interview/start'
+			navigateTo(targetPath)
+			return
+		}
+	}
 
-	// // 服务页面守卫（special/resume/behavior）
-	// const requiredService = serviceRouteMap[currentPath]
-	// if (requiredService) {
-	// 	// 检查是否已选择岗位
-	// 	if (!interviewStore.selectedPosition) {
-	// 		navigateTo('/interview/start')
-	// 		return
-	// 	}
+	// 服务页面守卫（special/resume/behavior）
+	const requiredService = serviceRouteMap[currentPath]
+	if (requiredService) {
+		// 检查是否已选择岗位
+		if (!interviewStore.selectedPosition) {
+			navigateTo('/interview/start')
+			return
+		}
 
-	// 	// 检查服务类型是否匹配
-	// 	if (interviewStore.selectedService !== requiredService) {
-	// 		navigateTo('/interview/start')
-	// 		return
-	// 	}
-	// }
+		// 检查服务类型是否匹配
+		if (interviewStore.selectedService !== requiredService) {
+			navigateTo('/interview/start')
+			return
+		}
+	}
 })
 
 // 监听路由变化，每次跳转都获取用户信息
