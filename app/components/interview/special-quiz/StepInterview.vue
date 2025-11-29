@@ -1,21 +1,6 @@
 <template>
 	<div class="h-full flex flex-col gap-6">
 		<div
-			class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3"
-		>
-			<div>
-				<h1 class="text-2xl font-bold text-neutral-900">AI 模拟面试</h1>
-				<p class="text-neutral-600 text-sm mt-1">
-					与 AI 面试官实时对话，展示你的专业能力和沟通技巧
-				</p>
-			</div>
-			<div class="text-xs text-neutral-500 flex items-center gap-2">
-				<UIcon name="i-heroicons-clock" class="w-4 h-4 text-primary-500" />
-				平均面试时长 60 分钟
-			</div>
-		</div>
-
-		<div
 			class="grid lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-6 flex-1 min-h-0"
 		>
 			<!-- 左侧：对话区域（占2列） -->
@@ -204,7 +189,7 @@
 					<div>
 						<h3 class="font-bold text-neutral-900">AI 面试官</h3>
 						<p class="text-xs text-neutral-500 mt-0.5">
-							{{ interviewStore.selectedPosition?.name || '通用岗位' }}
+							{{ interviewStore.selectedPosition?.positionName || '通用岗位' }}
 						</p>
 					</div>
 					<div class="flex items-center gap-1.5">
@@ -300,14 +285,24 @@
 				<!-- 底部提示 -->
 				<div class="p-5 border-t border-gray-100 bg-gray-50/50">
 					<div class="space-y-3">
-						<div
-							class="flex items-center gap-2 text-neutral-800 font-medium text-sm"
-						>
-							<UIcon
-								name="i-heroicons-light-bulb"
-								class="w-4 h-4 text-amber-500"
-							/>
-							面试小贴士
+						<div class="flex items-center justify-between">
+							<div
+								class="flex items-center gap-2 text-neutral-800 font-medium text-sm"
+							>
+								<UIcon
+									name="i-heroicons-light-bulb"
+									class="w-4 h-4 text-amber-500"
+								/>
+								面试小贴士
+							</div>
+
+							<div class="text-xs text-neutral-500 flex items-center gap-2">
+								<UIcon
+									name="i-heroicons-clock"
+									class="w-4 h-4 text-primary-500"
+								/>
+								平均面试时长 60 分钟
+							</div>
 						</div>
 						<div
 							class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-xs text-neutral-600 space-y-2"
@@ -385,6 +380,11 @@ const statusMeta = computed(() => {
 			color: 'primary',
 			description: 'AI 正在实时倾听你的回答，并根据内容生成追问与反馈。'
 		},
+		suspended: {
+			label: '已暂停',
+			color: 'warning',
+			description: '面试已暂停，点击「继续面试」即可恢复。'
+		},
 		ended: {
 			label: '已完成',
 			color: 'green',
@@ -392,27 +392,6 @@ const statusMeta = computed(() => {
 		}
 	}
 	return map[interviewStatus.value] || map.idle
-})
-const resumeMeta = computed(() => {
-	if (interviewStore.resumeText) {
-		return {
-			label: '简历解析完成',
-			icon: 'i-heroicons-check-circle',
-			textClass: 'text-green-600'
-		}
-	}
-	if (interviewStore.resumeUrl) {
-		return {
-			label: '简历已上传',
-			icon: 'i-heroicons-check-circle',
-			textClass: 'text-emerald-500'
-		}
-	}
-	return {
-		label: '尚未上传简历',
-		icon: 'i-heroicons-exclamation-triangle',
-		textClass: 'text-amber-600'
-	}
 })
 const conversationStats = computed(() => {
 	const assistantMessages = messages.value.filter(
