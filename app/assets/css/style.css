@@ -90,6 +90,10 @@ button {
   box-shadow: var(--shadow-sm);
 }
 
+.bg-elevated {
+  background-color: #f3f3f3;
+}
+
 /* .ring {
   border: 1px solid var(--color-ring-border);
   transition: border 0.01s ease-in-out;
