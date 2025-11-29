@@ -24,7 +24,7 @@
   /* 边框 */
   --color-border: #E5E7EB;
   /* 更深的边框 */
-  --color-ring-border: #838383;
+  --ui-border-accented: #AEB8C7;
   /* 背景 */
   --color-bg: #F8FAFC;
 
@@ -90,14 +90,14 @@ button {
   box-shadow: var(--shadow-sm);
 }
 
-.ring {
+/* .ring {
   border: 1px solid var(--color-ring-border);
   transition: border 0.01s ease-in-out;
 }
 
 .ring:focus {
   border: 1px solid var(--color-accent);
-}
+} */
 
 
 /* 深色模式（可选） */
