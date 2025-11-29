@@ -3,6 +3,7 @@
 		<!-- 第一步：输入信息 -->
 		<StepInput
 			v-if="step === 'input'"
+			service-type="resume"
 			:selected-position="interviewStore.selectedPosition"
 			:is-processing="step === 'processing'"
 			@update:selected-position="updateSelectedPosition"

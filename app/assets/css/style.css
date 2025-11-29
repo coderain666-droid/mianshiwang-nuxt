@@ -23,6 +23,8 @@
   --ui-text-inverted: #ffffff;
   /* 边框 */
   --color-border: #E5E7EB;
+  /* 更深的边框 */
+  --color-ring-border: #838383;
   /* 背景 */
   --color-bg: #F8FAFC;
 
@@ -38,6 +40,7 @@
   --ui-text-highlighted: #333;
   /* 默认字体颜色 */
   --ui-text: #555;
+
 
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -86,6 +89,16 @@ button {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
 }
+
+.ring {
+  border: 1px solid var(--color-ring-border);
+  transition: border 0.01s ease-in-out;
+}
+
+.ring:focus {
+  border: 1px solid var(--color-accent);
+}
+
 
 /* 深色模式（可选） */
 /* @media (prefers-color-scheme: dark) {
