@@ -183,8 +183,10 @@ import { ref } from 'vue'
 import { useInterviewStore } from '@/stores/interview'
 import { navigateTo, useRoute } from '#imports'
 import { SERVICE_TAGS } from '@/constants/vip'
+import { useGlobalModal } from '@/composables/useGlobalModal'
 import { useToast } from '#imports'
 
+const globalModal = useGlobalModal()
 const interviewStore = useInterviewStore()
 const route = useRoute()
 const toast = useToast()
@@ -220,6 +222,17 @@ const toggleSidebar = () => {
  * 4. Step 3: 只有在报告生成后才能访问
  */
 const handleStepClick = (stepId) => {
+	// 查看历史报告，不允许切换步骤
+	if (route.query.resultId) {
+		globalModal.showModal({
+			title: '温馨提示',
+			description: '查看历史报告，不允许切换步骤',
+			color: 'warning',
+			icon: 'i-heroicons-lock-closed'
+		})
+		return
+	}
+
 	// 禁止点击未解锁的步骤
 	if (stepId > interviewStore.currentStep) {
 		toast.add({

@@ -19,10 +19,10 @@
 						</NuxtLink>
 						<span class="text-slate-300">/</span>
 						<NuxtLink
-							to="/interview/start"
+							:to="route.query.resultId ? '/history' : '/interview/start'"
 							class="hover:text-primary-600 transition-colors flex items-center gap-1"
 						>
-							开始专项服务
+							{{ route.query.resultId ? '服务记录' : '开始专项服务' }}
 						</NuxtLink>
 						<span class="text-slate-300">/</span>
 						<span class="text-slate-900 font-medium">{{ pageTitle }}</span>
@@ -69,6 +69,11 @@ const { $api } = useNuxtApp()
 
 // 页面标题映射
 const pageTitle = computed(() => {
+	// 处理查看历史报告 标题展示
+	if (route.query.resultId) {
+		return '历史服务报告'
+	}
+
 	const titleMap = {
 		'/interview/resume': serviceHighlights[0].title,
 		'/interview/special': serviceHighlights[1].title,
