@@ -68,13 +68,7 @@
 						</span>
 					</label>
 					<UInput
-						:model-value="selectedPosition.company"
-						@update:model-value="
-							$emit('update:selectedPosition', {
-								...selectedPosition,
-								company: $event
-							})
-						"
+						v-model="interviewStore.selectedPosition.company"
 						class="w-full text-sm"
 						placeholder="请输入公司全称，如：字节跳动"
 						size="lg"
@@ -95,13 +89,7 @@
 						</span>
 					</label>
 					<UInput
-						:model-value="selectedPosition.positionName"
-						@update:model-value="
-							$emit('update:selectedPosition', {
-								...selectedPosition,
-								positionName: $event
-							})
-						"
+						v-model="interviewStore.selectedPosition.positionName"
 						class="w-full text-sm"
 						placeholder="请输入岗位名称，如：前端开发工程师"
 						size="lg"
@@ -124,13 +112,7 @@
 					<div class="flex items-center gap-3">
 						<div class="relative flex-1">
 							<UInput
-								:model-value="selectedPosition.minSalary"
-								@update:model-value="
-									$emit('update:selectedPosition', {
-										...selectedPosition,
-										minSalary: $event
-									})
-								"
+								v-model="interviewStore.selectedPosition.minSalary"
 								class="w-full"
 								placeholder="最低 (k)"
 								size="lg"
@@ -146,13 +128,7 @@
 						</div>
 						<div class="relative flex-1">
 							<UInput
-								:model-value="selectedPosition.maxSalary"
-								@update:model-value="
-									$emit('update:selectedPosition', {
-										...selectedPosition,
-										maxSalary: $event
-									})
-								"
+								v-model="interviewStore.selectedPosition.maxSalary"
 								class="w-full"
 								placeholder="最高 (k)"
 								size="lg"
@@ -194,7 +170,7 @@
 							leave-to-class="transform scale-95 opacity-0"
 						>
 							<span
-								v-if="selectedPosition?.jd?.length > 0"
+								v-if="interviewStore.selectedPosition.jd?.length > 0"
 								class="text-[10px] bg-green-50 text-green-600 px-2 py-0.5 rounded-full border border-green-100 flex items-center gap-1"
 							>
 								<UIcon name="i-heroicons-check" class="w-3 h-3" />
@@ -204,23 +180,18 @@
 						<span
 							class="text-xs text-neutral-400 font-mono"
 							:class="{
-								'text-primary-600 font-medium': selectedPosition?.jd?.length > 0
+								'text-primary-600 font-medium':
+									interviewStore.selectedPosition?.jd?.length > 0
 							}"
 						>
-							{{ selectedPosition?.jd?.length || 0 }} 字
+							{{ interviewStore.selectedPosition?.jd?.length || 0 }} 字
 						</span>
 					</div>
 				</div>
 				<div class="relative">
 					<UTextarea
 						class="w-full"
-						:model-value="selectedPosition.jd"
-						@update:model-value="
-							$emit('update:selectedPosition', {
-								...selectedPosition,
-								jd: $event
-							})
-						"
+						v-model="interviewStore.selectedPosition.jd"
 						minlength="50"
 						maxlength="800"
 						placeholder="请直接粘贴目标岗位的职位描述（JD）...
@@ -239,7 +210,9 @@
 					<div
 						class="absolute bottom-4 right-4 pointer-events-none transition-opacity duration-300"
 						:class="
-							selectedPosition.jd?.length > 0 ? 'opacity-0' : 'opacity-100'
+							interviewStore.selectedPosition.jd?.length > 0
+								? 'opacity-0'
+								: 'opacity-100'
 						"
 					>
 						<UIcon
@@ -281,12 +254,9 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useInterviewStore } from '@/stores/interview'
 
 const props = defineProps({
-	selectedPosition: {
-		type: Object,
-		required: true
-	},
 	isProcessing: {
 		type: Boolean,
 		default: false
@@ -298,7 +268,9 @@ const props = defineProps({
 	}
 })
 
-defineEmits(['submit', 'update:selectedPosition'])
+defineEmits(['submit'])
+
+const interviewStore = useInterviewStore()
 
 // 服务类型配置
 const SERVICE_CONFIGS = {

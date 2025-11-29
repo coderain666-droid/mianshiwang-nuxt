@@ -1,8 +1,15 @@
 <template>
 	<div class="h-full">
+		<!-- input 输入 -->
 		<StepInput
-			:selected-position="interviewStore.selectedPosition"
+			v-if="step === 'input'"
 			service-type="special"
+			@submit="handleComplete"
+		/>
+		<!-- 专项面试 -->
+		<StepInterview
+			v-else-if="step === 'interview'"
+			@complete="handleComplete"
 		/>
 	</div>
 </template>
@@ -18,6 +25,7 @@ import { useInterviewStore } from '@/stores/interview'
 import { useUserStore } from '@/stores/user'
 import { useGlobalModal } from '@/composables/useGlobalModal'
 import StepInput from '@/components/interview/resume-quiz/StepInput.vue'
+import StepInterview from '@/components/interview/special-quiz/StepInterview.vue'
 
 definePageMeta({
 	requiresAuth: true,
@@ -34,6 +42,9 @@ useHead({
 		}
 	]
 })
+
+// 步骤
+const step = ref('input') // input | interview
 
 const globalModal = useGlobalModal()
 const interviewStore = useInterviewStore()
@@ -52,6 +63,39 @@ const specialBalance = computed(
 onMounted(() => {})
 
 const handleComplete = () => {
-	navigateTo('/interview/report')
+	globalModal.showModal({
+		title: '准备开始专项面试',
+		description: '请确认以下信息后再开始面试流程',
+		contentComponent: SpecialInterviewConfirm,
+		contentProps: {
+			serviceType: 'special',
+			remainingCount: specialBalance.value,
+			onConfirm: () => {
+				// 验证是否有专项面试剩余次数
+				if (specialBalance.value < 1) {
+					globalModal.closeModal()
+					globalModal.showModal({
+						title: '面试押题次数不足，请先充值',
+						description: '当前剩余次数：' + specialBalance.value,
+						buttons: [
+							{
+								label: '去充值',
+								onClick: () => {
+									navigateTo('/profile')
+								}
+							}
+						]
+					})
+					return
+				}
+
+				globalModal.closeModal()
+				// 开始专项面试流程
+				step.value = 'interview'
+			}
+		},
+		buttons: [],
+		preventClose: true
+	})
 }
 </script>

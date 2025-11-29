@@ -8,7 +8,6 @@ export const useInterviewStore = defineStore('interview', {
 		isSidebarOpen: true,
 		// 选中的服务类型：special, resume, behavior
 		selectedService: null,
-		targetCompany: '',
 
 		// 第一步：岗位和简历
 		/*
@@ -23,7 +22,7 @@ minSalary: 25,
 maxSalary: 35,
 jd: '' 
 		*/
-		selectedPosition: null,
+		selectedPosition: {},
 		resumeId: null, // 简历 ID（当 type='resume' 时）
 		resumeText: '', // 简历文本（当 type='text' 时）
 
@@ -75,11 +74,6 @@ jd: ''
 		// 选择服务类型
 		setSelectedService(service) {
 			this.selectedService = service
-		},
-
-		// 设置目标公司
-		setTargetCompany(company) {
-			this.targetCompany = company
 		},
 
 		// 开始面试
@@ -140,13 +134,12 @@ jd: ''
 			this.plan7Days = null
 			this.reportGenerated = false
 			this.selectedService = null
-			this.targetCompany = ''
 		},
 
 		// 完全重置（重新开始）
 		reset() {
 			this.currentStep = 1
-			this.selectedPosition = null
+			this.selectedPosition = {}
 			this.resumeType = null
 			this.resumeId = null
 			this.resumeText = ''

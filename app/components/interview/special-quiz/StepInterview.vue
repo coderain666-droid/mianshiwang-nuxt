@@ -473,36 +473,6 @@ const specialBalance = computed(
 	() => userStore.userInfo?.specialRemainingCount ?? 0
 )
 
-const showEntryConfirmModal = () => {
-	if (entryModalShown.value) return
-	entryModalShown.value = true
-
-	let controller = null
-
-	const handleConfirm = () => {
-		controller?.close('confirmed')
-	}
-
-	const handleCompanyUpdate = (value) => {
-		interviewStore.setTargetCompany(value)
-	}
-
-	controller = globalModal.showModal({
-		title: '准备开始专项面试',
-		description: '请确认以下信息后再开始面试流程',
-		contentComponent: SpecialInterviewConfirm,
-		contentProps: {
-			positionName: positionName.value,
-			company: interviewStore.targetCompany,
-			remainingCount: specialBalance.value,
-			onCompanyUpdate: handleCompanyUpdate,
-			onConfirm: handleConfirm
-		},
-		buttons: [],
-		preventClose: true
-	})
-}
-
 // 格式化消息内容
 const formatMessage = (content) => {
 	if (!content) return ''
@@ -742,8 +712,6 @@ onMounted(() => {
 	// 如果面试已开始，恢复 SSE 连接
 	if (interviewStore.interviewId && interviewStatus.value === 'in_progress') {
 		connectSSE(interviewStore.interviewId)
-	} else {
-		showEntryConfirmModal()
 	}
 })
 

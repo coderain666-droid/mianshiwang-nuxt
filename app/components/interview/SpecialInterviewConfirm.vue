@@ -6,7 +6,7 @@
 				<div>
 					<p class="text-sm text-neutral-500 mb-1">目标岗位</p>
 					<p class="text-base font-semibold text-neutral-900">
-						{{ positionName }}
+						{{ interviewStore.selectedPosition.positionName }}
 					</p>
 				</div>
 				<div>
@@ -14,7 +14,7 @@
 						>目标公司（选填）</label
 					>
 					<UInput
-						v-model="localCompany"
+						v-model="interviewStore.selectedPosition.company"
 						class="w-full"
 						placeholder="请输入公司名称，例如：字节跳动"
 						size="lg"
@@ -72,6 +72,7 @@
 <script setup>
 import { ref, watch, computed } from 'vue'
 import { SERVICE_TAGS } from '@/constants/vip'
+import { useInterviewStore } from '@/stores/interview'
 
 const props = defineProps({
 	/**
@@ -81,20 +82,6 @@ const props = defineProps({
 		type: String,
 		required: true,
 		validator: (value) => Object.values(SERVICE_TAGS).includes(value)
-	},
-	/**
-	 * 目标岗位
-	 */
-	positionName: {
-		type: String,
-		default: ''
-	},
-	/**
-	 * 目标公司
-	 */
-	company: {
-		type: String,
-		default: ''
 	},
 	/**
 	 * 剩余次数
@@ -119,16 +106,7 @@ const props = defineProps({
 	}
 })
 
-const localCompany = ref(props.company)
-
-watch(
-	() => props.company,
-	(value) => {
-		if (value !== localCompany.value) {
-			localCompany.value = value
-		}
-	}
-)
+const interviewStore = useInterviewStore()
 
 // 服务配置映射
 const serviceConfig = computed(() => {
@@ -199,7 +177,6 @@ const handleConfirm = () => {
 	if (props.remainingCount <= 0) {
 		return
 	}
-	props.onCompanyUpdate?.(localCompany.value?.trim() || '')
 	props.onConfirm?.()
 }
 

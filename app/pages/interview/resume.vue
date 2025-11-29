@@ -4,9 +4,7 @@
 		<StepInput
 			v-if="step === 'input'"
 			service-type="resume"
-			:selected-position="interviewStore.selectedPosition"
 			:is-processing="step === 'processing'"
-			@update:selected-position="updateSelectedPosition"
 			@submit="handlePredictClick"
 		/>
 
@@ -170,11 +168,6 @@ const getCategoryName = (category) => {
 	return categoryMap[category?.toLowerCase()] || category
 }
 
-// 更新选中的岗位信息
-const updateSelectedPosition = (newPosition) => {
-	interviewStore.selectedPosition = newPosition
-}
-
 // 点击押题按钮
 const handlePredictClick = () => {
 	// JD 字数判断 50 ~ 2000 字之间
@@ -201,13 +194,7 @@ const handlePredictClick = () => {
 		contentComponent: SpecialInterviewConfirm,
 		contentProps: {
 			serviceType: 'resume',
-			positionName: interviewStore.selectedPosition.positionName || '通用岗位',
-			company: interviewStore.selectedPosition.company, // 传入表单中的公司
 			remainingCount: resumeBalance.value,
-			onCompanyUpdate: (company) => {
-				interviewStore.selectedPosition.company = company
-				interviewStore.setTargetCompany(company)
-			},
 			onConfirm: () => {
 				// 验证是否有面试押题剩余次数
 				if (resumeBalance.value < 1) {

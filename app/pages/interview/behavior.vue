@@ -51,12 +51,7 @@ onMounted(() => {
 		contentComponent: SpecialInterviewConfirm,
 		contentProps: {
 			serviceType: 'behavior',
-			positionName: positionName.value,
-			company: interviewStore.targetCompany,
 			remainingCount: behaviorBalance.value,
-			onCompanyUpdate: (company) => {
-				interviewStore.setTargetCompany(company)
-			},
 			onConfirm: () => {
 				globalModal.closeModal()
 				// TODO: 开始综合面试流程
