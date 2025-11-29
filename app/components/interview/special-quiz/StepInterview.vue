@@ -283,55 +283,7 @@
 				</div>
 
 				<!-- 底部提示 -->
-				<div class="p-5 border-t border-gray-100 bg-gray-50/50">
-					<div class="space-y-3">
-						<div class="flex items-center justify-between">
-							<div
-								class="flex items-center gap-2 text-neutral-800 font-medium text-sm"
-							>
-								<UIcon
-									name="i-heroicons-light-bulb"
-									class="w-4 h-4 text-amber-500"
-								/>
-								面试小贴士
-							</div>
-
-							<div class="text-xs text-neutral-500 flex items-center gap-2">
-								<UIcon
-									name="i-heroicons-clock"
-									class="w-4 h-4 text-primary-500"
-								/>
-								平均面试时长 60 分钟
-							</div>
-						</div>
-						<div
-							class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-xs text-neutral-600 space-y-2"
-						>
-							<div class="flex gap-2 items-start">
-								<span
-									class="shrink-0 w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5"
-								></span>
-								<p>回答问题时请尽量清晰、有条理</p>
-							</div>
-							<div class="flex gap-2 items-start">
-								<span
-									class="shrink-0 w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5"
-								></span>
-								<p>
-									推荐使用
-									<StarMethodModal />
-									法则来描述您的经历
-								</p>
-							</div>
-							<div class="flex gap-2 items-start">
-								<span
-									class="shrink-0 w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5"
-								></span>
-								<p>保持自信，像真实的面试一样交流</p>
-							</div>
-						</div>
-					</div>
-				</div>
+				<InterviewTip :range-time="60" />
 			</div>
 		</div>
 	</div>
@@ -343,7 +295,7 @@ import { useInterviewStore } from '@/stores/interview'
 import { useUserStore } from '@/stores/user'
 import { useToast } from '#imports'
 import { useGlobalModal } from '@/composables/useGlobalModal'
-import SpecialInterviewConfirm from '@/components/interview/SpecialInterviewConfirm.vue'
+import InterviewTip from '@/components/interview/interviewTip.vue'
 
 const emit = defineEmits(['complete'])
 
@@ -415,42 +367,9 @@ const conversationStats = computed(() => {
 		userAvgLength
 	}
 })
-const heroStats = computed(() => [
-	{
-		label: '对话轮次',
-		value: conversationStats.value.total || 0,
-		suffix: '轮',
-		hint:
-			conversationStats.value.total > 0
-				? '保持稳定的问答节奏'
-				: '开始面试即可记录每一轮'
-	},
-	{
-		label: '候选人回答',
-		value: conversationStats.value.userCount || 0,
-		suffix: '次',
-		hint:
-			conversationStats.value.userCount > 0
-				? '尽量覆盖项目与技能亮点'
-				: '积极作答有助于 AI 深度评估'
-	},
-	{
-		label: '平均回答长度',
-		value:
-			conversationStats.value.userCount > 0
-				? conversationStats.value.userAvgLength
-				: '--',
-		suffix: conversationStats.value.userCount > 0 ? '字' : '',
-		hint: '建议控制在 80-150 字之间'
-	}
-])
 const canSendMessage = computed(() => {
 	return interviewStatus.value === 'in_progress' && !isStreaming.value
 })
-
-const specialBalance = computed(
-	() => userStore.userInfo?.specialRemainingCount ?? 0
-)
 
 // 格式化消息内容
 const formatMessage = (content) => {
