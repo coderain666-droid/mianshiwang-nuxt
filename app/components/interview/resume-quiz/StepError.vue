@@ -33,7 +33,7 @@
 					size="xl"
 					color="primary"
 					class="px-8 shadow-lg shadow-primary-500/20"
-					@click="$emit('retry')"
+					@click="handleRetry"
 				>
 					<UIcon name="i-heroicons-arrow-path" class="w-5 h-5 mr-2" />
 					重新押题
@@ -44,6 +44,15 @@
 </template>
 
 <script setup>
-defineEmits(['retry'])
-</script>
+import { useInterviewStore } from '@/stores/interview'
+import { navigateTo } from '#imports'
 
+const interviewStore = useInterviewStore()
+
+const handleRetry = () => {
+	// 清空选择的所有内容
+	interviewStore.reset()
+	// 跳转到选择岗位页面
+	navigateTo('/interview/start')
+}
+</script>

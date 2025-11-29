@@ -19,7 +19,7 @@
 					variant="ghost"
 					icon="i-heroicons-arrow-path"
 					class="flex-1 sm:flex-none"
-					@click="$emit('retry')"
+					@click="handleRetry"
 				>
 					重新押题
 				</UButton>
@@ -35,7 +35,9 @@
 			</div>
 		</div>
 
-		<div class="overflow-y-auto max-h-[calc(100vh-200px)] pb-10 custom-scrollbar">
+		<div
+			class="overflow-y-auto max-h-[calc(100vh-200px)] pb-10 custom-scrollbar"
+		>
 			<!-- 押题总结 -->
 			<div
 				v-if="predictionSummary"
@@ -46,12 +48,17 @@
 						<div
 							class="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center"
 						>
-							<UIcon name="i-heroicons-sparkles" class="w-5 h-5 text-primary-600" />
+							<UIcon
+								name="i-heroicons-sparkles"
+								class="w-5 h-5 text-primary-600"
+							/>
 						</div>
 					</div>
 					<div class="space-y-2">
 						<h3 class="font-bold text-neutral-900">AI 押题分析总结</h3>
-						<p class="text-sm text-neutral-600 leading-relaxed whitespace-pre-wrap">
+						<p
+							class="text-sm text-neutral-600 leading-relaxed whitespace-pre-wrap"
+						>
 							{{ predictionSummary }}
 						</p>
 					</div>
@@ -187,6 +194,9 @@
 </template>
 
 <script setup>
+import { useInterviewStore } from '@/stores/interview'
+import { navigateTo } from '#imports'
+
 defineProps({
 	predictionResults: {
 		type: Array,
@@ -219,5 +229,33 @@ const getDifficultyConfig = (difficulty) => {
 	}
 	return difficultyMap[difficulty] || { label: difficulty, color: 'gray' }
 }
-</script>
 
+const interviewStore = useInterviewStore()
+const globalModal = useGlobalModal()
+
+const handleRetry = () => {
+	globalModal.showModal({
+		title: '温馨提示',
+		description: '重新押题将清空当前选择的所有内容',
+		content: '是否继续？',
+		buttons: [
+			{
+				label: '取消',
+				color: 'gray',
+				variant: 'ghost',
+				onClick: () => console.log('cancel')
+			},
+			{
+				label: '继续',
+				color: 'primary',
+				onClick: () => {
+					// 清空选择的所有内容
+					interviewStore.reset()
+					// 跳转到选择岗位页面
+					navigateTo('/interview/start')
+				}
+			}
+		]
+	})
+}
+</script>

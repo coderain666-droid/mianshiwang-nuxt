@@ -139,7 +139,7 @@ const ModalHost = defineComponent({
 									'div',
 									{
 										class:
-											'flex flex-col-reverse gap-3 pt-6 mt-6 border-t border-gray-100 sm:flex-row sm:items-center sm:justify-end sm:gap-4'
+											'flex flex-col-reverse gap-3 mt-2 sm:flex-row sm:items-center sm:justify-end sm:gap-4'
 									},
 									buttons.value.map((button, index) =>
 										h(

@@ -75,6 +75,7 @@ const pageTitle = computed(() => {
 	}
 
 	const titleMap = {
+		'/interview/start': '选择岗位与简历',
 		'/interview/resume': serviceHighlights[0].title,
 		'/interview/special': serviceHighlights[1].title,
 		'/interview/behavior': serviceHighlights[2].title,
@@ -107,6 +108,11 @@ onMounted(() => {
 
 	// 获取用户信息
 	fetchUserInfo()
+
+	// 请求包含 resultId 时，表示为查看历史记录，不需要执行守卫
+	if (route.query.resultId) {
+		return
+	}
 
 	// 报告页面守卫
 	if (currentPath === '/interview/report') {

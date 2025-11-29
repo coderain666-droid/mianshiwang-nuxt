@@ -23,13 +23,12 @@
 			v-if="step === 'complete'"
 			:prediction-results="predictionResults"
 			:prediction-summary="predictionSummary"
-			@retry="handleRetry"
 			@next-step="handleNextStep"
 			@navigate-history="navigateTo('/history')"
 		/>
 
 		<!-- 第四步：押题失败 -->
-		<StepError v-if="step === 'error'" @retry="handleRetry" />
+		<StepError v-if="step === 'error'" />
 	</div>
 </template>
 
@@ -332,26 +331,31 @@ const startPredictionProcess = async (requestId) => {
 	})
 }
 
-// 重新押题
-const handleRetry = () => {
-	// 关闭现有的 SSE 连接
-	if (sseController.value) {
-		sseController.value.close()
-		sseController.value = null
-	}
+// // 重新押题
+// const handleRetry = () => {
+// 	// 关闭现有的 SSE 连接
+// 	if (sseController.value) {
+// 		sseController.value.close()
+// 		sseController.value = null
+// 	}
 
-	step.value = 'input'
-	// 清空之前的结果
-	predictionResults.value = []
-	predictionSummary.value = ''
-	// 重置进度
-	currentProgressStep.value = {
-		progress: 0,
-		label: '正在准备...',
-		stage: 'prepare'
-	}
-	progressSteps.value = []
-}
+// 	step.value = 'input'
+// 	// 清空之前的结果
+// 	predictionResults.value = []
+// 	predictionSummary.value = ''
+// 	// 重置进度
+// 	currentProgressStep.value = {
+// 		progress: 0,
+// 		label: '正在准备...',
+// 		stage: 'prepare'
+// 	}
+// 	progressSteps.value = []
+
+// 	// 清空选择的所有内容
+// 	interviewStore.reset()
+// 	// 跳转到选择岗位页面
+// 	navigateTo('/interview/start')
+// }
 
 const route = useRoute()
 const { $api } = useNuxtApp()
