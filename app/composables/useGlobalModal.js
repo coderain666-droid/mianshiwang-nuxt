@@ -104,6 +104,88 @@ const ModalHost = defineComponent({
 			})
 		})
 
+		const bodyContainer = () => {
+			// 在没有内容和 buttons 的时候，只显示标题和 description，不显示 footer 区域和分割线
+			if (
+				!props.options.contentComponent &&
+				!props.options.content &&
+				!props.options.buttons
+			) {
+				return null
+			}
+			return {
+				body: () => {
+					// 内容部分
+					const contentVNode = props.options.contentComponent
+						? h(
+								props.options.contentComponent,
+								props.options.contentProps || {}
+						  )
+						: props.options.content
+						? h(
+								'div',
+								{
+									class:
+										'text-sm text-neutral-600 leading-relaxed whitespace-pre-line'
+								},
+								props.options.content
+						  )
+						: null
+
+					// 按钮部分（仅在有按钮时渲染）
+					const buttonsVNode =
+						buttons.value.length > 0
+							? h(
+									'div',
+									{
+										class:
+											'flex flex-col-reverse gap-3 pt-6 mt-6 border-t border-gray-100 sm:flex-row sm:items-center sm:justify-end sm:gap-4'
+									},
+									buttons.value.map((button, index) =>
+										h(
+											UButton,
+											{
+												key: button.key ?? `${button.label || 'btn'}-${index}`,
+												color: button.color || 'primary',
+												variant: button.variant || 'solid',
+												size: button.size || 'md',
+												block: button.block ?? false,
+												class: ['w-full', 'sm:w-auto', button.class || ''],
+												loading: loadingIndex.value === index,
+												disabled:
+													button.disabled ||
+													(loadingIndex.value !== null &&
+														loadingIndex.value !== index),
+												onClick: () => handleButtonClick(button, index)
+											},
+											() =>
+												h(
+													'span',
+													{
+														class:
+															'inline-flex items-center justify-center gap-2'
+													},
+													[
+														button.icon
+															? h(UIcon, {
+																	name: button.icon,
+																	class: 'w-4 h-4'
+															  })
+															: null,
+														h('span', null, button.label || '确认')
+													]
+												)
+										)
+									)
+							  )
+							: null
+
+					// 只返回存在的部分
+					return h('div', {}, [contentVNode, buttonsVNode].filter(Boolean))
+				}
+			}
+		}
+
 		return () => {
 			return h(
 				UModal,
@@ -115,72 +197,7 @@ const ModalHost = defineComponent({
 					preventClose: props.options.preventClose ?? false,
 					ui: modalUi.value
 				},
-				{
-					body: () =>
-						h('div', { class: '' }, [
-							props.options.contentComponent
-								? h(
-										props.options.contentComponent,
-										props.options.contentProps || {}
-								  )
-								: props.options.content
-								? h(
-										'div',
-										{
-											class:
-												'text-sm text-neutral-600 leading-relaxed whitespace-pre-line'
-										},
-										props.options.content
-								  )
-								: null,
-							buttons.value.length
-								? h(
-										'div',
-										{
-											class:
-												'flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:items-center sm:justify-end sm:gap-4'
-										},
-										buttons.value.map((button, index) =>
-											h(
-												UButton,
-												{
-													key:
-														button.key ?? `${button.label || 'btn'}-${index}`,
-													color: button.color || 'primary',
-													variant: button.variant || 'solid',
-													size: button.size || 'md',
-													block: button.block ?? false,
-													class: ['w-full', 'sm:w-auto', button.class || ''],
-													loading: loadingIndex.value === index,
-													disabled:
-														button.disabled ||
-														(loadingIndex.value !== null &&
-															loadingIndex.value !== index),
-													onClick: () => handleButtonClick(button, index)
-												},
-												() =>
-													h(
-														'span',
-														{
-															class:
-																'inline-flex items-center justify-center gap-2'
-														},
-														[
-															button.icon
-																? h(UIcon, {
-																		name: button.icon,
-																		class: 'w-4 h-4'
-																  })
-																: null,
-															h('span', null, button.label || '确认')
-														]
-													)
-											)
-										)
-								  )
-								: null
-						])
-				}
+				bodyContainer()
 			)
 		}
 	}
@@ -225,15 +242,15 @@ export const useGlobalModal = () => {
 
 		// 获取当前 Nuxt 应用实例，复用其插件和配置
 		const nuxtApp = useNuxtApp()
-		
+
 		if (nuxtApp) {
 			// 复制全局属性和配置
 			if (nuxtApp.vueApp?.config?.globalProperties) {
-				app.config.globalProperties = { 
-					...nuxtApp.vueApp.config.globalProperties 
+				app.config.globalProperties = {
+					...nuxtApp.vueApp.config.globalProperties
 				}
 			}
-			
+
 			// 注册全局组件（包括 NuxtLink/RouterLink）
 			if (nuxtApp.vueApp?._context?.components) {
 				Object.entries(nuxtApp.vueApp._context.components).forEach(
@@ -242,18 +259,18 @@ export const useGlobalModal = () => {
 					}
 				)
 			}
-			
+
 			// 注册 Router（解决 RouterLink 问题）
 			if (nuxtApp.$router) {
 				app.use(nuxtApp.$router)
 			}
-			
+
 			// 注册其他可能需要的插件
 			if (nuxtApp.vueApp?._context?.app) {
 				const nuxtVueApp = nuxtApp.vueApp._context.app
 				// 复制插件
 				if (nuxtVueApp._plugins) {
-					nuxtVueApp._plugins.forEach(plugin => {
+					nuxtVueApp._plugins.forEach((plugin) => {
 						try {
 							app.use(plugin)
 						} catch (e) {
