@@ -548,7 +548,7 @@
 				<!-- 名称和状态 -->
 				<div class="text-center">
 					<h4 class="text-lg font-semibold text-neutral-800 mb-1">
-						{{ interviewerName || '正在分配面试官...' }}
+						{{ interviewStore.interviewerName || '正在分配面试官...' }}
 					</h4>
 					<p class="text-sm text-neutral-500 mb-2">资深技术面试官</p>
 					<div
@@ -579,13 +579,6 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import InterviewTip from '@/components/interview/interviewTip.vue'
 import { useInterviewStore } from '@/stores/interview'
-
-defineProps({
-	interviewerName: {
-		type: String,
-		default: '张老师'
-	}
-})
 
 const interviewStore = useInterviewStore()
 

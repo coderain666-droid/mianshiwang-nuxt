@@ -28,8 +28,6 @@ jd: ''
 		resumeText: '', // 简历文本（当 type='text' 时）
 
 		// 第二步：面试过程
-		// 面试会话 ID
-		interviewId: null,
 		// idle：未进入面试状态，不需要关心
 		// starting：面试已经开始，但是费用暂未扣除，处于倒计时阶段
 		// in_progress：面试已经开始，费用已经扣除。此时用户进入服务页面，将直接跳转到面试页面
@@ -41,7 +39,20 @@ jd: ''
 	 {"role": "interviewer","type":"start","sessionId":"f61f5e8c-8b2b-4793-b015-711dfa0ab7d2","interviewerName":"孙娜","content":"你好，","questionNumber":0,"totalQuestions":12,"elapsedMinutes":0}
 */
 		messages: [],
-		isStreaming: false, // 是否正在流式输出
+		// 面试官名称：
+		interviewerName: '正在分配面试官...',
+
+		// 面试会话 ID
+		sessionId: null,
+		/*
+		  START = 'start', // 面试开始
+  QUESTION = 'question', // 面试官提问
+  WAITING = 'waiting', // 等待候选人回答
+  THINKING = 'thinking', // AI正在思考
+  END = 'end', // 面试结束
+  ERROR = 'error', // 发生错误 */
+		// 面试中进度类型
+		interviewEventType: 'start',
 
 		// 第三步：报告
 		report: null, // 结构化报告数据
@@ -90,14 +101,6 @@ jd: ''
 			this.selectedService = service
 		},
 
-		// 开始面试
-		startInterview(interviewId) {
-			this.interviewId = interviewId
-			this.interviewStatus = 'starting'
-			this.messages = []
-			this.currentStep = 2
-		},
-
 		// 添加消息
 		addMessage(role, content) {
 			this.messages.push({
@@ -119,11 +122,6 @@ jd: ''
 			}
 		},
 
-		// 设置流式状态
-		setStreaming(isStreaming) {
-			this.isStreaming = isStreaming
-		},
-
 		// 结束面试
 		endInterview() {
 			this.interviewStatus = 'ended'
@@ -143,7 +141,9 @@ jd: ''
 			this.interviewId = null
 			this.interviewStatus = 'idle'
 			this.messages = []
-			this.isStreaming = false
+			this.interviewerName = '正在分配面试官...'
+			this.interviewEventType = 'start'
+			this.sessionId = null
 			this.report = null
 			this.plan7Days = null
 			this.reportGenerated = false

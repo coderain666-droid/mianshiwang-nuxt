@@ -188,7 +188,7 @@
 			</div>
 
 			<!-- 右侧：3D 数字人（占1列） -->
-			<ThreeDDigitalPeople :interviewer-name="interviewerName" />
+			<ThreeDDigitalPeople />
 		</div>
 
 		<!-- 倒计时遮罩 -->
@@ -213,7 +213,10 @@ import { useUserStore } from '@/stores/user'
 import { useToast } from '#imports'
 import { useGlobalModal } from '@/composables/useGlobalModal'
 import ThreeDDigitalPeople from '@/components/interview/3DDigitalPeople.vue'
-import { startMockInterviewAPI } from '@/api/interview'
+import {
+	startMockInterviewAPI,
+	answerInterviewQuestionAPI
+} from '@/api/interview'
 
 const emit = defineEmits(['complete', 'cancel'])
 
@@ -229,10 +232,15 @@ const inputMessage = ref('')
 const messagesContainerRef = ref(null)
 let closeMockInterview = null
 
+/**
+ * 是否可以发送消息
+ * 1. 面试状态为进行中
+ * 2. 面试进度类型为等待候选人回答
+ */
 const canSendMessage = computed(() => {
 	return (
 		interviewStore.interviewStatus === 'in_progress' &&
-		!interviewStore.isStreaming.value
+		interviewStore.interviewEventType === 'waiting'
 	)
 })
 
@@ -255,10 +263,6 @@ watch(
 	{ deep: true }
 )
 
-// 面试的链接 ID
-const sessionId = ref(null)
-// 面试官名称
-const interviewerName = ref(null)
 // 开始面试
 const startInterview = async () => {
 	try {
@@ -288,23 +292,23 @@ const startInterview = async () => {
 					const { type } = data
 					// 面试开始，包含开场白
 					if (type === 'start') {
-						sessionId.value = data.sessionId
-						interviewerName.value = data.interviewerName
-						interviewStore.messages.push({
-							...data,
-							role: 'interviewer'
-						})
+						interviewStore.interviewEventType = 'start'
+						interviewStore.sessionId = data.sessionId
+						interviewStore.interviewerName = data.interviewerName
+						interviewStore.addMessage('interviewer', data.content)
 					}
 					// 等待候选人回答
 					else if (type === 'waiting') {
+						interviewStore.interviewEventType = 'waiting'
 					}
 					// 发生错误
 					else if (type === 'error') {
+						interviewStore.interviewEventType = 'error'
 					}
 				},
 				onError: (error) => {
 					console.error('SSE Error:', error)
-
+					interviewStore.interviewEventType = 'error'
 					toast.add({
 						title: '面试启动失败',
 						description: error.message || '网络错误，请稍后重试',
@@ -317,6 +321,7 @@ const startInterview = async () => {
 		// 改变状态标记
 		interviewStore.interviewStatus = 'in_progress'
 	} catch (error) {
+		interviewStore.interviewEventType = 'error'
 		toast.add({
 			title: '启动失败',
 			description: error.message || '请稍后重试',
@@ -327,31 +332,13 @@ const startInterview = async () => {
 }
 
 // 连接 SSE 流式输出
-const connectSSE = (interviewId) => {
+const connectSSE = (sessionId) => {
 	// 关闭旧的连接
 	if (closeMockInterview) {
 		closeMockInterview()
 	}
 
 	startInterview()
-}
-
-// 模拟流式输出
-const simulateStreaming = (fullText) => {
-	let index = 0
-	interviewStore.addMessage('assistant', '')
-
-	const interval = setInterval(() => {
-		if (index < fullText.length) {
-			const chunk = fullText.substring(0, index + 1)
-			interviewStore.updateLastMessage(chunk)
-			index++
-			scrollToBottom()
-		} else {
-			clearInterval(interval)
-			interviewStore.setStreaming(false)
-		}
-	}, 30) // 每 30ms 输出一个字符
 }
 
 // 发送消息
@@ -365,28 +352,42 @@ const handleSendMessage = async () => {
 	scrollToBottom()
 
 	try {
-		interviewStore.setStreaming(true)
+		const params = {
+			sessionId: interviewStore.sessionId,
+			answer: userMessage
+		}
 
-		// TODO: 调用 API 发送消息
-		// const response = await $api(`/interview/${interviewStore.interviewId}/message`, {
-		// 	method: 'POST',
-		// 	body: { message: userMessage }
-		// })
+		// 获取配置
+		const config = useRuntimeConfig()
 
-		// 模拟 AI 回复
-		setTimeout(() => {
-			const aiResponse = `这是一个模拟的 AI 回复。在实际应用中，这里会通过 SSE 流式返回 AI 的回答。
-
-你对这个问题有什么具体的经验或案例可以分享吗？`
-			simulateStreaming(aiResponse)
-		}, 500)
+		answerInterviewQuestionAPI(params, {
+			token: userStore.token,
+			baseURL: config.public.apiBase,
+			callbacks: {
+				onMessage: (data) => {
+					console.log('SSE Message:', data)
+					// 面试官回答了问题
+					if (data.type === 'question') {
+						// 修改面试动作
+						interviewStore.interviewEventType = 'question'
+						// 添加面试官回答的消息
+						interviewStore.addMessage('interviewer', data.content)
+						// 滚动到底部
+						scrollToBottom()
+					}
+				},
+				onError: (error) => {
+					console.error('SSE Error:', error)
+				}
+			}
+		})
 	} catch (error) {
 		toast.add({
 			title: '发送失败',
 			description: error.message || '请稍后重试',
 			color: 'error'
 		})
-		interviewStore.setStreaming(false)
+		interviewStore.interviewEventType = 'waiting'
 	}
 }
 
@@ -449,10 +450,12 @@ const startCountdown = () => {
 onMounted(() => {
 	// 如果面试已开始，恢复 SSE 连接
 	if (
-		interviewStore.interviewId &&
+		interviewStore.sessionId &&
 		interviewStore.interviewStatus === 'in_progress'
 	) {
-		connectSSE(interviewStore.interviewId)
+		connectSSE(interviewStore.sessionId)
+		// TODO：重新进入，设置为 waiting 状态
+		interviewStore.interviewEventType = 'waiting'
 	}
 	// 只有空闲状态才需要进行这样的提示
 	if (interviewStore.interviewStatus === 'starting') {
