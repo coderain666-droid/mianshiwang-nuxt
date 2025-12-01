@@ -265,7 +265,7 @@
 										上传简历
 									</UButton>
 									<span v-else class="text-sm text-gray-500">
-										最多上传 5 份简历
+										最多上传 {{ MAX_RESUME_COUNT }} 份简历
 									</span>
 								</div>
 							</div>
@@ -467,6 +467,7 @@ import {
 	getConsumptionRecordsAPI
 } from '@/api/user'
 import dayjs from 'dayjs'
+import { MAX_RESUME_COUNT } from '@/constants'
 
 definePageMeta({
 	requiresAuth: true,

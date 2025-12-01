@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { navigateTo } from '#app'
+import { MAX_RESUME_COUNT } from '@/constants'
 
 export const useUserStore = defineStore('user', {
 	state: () => ({
@@ -37,8 +38,8 @@ export const useUserStore = defineStore('user', {
 		resumes: []
 	}),
 	getters: {
-		// 是否可以添加更多简历（最多5份）
-		canAddResume: (state) => state.resumes.length < 5
+		// 是否可以添加更多简历
+		canAddResume: (state) => state.resumes.length < MAX_RESUME_COUNT
 	},
 	actions: {
 		// 登出

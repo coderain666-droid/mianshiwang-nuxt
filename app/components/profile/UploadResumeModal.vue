@@ -35,7 +35,7 @@
 						<p class="text-xs text-gray-500">
 							支持 PDF、DOC、DOCX 格式，文件大小不超过 5MB
 							<br />
-							（简历最多支持 5 份）
+							（简历最多支持 {{ MAX_RESUME_COUNT }} 份）
 						</p>
 					</div>
 
@@ -97,6 +97,7 @@ import { getOSSClient } from '@/utils/sts'
 import { useUserStore } from '@/stores/user'
 import { uploadResumeAPI } from '@/api/resume'
 import { createActionGuard } from '@/utils/actionGuard'
+import { MAX_RESUME_COUNT, FILE_SIZE_LIMIT } from '@/constants'
 
 const props = defineProps({
 	open: {
@@ -198,7 +199,7 @@ const processFile = (file) => {
 	}
 
 	// 验证文件大小（限制 5MB）
-	if (file.size > 5 * 1024 * 1024) {
+	if (file.size > FILE_SIZE_LIMIT) {
 		toast.add({
 			title: '文件大小不能超过 5MB',
 			color: 'error'

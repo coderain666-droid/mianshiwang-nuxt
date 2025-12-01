@@ -184,7 +184,14 @@
 				<div class="flex-1 min-h-0 overflow-y-auto pr-1 custom-scrollbar">
 					<ResumeSelector>
 						<template #title>
-							<h2 class="text-lg font-semibold text-neutral-900">选择简历</h2>
+							<h2 class="text-lg font-semibold text-neutral-900">
+								选择简历
+								<span
+									class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
+								>
+									{{ userStore.resumes.length }}/5
+								</span>
+							</h2>
 						</template>
 					</ResumeSelector>
 				</div>
@@ -212,6 +219,7 @@ import ResumeSelector from '@/components/interview/ResumeSelector.vue'
 import { useGlobalModal } from '@/composables/useGlobalModal'
 import ServiceSelectionContent from '@/components/interview/ServiceSelectionContent.vue'
 import { serviceHighlights, SERVICE_TAGS } from '@/constants/vip'
+import { useUserStore } from '@/stores/user'
 
 definePageMeta({
 	requiresAuth: true,
@@ -232,6 +240,7 @@ useHead({
 
 const emit = defineEmits(['next'])
 
+const userStore = useUserStore()
 const interviewStore = useInterviewStore()
 // 确定当前为 第一步
 interviewStore.currentStep = 1

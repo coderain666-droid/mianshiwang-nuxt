@@ -16,6 +16,9 @@
 				>
 					上传新简历
 				</UButton>
+				<span v-else class="text-sm text-gray-500">
+					最多上传 {{ MAX_RESUME_COUNT }} 份简历
+				</span>
 			</div>
 
 			<!-- 简历列表 -->
@@ -24,8 +27,8 @@
 				class="space-y-2 max-h-[300px] overflow-y-auto pr-1"
 			>
 				<div
-					v-for="resume in userStore.resumes"
-					:key="resume.id"
+					v-for="(resume, index) in userStore.resumes"
+					:key="resume.resumeId"
 					:class="[
 						'group flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all',
 						interviewStore.resumeId === resume.resumeId
@@ -57,8 +60,17 @@
 						variant="ghost"
 						size="sm"
 						icon="i-heroicons-eye"
-						class="p-2! opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+						class="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
 						@click.stop="handlePreview(resume)"
+					/>
+
+					<UButton
+						color="neutral"
+						variant="ghost"
+						size="sm"
+						icon="i-heroicons-trash"
+						class="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"
+						@click.stop="handleDelete(index, resume)"
 					/>
 
 					<UIcon
@@ -147,9 +159,12 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import UploadResumeModal from '@/components/profile/UploadResumeModal.vue'
-import { getResumeListAPI } from '@/api/resume'
+import { getResumeListAPI, deleteResumeAPI } from '@/api/resume'
 import dayjs from 'dayjs'
 import { useInterviewStore } from '@/stores/interview'
+import { useGlobalModal } from '@/composables/useGlobalModal'
+import { useToast } from '#imports'
+import { MAX_RESUME_COUNT } from '@/constants'
 
 const props = defineProps({
 	modelValue: {
@@ -160,6 +175,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
+const globalModal = useGlobalModal()
+const toast = useToast()
 const userStore = useUserStore()
 const interviewStore = useInterviewStore()
 const { $api } = useNuxtApp()
@@ -205,6 +222,42 @@ const handleTextChange = (value) => {
 		})
 	} else {
 		emit('update:modelValue', null)
+	}
+}
+
+const deleteIndex = ref(-1)
+const deleteResume = ref(null)
+
+// 删除简历
+const handleDelete = (index, resume) => {
+	deleteIndex.value = index
+	deleteResume.value = resume
+
+	globalModal.showModal({
+		title: '确认删除',
+		description: '确定要删除这份简历吗？删除后无法恢复。',
+		buttons: [
+			{
+				label: '取消',
+				color: 'gray',
+				variant: 'ghost'
+			},
+			{ label: '确定删除', color: 'error', onClick: confirmDelete }
+		]
+	})
+}
+
+// 确认删除
+const confirmDelete = async () => {
+	const res = await deleteResumeAPI($api, deleteResume.value.resumeId)
+	if (res) {
+		toast.add({
+			title: '删除成功',
+			color: 'success'
+		})
+		userStore.resumes.splice(deleteIndex.value, 1)
+		deleteIndex.value = -1
+		deleteResume.value = null
 	}
 }
 
