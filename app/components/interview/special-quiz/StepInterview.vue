@@ -70,7 +70,7 @@
 					</div>
 
 					<!-- 正在输入指示器 -->
-					<div v-if="interviewStore.isStreaming" class="flex gap-4">
+					<div v-if="isStreaming" class="flex gap-4">
 						<div
 							class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-linear-to-br from-indigo-500 to-purple-600 shadow-sm"
 						>
@@ -244,6 +244,17 @@ const canSendMessage = computed(() => {
 	)
 })
 
+/**
+ * 是否正在流式输出（AI 正在说话）
+ */
+const isStreaming = computed(() => {
+	return (
+		interviewStore.interviewEventType === 'question' ||
+		interviewStore.interviewEventType === 'thinking' ||
+		interviewStore.interviewEventType === 'start'
+	)
+})
+
 // 滚动到底部
 const scrollToBottom = () => {
 	nextTick(() => {
@@ -289,21 +300,45 @@ const startInterview = async () => {
 				onMessage: (data) => {
 					console.log('SSE Message:', data)
 
-					const { type } = data
-					// 面试开始，包含开场白
+					const { type, content } = data
+
+					// 面试开始，包含开场白（流式输出）
 					if (type === 'start') {
 						interviewStore.interviewEventType = 'start'
 						interviewStore.sessionId = data.sessionId
 						interviewStore.interviewerName = data.interviewerName
-						interviewStore.addMessage('interviewer', data.content)
+
+						// 开始流式消息（创建占位消息）
+						interviewStore.startStreamingMessage('interviewer')
+						// 更新消息内容（流式追加）
+						interviewStore.updateLastMessage(content, 'interviewer')
+						scrollToBottom()
+					}
+					// 面试官提问（流式输出）
+					else if (type === 'question') {
+						interviewStore.interviewEventType = 'question'
+
+						// 更新最后一条面试官消息（流式追加）
+						interviewStore.updateLastMessage(content, 'interviewer')
+						scrollToBottom()
 					}
 					// 等待候选人回答
 					else if (type === 'waiting') {
 						interviewStore.interviewEventType = 'waiting'
 					}
+					// 面试结束
+					else if (type === 'end') {
+						interviewStore.interviewEventType = 'end'
+						interviewStore.interviewStatus = 'ended'
+					}
 					// 发生错误
 					else if (type === 'error') {
 						interviewStore.interviewEventType = 'error'
+						toast.add({
+							title: '面试出错',
+							description: content || '请稍后重试',
+							color: 'error'
+						})
 					}
 				},
 				onError: (error) => {
@@ -366,18 +401,49 @@ const handleSendMessage = async () => {
 			callbacks: {
 				onMessage: (data) => {
 					console.log('SSE Message:', data)
-					// 面试官回答了问题
-					if (data.type === 'question') {
-						// 修改面试动作
+					const { type, content } = data
+
+					// 面试官开始回复（流式输出的第一条消息）
+					if (type === 'thinking') {
+						interviewStore.interviewEventType = 'thinking'
+						// 开始流式消息（创建占位消息）
+						interviewStore.startStreamingMessage('interviewer')
+					}
+					// 面试官提问（流式输出）
+					else if (type === 'question') {
 						interviewStore.interviewEventType = 'question'
-						// 添加面试官回答的消息
-						interviewStore.addMessage('interviewer', data.content)
-						// 滚动到底部
+
+						// 更新最后一条面试官消息（流式追加）
+						interviewStore.updateLastMessage(content, 'interviewer')
 						scrollToBottom()
+					}
+					// 等待候选人回答
+					else if (type === 'waiting') {
+						interviewStore.interviewEventType = 'waiting'
+					}
+					// 面试结束
+					else if (type === 'end') {
+						interviewStore.interviewEventType = 'end'
+						interviewStore.interviewStatus = 'ended'
+					}
+					// 发生错误
+					else if (type === 'error') {
+						interviewStore.interviewEventType = 'error'
+						toast.add({
+							title: '回答失败',
+							description: content || '请稍后重试',
+							color: 'error'
+						})
 					}
 				},
 				onError: (error) => {
 					console.error('SSE Error:', error)
+					interviewStore.interviewEventType = 'error'
+					toast.add({
+						title: '网络错误',
+						description: error.message || '请检查网络连接',
+						color: 'error'
+					})
 				}
 			}
 		})

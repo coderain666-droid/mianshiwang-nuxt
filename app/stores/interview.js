@@ -102,23 +102,38 @@ jd: ''
 		},
 
 		// 添加消息
-		addMessage(role, content) {
+		addMessage(role, content, metadata = {}) {
 			this.messages.push({
 				role,
 				content,
-				timestamp: new Date()
+				timestamp: new Date(),
+				...metadata
 			})
 		},
 
-		// 更新最后一条消息（用于流式输出）
-		updateLastMessage(content) {
-			if (
-				this.messages.length > 0 &&
-				this.messages[this.messages.length - 1].role === 'assistant'
-			) {
-				this.messages[this.messages.length - 1].content = content
+		// 更新最后一条消息（用于流式输出）- 优化版
+		updateLastMessage(content, role = 'interviewer') {
+			const lastMessage = this.messages[this.messages.length - 1]
+
+			// 如果最后一条消息的角色匹配，则更新内容
+			if (lastMessage && lastMessage.role === role) {
+				lastMessage.content = content
 			} else {
-				this.addMessage('assistant', content)
+				// 否则创建新消息
+				this.addMessage(role, content)
+			}
+		},
+
+		// 开始流式消息（创建占位消息）
+		startStreamingMessage(role = 'interviewer') {
+			// 检查最后一条消息是否已经是该角色的空消息
+			const lastMessage = this.messages[this.messages.length - 1]
+			if (
+				!lastMessage ||
+				lastMessage.role !== role ||
+				lastMessage.content !== ''
+			) {
+				this.addMessage(role, '')
 			}
 		},
 
