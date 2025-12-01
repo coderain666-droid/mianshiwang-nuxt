@@ -9,6 +9,7 @@
 		<!-- 专项面试 -->
 		<StepInterview
 			v-else-if="step === 'interview'"
+			@cancel="handleCancel"
 			@complete="handleComplete"
 		/>
 	</div>
@@ -26,6 +27,7 @@ import { useUserStore } from '@/stores/user'
 import { useGlobalModal } from '@/composables/useGlobalModal'
 import StepInput from '@/components/interview/resume-quiz/StepInput.vue'
 import StepInterview from '@/components/interview/special-quiz/StepInterview.vue'
+import { useToast } from '#imports'
 
 definePageMeta({
 	requiresAuth: true,
@@ -46,6 +48,7 @@ useHead({
 // 步骤
 const step = ref('input') // input | interview
 
+const toast = useToast()
 const globalModal = useGlobalModal()
 const interviewStore = useInterviewStore()
 // 确定当前为 第二步
@@ -96,6 +99,16 @@ const handleComplete = () => {
 		},
 		buttons: [],
 		preventClose: true
+	})
+}
+
+const handleCancel = () => {
+	step.value = 'input'
+
+	toast.add({
+		title: '面试已取消',
+		description: '面试次数已返还至账户',
+		color: 'error'
 	})
 }
 </script>

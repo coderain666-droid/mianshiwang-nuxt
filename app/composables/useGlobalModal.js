@@ -191,6 +191,7 @@ const ModalHost = defineComponent({
 				UModal,
 				{
 					open: open.value,
+					dismissible: props.options.dismissible ?? true,
 					title: props.options.title,
 					description: props.options.description,
 					'onUpdate:open': handleUpdateOpen,

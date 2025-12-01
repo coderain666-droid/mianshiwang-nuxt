@@ -297,7 +297,7 @@ import { useToast } from '#imports'
 import { useGlobalModal } from '@/composables/useGlobalModal'
 import InterviewTip from '@/components/interview/interviewTip.vue'
 
-const emit = defineEmits(['complete'])
+const emit = defineEmits(['complete', 'cancel'])
 
 const interviewStore = useInterviewStore()
 const userStore = useUserStore()
@@ -318,26 +318,31 @@ const positionName = computed(
 const statusMeta = computed(() => {
 	const map = {
 		idle: {
+			step: 0,
 			label: '待开始',
 			color: 'gray',
 			description: '已完成岗位与简历选择，点击开始面试即可建立实时连接。'
 		},
 		starting: {
+			step: 1,
 			label: '准备中',
 			color: 'amber',
 			description: 'AI 面试官正在唤醒，请保持网络稳定，稍后即可开始对话。'
 		},
 		in_progress: {
+			step: 2,
 			label: '进行中',
 			color: 'primary',
 			description: 'AI 正在实时倾听你的回答，并根据内容生成追问与反馈。'
 		},
 		suspended: {
+			step: 3,
 			label: '已暂停',
 			color: 'warning',
 			description: '面试已暂停，点击「继续面试」即可恢复。'
 		},
 		ended: {
+			step: 4,
 			label: '已完成',
 			color: 'green',
 			description: '面试结束，点击查看报告即可获取表现分析与强化计划。'
@@ -611,6 +616,23 @@ onMounted(() => {
 	if (interviewStore.interviewId && interviewStatus.value === 'in_progress') {
 		connectSSE(interviewStore.interviewId)
 	}
+	globalModal.showModal({
+		title: '提示',
+		description:
+			'面试中请保持网络稳定，如遇网络波动导致面试中断，可刷新页面继续进行面试',
+		content: '点击确定按钮，面试将在「5秒」后开始。点击取消按钮，返回上一步',
+		dismissible: false,
+		buttons: [
+			{
+				label: '取消',
+				color: 'error',
+				onClick: () => {
+					emit('cancel')
+				}
+			},
+			{ label: '确定', color: 'success', onClick: () => {} }
+		]
+	})
 })
 
 onUnmounted(() => {
