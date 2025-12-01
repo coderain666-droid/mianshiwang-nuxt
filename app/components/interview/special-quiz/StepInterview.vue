@@ -421,8 +421,6 @@ watch(
 // 开始面试
 const startInterview = async () => {
 	try {
-		interviewStore.interviewStatus = 'starting'
-
 		// TODO: 调用 API 开始面试
 		// const response = await $api('/interview/start', {
 		// 	method: 'POST',
@@ -444,6 +442,9 @@ const startInterview = async () => {
 			title: '面试开始',
 			color: 'success'
 		})
+
+		// 改变状态标记
+		interviewStore.interviewStatus = 'in_progress'
 	} catch (error) {
 		toast.add({
 			title: '启动失败',
@@ -645,32 +646,38 @@ onMounted(() => {
 	if (interviewStore.interviewId && interviewStatus.value === 'in_progress') {
 		connectSSE(interviewStore.interviewId)
 	}
-	globalModal.showModal({
-		title: '提示',
-		description:
-			'面试中请保持网络稳定，如遇网络波动导致面试中断，可刷新页面继续进行面试',
-		content: '点击确定按钮，面试将在「5秒」后开始。点击取消按钮，返回上一步',
-		dismissible: false,
-		preventClose: true,
-		close: false,
-		buttons: [
-			{
-				label: '取消',
-				color: 'error',
-				variant: 'ghost',
-				onClick: () => {
-					emit('cancel')
+	// 只有空闲状态才需要进行这样的提示
+	if (interviewStatus.value === 'starting') {
+		globalModal.showModal({
+			title: '提示',
+			description:
+				'面试中请保持网络稳定，如遇网络波动导致面试中断，可刷新页面继续进行面试',
+			content: '点击确定按钮，面试将在「5秒」后开始。点击取消按钮，返回上一步',
+			dismissible: false,
+			preventClose: true,
+			close: false,
+			buttons: [
+				{
+					label: '取消',
+					color: 'error',
+					variant: 'ghost',
+					onClick: () => {
+						emit('cancel')
+					}
+				},
+				{
+					label: '确定',
+					color: 'success',
+					onClick: () => {
+						// 改变面试的状态标记
+						interviewStore.interviewStatus = 'starting'
+						// 开始倒计时
+						startCountdown()
+					}
 				}
-			},
-			{
-				label: '确定',
-				color: 'success',
-				onClick: () => {
-					startCountdown()
-				}
-			}
-		]
-	})
+			]
+		})
+	}
 })
 
 onUnmounted(() => {

@@ -233,6 +233,21 @@ const handleStepClick = (stepId) => {
 		return
 	}
 
+	// 当前处于面试状态中，不需要切换步骤
+	if (
+		interviewStore.interviewStatus === 'starting' ||
+		interviewStore.interviewStatus === 'in_progress' ||
+		interviewStore.interviewStatus === 'suspend'
+	) {
+		toast.add({
+			title: '温馨提示',
+			description: '您当前正在面试中，请先完成面试后再进行切换',
+			color: 'warning',
+			icon: 'i-heroicons-lock-closed'
+		})
+		return
+	}
+
 	// 禁止点击未解锁的步骤
 	if (stepId > interviewStore.currentStep) {
 		toast.add({

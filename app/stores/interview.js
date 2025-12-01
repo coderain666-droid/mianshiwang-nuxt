@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { isEmpty } from '@/utils'
 
 export const useInterviewStore = defineStore('interview', {
 	state: () => ({
@@ -27,8 +28,14 @@ jd: ''
 		resumeText: '', // 简历文本（当 type='text' 时）
 
 		// 第二步：面试过程
-		interviewId: null, // 面试会话 ID
-		interviewStatus: 'idle', // idle, starting, in_progress, ended
+		// 面试会话 ID
+		interviewId: null,
+		// idle：未进入面试状态，不需要关心
+		// starting：面试已经开始，但是费用暂未扣除，处于倒计时阶段
+		// in_progress：面试已经开始，费用已经扣除。此时用户进入服务页面，将直接跳转到面试页面
+		// suspend：用户点击了暂停面试的按钮，但并不意味着面试结束
+		// ended：面试已经结束
+		interviewStatus: 'idle',
 		messages: [], // 对话消息列表 [{ role: 'user'|'assistant', content: string, timestamp: Date }]
 		isStreaming: false, // 是否正在流式输出
 
@@ -48,7 +55,10 @@ jd: ''
 		// 是否可以进入下一步
 		canGoToNextStep: (state) => {
 			if (state.currentStep === 1) {
-				return state.selectedPosition && (state.resumeId || state.resumeText)
+				return (
+					!isEmpty(state.selectedPosition) &&
+					(state.resumeId || state.resumeText)
+				)
 			}
 			if (state.currentStep === 2) {
 				return state.interviewStatus === 'ended'

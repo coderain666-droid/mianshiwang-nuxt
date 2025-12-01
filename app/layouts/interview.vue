@@ -11,7 +11,7 @@
 				>
 					<div class="flex items-center gap-2 text-slate-500 text-sm">
 						<NuxtLink
-							to="/"
+							@click="onGoHome"
 							class="hover:text-primary-600 transition-colors flex items-center gap-1"
 						>
 							<UIcon name="i-heroicons-home" class="w-4 h-4" />
@@ -19,7 +19,7 @@
 						</NuxtLink>
 						<span class="text-slate-300">/</span>
 						<NuxtLink
-							:to="route.query.resultId ? '/history' : '/interview/start'"
+							@click="onGoStart"
 							class="hover:text-primary-600 transition-colors flex items-center gap-1"
 						>
 							{{ route.query.resultId ? '服务记录' : '开始专项服务' }}
@@ -55,14 +55,16 @@
 
 <script setup>
 import { computed, onMounted, watch } from 'vue'
-import { useRoute, navigateTo } from '#imports'
+import { useRoute, navigateTo, useToast } from '#imports'
 import { useInterviewStore } from '@/stores/interview'
 import { useUserStore } from '@/stores/user'
 import { SERVICE_TAGS, serviceHighlights } from '@/constants/vip'
 import InterviewSidebar from '@/components/interview/InterviewSidebar.vue'
 import { getUserInfoAPI } from '@/api/user'
+import { isEmpty } from '@/utils'
 
 const route = useRoute()
+const toast = useToast()
 const interviewStore = useInterviewStore()
 const userStore = useUserStore()
 const { $api } = useNuxtApp()
@@ -114,6 +116,17 @@ onMounted(() => {
 		return
 	}
 
+	// 根据当前面试的状态，来决定后续跳转的逻辑。
+	// 如果当前面试处于 进行中 ｜｜ 暂停中 的状态，则表示面试尚未结束，那么此时需要跳转到面试页面
+	if (isInterviewing.value) {
+		// 面试分为 专项面试 和 综合面试 两种，需要根据不同的状态进行跳转
+		if (interviewStore.selectedService === SERVICE_TAGS.SPECIAL) {
+			navigateTo('/interview/special')
+		} else if (interviewStore.selectedService === SERVICE_TAGS.BEHAVIOR) {
+			navigateTo('/interview/behavior')
+		}
+	}
+
 	// 报告页面守卫
 	if (currentPath === '/interview/report') {
 		// 检查是否已生成报告
@@ -135,7 +148,7 @@ onMounted(() => {
 	const requiredService = serviceRouteMap[currentPath]
 	if (requiredService) {
 		// 检查是否已选择岗位
-		if (!interviewStore.selectedPosition) {
+		if (isEmpty(interviewStore.selectedPosition)) {
 			navigateTo('/interview/start')
 			return
 		}
@@ -159,6 +172,41 @@ watch(
 		}
 	}
 )
+
+const isInterviewing = computed(() => {
+	return (
+		interviewStore.interviewStatus === 'starting' ||
+		interviewStore.interviewStatus === 'in_progress' ||
+		interviewStore.interviewStatus === 'suspend'
+	)
+})
+
+const onGoHome = () => {
+	if (isInterviewing.value) {
+		toast.add({
+			title: '温馨提示',
+			description: '您当前正在面试中，请先完成面试后再进行切换',
+			color: 'warning',
+			icon: 'i-heroicons-lock-closed'
+		})
+		return
+	}
+	navigateTo('/')
+}
+
+const onGoStart = () => {
+	if (isInterviewing.value) {
+		toast.add({
+			title: '温馨提示',
+			description: '您当前正在面试中，请先完成面试后再进行切换',
+			color: 'warning',
+			icon: 'i-heroicons-lock-closed'
+		})
+		return
+	}
+	const targetPath = route.query.resultId ? '/history' : '/interview/start'
+	navigateTo(targetPath)
+}
 </script>
 
 <style scoped></style>

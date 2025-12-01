@@ -2,13 +2,17 @@
 	<div class="h-full">
 		<!-- input 输入 -->
 		<StepInput
-			v-if="step === 'input'"
+			v-if="interviewStore.interviewStatus === 'idle'"
 			service-type="special"
 			@submit="handleComplete"
 		/>
 		<!-- 专项面试 -->
 		<StepInterview
-			v-else-if="step === 'interview'"
+			v-else-if="
+				interviewStore.interviewStatus === 'starting' ||
+				interviewStore.interviewStatus === 'in_progress' ||
+				interviewStore.interviewStatus === 'suspend'
+			"
 			@cancel="handleCancel"
 			@complete="handleComplete"
 		/>
@@ -44,9 +48,6 @@ useHead({
 		}
 	]
 })
-
-// 步骤
-const step = ref('input') // input | interview
 
 const toast = useToast()
 const globalModal = useGlobalModal()
@@ -94,7 +95,7 @@ const handleComplete = () => {
 
 				globalModal.closeModal()
 				// 开始专项面试流程
-				step.value = 'interview'
+				interviewStore.interviewStatus = 'starting'
 			}
 		},
 		buttons: [],
@@ -103,7 +104,7 @@ const handleComplete = () => {
 }
 
 const handleCancel = () => {
-	step.value = 'input'
+	interviewStore.interviewStatus = 'idle'
 
 	toast.add({
 		title: '面试已取消',
