@@ -596,7 +596,9 @@ let mouthAnimationInterval = null
 let soundWaveInterval = null
 let eyebrowInterval = null
 
-// 计算属性
+/**
+ * 面试是否正在进行
+ */
 const isOnline = computed(() => {
 	return (
 		interviewStore.interviewStatus === 'in_progress' ||
@@ -604,12 +606,15 @@ const isOnline = computed(() => {
 	)
 })
 
+/**
+ * 面试官是否正在说话
+ */
 const isSpeaking = computed(() => {
-	return interviewStore.isStreaming
+	return interviewStore.interviewEventType === 'question'
 })
 
 const statusText = computed(() => {
-	if (isSpeaking.value) return '正在分析您的回答...'
+	if (isSpeaking.value) return '面试官正在说话...'
 	if (isOnline.value) return '正在倾听...'
 	return '准备就绪'
 })
@@ -705,13 +710,13 @@ const animateEyebrow = () => {
 
 // 监听流式输出
 watch(
-	() => interviewStore.isStreaming,
-	(isStreaming) => {
-		if (isStreaming) {
+	() => interviewStore.interviewEventType,
+	(interviewEventType) => {
+		if (interviewEventType === 'question') {
 			animateSoundWave()
 			const lastMessage =
 				interviewStore.messages[interviewStore.messages.length - 1]
-			if (lastMessage && lastMessage.role === 'assistant') {
+			if (lastMessage && lastMessage.role === 'interviewer') {
 				animateMouth(lastMessage.content)
 			}
 		} else {
@@ -733,7 +738,10 @@ watch(
 	(messages) => {
 		if (messages.length > 0) {
 			const lastMessage = messages[messages.length - 1]
-			if (lastMessage.role === 'assistant' && interviewStore.isStreaming) {
+			if (
+				lastMessage.role === 'interviewer' &&
+				interviewStore.interviewEventType === 'question'
+			) {
 				animateMouth(lastMessage.content)
 			}
 		}

@@ -117,7 +117,9 @@
 								base: 'pr-24 py-3 pl-4 rounded-xl border-gray-200 focus:ring-primary-500 focus:border-primary-500 bg-gray-50 focus:bg-white transition-colors duration-200',
 								placeholder: 'text-gray-400'
 							}"
-							@keydown.enter.exact.prevent="handleSendMessage"
+							@keydown.enter.exact.prevent="handleEnterKey"
+							@compositionstart="handleCompositionStart"
+							@compositionend="handleCompositionEnd"
 						/>
 						<div class="absolute bottom-3 right-3 flex items-center gap-2">
 							<UButton
@@ -231,6 +233,7 @@ const countdown = ref(5)
 const inputMessage = ref('')
 const messagesContainerRef = ref(null)
 let closeMockInterview = null
+const isComposing = ref(false) // 是否正在使用输入法组合输入
 
 /**
  * 是否可以发送消息
@@ -366,6 +369,27 @@ const connectSSE = (sessionId) => {
 	}
 
 	startInterview()
+}
+
+// 处理输入法组合开始
+const handleCompositionStart = () => {
+	isComposing.value = true
+}
+
+// 处理输入法组合结束
+const handleCompositionEnd = () => {
+	isComposing.value = false
+}
+
+// 处理回车键
+const handleEnterKey = (event) => {
+	// 如果正在使用输入法组合输入，不发送消息
+	if (isComposing.value) {
+		return
+	}
+
+	// 否则发送消息
+	handleSendMessage()
 }
 
 // 发送消息

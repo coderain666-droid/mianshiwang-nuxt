@@ -140,7 +140,6 @@ jd: ''
 		// 结束面试
 		endInterview() {
 			this.interviewStatus = 'ended'
-			this.isStreaming = false
 		},
 
 		// 设置报告
