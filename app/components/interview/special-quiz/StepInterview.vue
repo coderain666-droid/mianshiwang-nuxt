@@ -4,7 +4,7 @@
 			class="grid lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-6 flex-1 min-h-0"
 		>
 			<!-- 左侧：对话区域（占2列） -->
-			<AIDialogue />
+			<AIDialogue ref="AIDialogueRef" />
 
 			<!-- 右侧：3D 数字人（占1列） -->
 			<ThreeDDigitalPeople />
@@ -40,6 +40,8 @@ const globalModal = useGlobalModal()
 
 const showCountdown = ref(false)
 const countdown = ref(5)
+
+const AIDialogueRef = ref(null)
 
 // 完成并查看报告
 const handleComplete = async () => {
@@ -92,7 +94,7 @@ const startCountdown = () => {
 		if (countdown.value <= 0) {
 			clearInterval(timer)
 			showCountdown.value = false
-			startInterview()
+			AIDialogueRef.value.startInterview()
 		}
 	}, 1000)
 }

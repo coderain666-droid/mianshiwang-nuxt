@@ -192,6 +192,8 @@ import {
 import { onMounted, onUnmounted, ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useToast } from '#imports'
+import { useGlobalModal } from '@/composables/useGlobalModal'
+const globalModal = useGlobalModal()
 
 const interviewStore = useInterviewStore()
 
@@ -490,4 +492,8 @@ const endInterview = () => {
 		]
 	})
 }
+
+defineExpose({
+	startInterview
+})
 </script>
