@@ -196,6 +196,7 @@ const ModalHost = defineComponent({
 					description: props.options.description,
 					'onUpdate:open': handleUpdateOpen,
 					preventClose: props.options.preventClose ?? false,
+					close: props.options.close ?? true,
 					ui: modalUi.value
 				},
 				bodyContainer()

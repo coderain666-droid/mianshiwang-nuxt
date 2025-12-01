@@ -652,6 +652,7 @@ onMounted(() => {
 		content: '点击确定按钮，面试将在「5秒」后开始。点击取消按钮，返回上一步',
 		dismissible: false,
 		preventClose: true,
+		close: false,
 		buttons: [
 			{
 				label: '取消',
