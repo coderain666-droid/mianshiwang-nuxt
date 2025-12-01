@@ -53,6 +53,7 @@ import StepInput from '@/components/interview/resume-quiz/StepInput.vue'
 import StepProgress from '@/components/interview/resume-quiz/StepProgress.vue'
 import StepComplete from '@/components/interview/resume-quiz/StepComplete.vue'
 import StepError from '@/components/interview/resume-quiz/StepError.vue'
+import { MIN_JD_LENGTH, MAX_JD_LENGTH } from '../../constants'
 
 // TODO：处理在押题过程中可能出现的其他问题，比如：用户刷新页面、点击了跳转其他页面的按钮 等
 
@@ -170,19 +171,6 @@ const getCategoryName = (category) => {
 
 // 点击押题按钮
 const handlePredictClick = () => {
-	// JD 字数判断 50 ~ 2000 字之间
-	if (
-		interviewStore.selectedPosition.jd?.trim().length < 50 ||
-		interviewStore.selectedPosition.jd?.trim().length > 2000
-	) {
-		toast.add({
-			title: '请填写更加详细的岗位职责（JD）',
-			description: '以便生成更加准确的押题数据（最少 50 字）',
-			color: 'error'
-		})
-		return
-	}
-
 	// 生成本次提交的唯一请求ID（用于幂等性控制）
 	// 在用户确认前生成，确保同一次确认操作使用相同的 requestId
 	const requestId = uuidv4()

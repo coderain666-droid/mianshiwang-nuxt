@@ -153,23 +153,32 @@
 							</UButton>
 							<UButton
 								v-else-if="
-									interviewStatus === 'idle' || interviewStatus === 'starting'
+									interviewStatus === 'starting' ||
+									interviewStatus === 'in_progress'
 								"
-								color="primary"
+								color="warning"
 								size="xs"
 								variant="soft"
-								:loading="interviewStatus === 'starting'"
-								icon="i-heroicons-play"
-								@click="startInterview"
+								icon="i-heroicons-pause"
+								@click="suspendInterview"
 							>
-								开始面试
+								暂停面试
 							</UButton>
 							<UButton
-								v-else
-								color="red"
+								v-else-if="interviewStatus === 'suspended'"
+								color="warning"
+								size="xs"
+								variant="soft"
+								icon="i-heroicons-play"
+								@click="restartInterview"
+							>
+								继续面试
+							</UButton>
+							<UButton
+								color="error"
 								variant="ghost"
 								size="xs"
-								icon="i-heroicons-stop"
+								icon="i-heroicons-stop-circle"
 								@click="endInterview"
 							>
 								结束面试
@@ -550,41 +559,6 @@ const handleSendMessage = async () => {
 	}
 }
 
-// 结束面试
-const endInterview = async () => {
-	try {
-		// TODO: 调用 API 结束面试
-		// await $api(`/interview/${interviewStore.interviewId}/end`, {
-		// 	method: 'POST'
-		// })
-
-		interviewStore.endInterview()
-
-		// 关闭 SSE 连接
-		if (eventSource.value) {
-			eventSource.value.close()
-			eventSource.value = null
-		}
-
-		toast.add({
-			title: '面试已结束',
-			description: '正在生成评估报告...',
-			color: 'info'
-		})
-
-		// 自动生成报告
-		setTimeout(() => {
-			handleComplete()
-		}, 1500)
-	} catch (error) {
-		toast.add({
-			title: '结束失败',
-			description: error.message || '请稍后重试',
-			color: 'error'
-		})
-	}
-}
-
 // 完成并查看报告
 const handleComplete = async () => {
 	// TODO: 调用 API 生成报告
@@ -687,6 +661,79 @@ onUnmounted(() => {
 		eventSource.value = null
 	}
 })
+
+/**
+ * 暂停面试
+ */
+const suspendInterview = () => {
+	// TODO：暂停面试的流程
+	interviewStore.interviewStatus = 'suspend'
+}
+
+/**
+ * 恢复面试
+ */
+const restartInterview = () => {
+	// TODO：恢复面试的流程
+	interviewStore.interviewStatus = 'in_progress'
+}
+
+/**
+ * 结束面试
+ */
+const endInterview = () => {
+	globalModal.showModal({
+		title: '提示',
+		description: '确定要主动结束当前面试吗？结束后将生成面试报告。',
+		buttons: [
+			{
+				label: '取消',
+				color: 'gray',
+				variant: 'ghost',
+				onClick: () => {}
+			},
+			{
+				label: '确定',
+				color: 'error',
+				onClick: () => {
+					// TODO：结束面试
+
+					try {
+						// TODO: 调用 API 结束面试
+						// await $api(`/interview/${interviewStore.interviewId}/end`, {
+						// 	method: 'POST'
+						// })
+
+						interviewStore.endInterview()
+
+						// 关闭 SSE 连接
+						if (eventSource.value) {
+							eventSource.value.close()
+							eventSource.value = null
+						}
+
+						toast.add({
+							title: '面试已结束',
+							description: '正在生成评估报告...',
+							color: 'info'
+						})
+
+						// 自动生成报告
+						setTimeout(() => {
+							handleComplete()
+						}, 1500)
+					} catch (error) {
+						toast.add({
+							title: '结束失败',
+							description: error.message || '请稍后重试',
+							color: 'error'
+						})
+					}
+				}
+			}
+		]
+	})
+}
 </script>
 
 <style scoped>

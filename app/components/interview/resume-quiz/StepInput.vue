@@ -158,7 +158,9 @@
 							class="text-[10px] font-medium text-red-500 bg-red-50 px-2 py-0.5 rounded-full border border-red-100"
 							>必填</span
 						>
-						<span class="text-xs text-neutral-400">50 ~ 800 字</span>
+						<span class="text-xs text-neutral-400"
+							>{{ MIN_JD_LENGTH }} ~ {{ MAX_JD_LENGTH }} 字</span
+						>
 					</label>
 					<div class="flex items-center gap-2">
 						<transition
@@ -234,7 +236,7 @@
 					:color="serviceConfig.buttonColor"
 					class="w-full sm:w-auto px-12 hover:shadow-primary-500/30 hover:-translate-y-0.5 transition-all duration-300"
 					:loading="isProcessing"
-					@click="$emit('submit')"
+					@click="handleSubmit"
 					:ui="{ rounded: 'rounded-xl' }"
 				>
 					<span class="font-bold text-base">{{
@@ -255,6 +257,8 @@
 <script setup>
 import { computed } from 'vue'
 import { useInterviewStore } from '@/stores/interview'
+import { useToast } from '#imports'
+import { MIN_JD_LENGTH, MAX_JD_LENGTH } from '@/constants'
 
 const props = defineProps({
 	isProcessing: {
@@ -271,6 +275,8 @@ const props = defineProps({
 defineEmits(['submit'])
 
 const interviewStore = useInterviewStore()
+
+const toast = useToast()
 
 // 服务类型配置
 const SERVICE_CONFIGS = {
@@ -343,4 +349,25 @@ const SERVICE_CONFIGS = {
 const serviceConfig = computed(() => {
 	return SERVICE_CONFIGS[props.serviceType] || SERVICE_CONFIGS.resume
 })
+
+/**
+ * 提交押题
+ */
+const handleSubmit = () => {
+	// JD 字数判断 50 ~ 800 字之间
+
+	if (
+		interviewStore.selectedPosition.jd?.trim().length < MIN_JD_LENGTH ||
+		interviewStore.selectedPosition.jd?.trim().length > MAX_JD_LENGTH
+	) {
+		toast.add({
+			title: '请填写更加详细的岗位职责（JD）',
+			description: '以便生成更加准确的服务数据（最少 50 字）',
+			color: 'error'
+		})
+		return
+	}
+
+	$emit('submit')
+}
 </script>
