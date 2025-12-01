@@ -16,6 +16,14 @@
 			@cancel="handleCancel"
 			@complete="handleComplete"
 		/>
+
+		<!-- TODO：临时的展示 -->
+		<div v-else>
+			面试结束，展示面试报告
+			<UButton @click="interviewStore.interviewStatus = 'idle'"
+				>重新开始</UButton
+			>
+		</div>
 	</div>
 </template>
 
