@@ -632,7 +632,7 @@ onMounted(() => {
 			close: false,
 			buttons: [
 				{
-					label: '取消',
+					label: '取消面试，返回上层',
 					color: 'error',
 					variant: 'ghost',
 					onClick: () => {
@@ -640,7 +640,7 @@ onMounted(() => {
 					}
 				},
 				{
-					label: '确定',
+					label: '我知道了，开始面试',
 					color: 'success',
 					onClick: () => {
 						// 改变面试的状态标记

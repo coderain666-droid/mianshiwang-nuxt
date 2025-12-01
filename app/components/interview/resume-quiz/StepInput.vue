@@ -272,7 +272,7 @@ const props = defineProps({
 	}
 })
 
-defineEmits(['submit'])
+const emit = defineEmits(['submit'])
 
 const interviewStore = useInterviewStore()
 
@@ -368,6 +368,6 @@ const handleSubmit = () => {
 		return
 	}
 
-	$emit('submit')
+	emit('submit')
 }
 </script>
