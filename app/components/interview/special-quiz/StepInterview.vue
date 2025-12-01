@@ -286,6 +286,19 @@
 				<InterviewTip :range-time="60" />
 			</div>
 		</div>
+
+		<!-- 倒计时遮罩 -->
+		<div
+			v-if="showCountdown"
+			class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm text-white"
+		>
+			<div class="text-9xl font-bold mb-12 animate-pulse text-primary-400">
+				{{ countdown }}
+			</div>
+			<div class="text-3xl font-medium tracking-wider animate-bounce">
+				请做好准备，面试即将开始
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -303,6 +316,9 @@ const interviewStore = useInterviewStore()
 const userStore = useUserStore()
 const toast = useToast()
 const globalModal = useGlobalModal()
+
+const showCountdown = ref(false)
+const countdown = ref(5)
 
 const inputMessage = ref('')
 const messagesContainerRef = ref(null)
@@ -611,6 +627,19 @@ const handleComplete = async () => {
 	emit('complete')
 }
 
+const startCountdown = () => {
+	showCountdown.value = true
+	countdown.value = 5
+	const timer = setInterval(() => {
+		countdown.value--
+		if (countdown.value <= 0) {
+			clearInterval(timer)
+			showCountdown.value = false
+			startInterview()
+		}
+	}, 1000)
+}
+
 onMounted(() => {
 	// 如果面试已开始，恢复 SSE 连接
 	if (interviewStore.interviewId && interviewStatus.value === 'in_progress') {
@@ -622,15 +651,23 @@ onMounted(() => {
 			'面试中请保持网络稳定，如遇网络波动导致面试中断，可刷新页面继续进行面试',
 		content: '点击确定按钮，面试将在「5秒」后开始。点击取消按钮，返回上一步',
 		dismissible: false,
+		preventClose: true,
 		buttons: [
 			{
 				label: '取消',
 				color: 'error',
+				variant: 'ghost',
 				onClick: () => {
 					emit('cancel')
 				}
 			},
-			{ label: '确定', color: 'success', onClick: () => {} }
+			{
+				label: '确定',
+				color: 'success',
+				onClick: () => {
+					startCountdown()
+				}
+			}
 		]
 	})
 })
