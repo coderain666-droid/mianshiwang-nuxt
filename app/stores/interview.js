@@ -34,6 +34,8 @@ jd: ''
 		// suspend：用户点击了暂停面试的按钮，但并不意味着面试结束
 		// ended：面试已经结束
 		interviewStatus: 'idle',
+		// 已面试时长（字符串，格式：HH:mm:ss）
+		interviewDuration: '00:00:00',
 		/*
 		所有的对话集合，包括了：面试官（interviewer） + 候选人（user）
 	 {"role": "interviewer","type":"start","sessionId":"f61f5e8c-8b2b-4793-b015-711dfa0ab7d2","interviewerName":"孙娜","content":"你好，","questionNumber":0,"totalQuestions":12,"elapsedMinutes":0}
@@ -154,6 +156,7 @@ jd: ''
 		resetInterview() {
 			this.interviewId = null
 			this.interviewStatus = 'idle'
+			this.interviewDuration = '00:00:00'
 			this.messages = []
 			this.interviewerName = '正在分配面试官...'
 			this.interviewEventType = 'start'

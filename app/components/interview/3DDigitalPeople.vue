@@ -9,23 +9,29 @@
 					{{ interviewStore.selectedPosition?.positionName || '通用岗位' }}
 				</p>
 			</div>
-			<div class="flex items-center gap-1.5">
-				<span class="relative flex h-2.5 w-2.5">
+			<div class="flex flex-col justify-around h-full">
+				<div class="flex items-center gap-1 justify-end">
+					<span class="relative flex h-2.5 w-2.5">
+						<span
+							v-if="isOnline"
+							class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
+						></span>
+						<span
+							class="relative inline-flex rounded-full h-2.5 w-2.5"
+							:class="isOnline ? 'bg-green-500' : 'bg-gray-300'"
+						></span>
+					</span>
 					<span
-						v-if="isOnline"
-						class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"
-					></span>
-					<span
-						class="relative inline-flex rounded-full h-2.5 w-2.5"
-						:class="isOnline ? 'bg-green-500' : 'bg-gray-300'"
-					></span>
-				</span>
-				<span
-					class="text-xs font-medium"
-					:class="isOnline ? 'text-green-600' : 'text-neutral-400'"
-				>
-					{{ isOnline ? '在线' : '离线' }}
-				</span>
+						class="text-xs font-medium"
+						:class="isOnline ? 'text-green-600' : 'text-neutral-400'"
+					>
+						{{ isOnline ? '在线' : '离线' }}
+					</span>
+				</div>
+
+				<div class="text-xs text-neutral-500">
+					已面试：{{ interviewStore.interviewDuration || '00:00:00' }}
+				</div>
 			</div>
 		</div>
 
@@ -590,11 +596,15 @@ const mouthOpen = ref(0)
 const soundWave = ref(0)
 const eyebrowOffset = ref(0)
 
+// 面试时长（秒）
+const elapsedSeconds = ref(0)
+
 // 定时器
 let blinkInterval = null
 let mouthAnimationInterval = null
 let soundWaveInterval = null
 let eyebrowInterval = null
+let durationInterval = null
 
 /**
  * 面试是否正在进行
@@ -605,6 +615,26 @@ const isOnline = computed(() => {
 		interviewStore.interviewStatus === 'starting'
 	)
 })
+
+// 已面试时长（格式化为 HH:mm:ss）
+const formattedDuration = computed(() => {
+	const total = elapsedSeconds.value
+	const hours = Math.floor(total / 3600)
+	const minutes = Math.floor((total % 3600) / 60)
+	const seconds = total % 60
+
+	const pad = (n) => String(n).padStart(2, '0')
+	return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+})
+
+// 监听 formattedDuration，同步到全局 store，方便其他组件使用
+watch(
+	formattedDuration,
+	(value) => {
+		interviewStore.interviewDuration = value
+	},
+	{ immediate: true }
+)
 
 /**
  * 面试官是否正在说话
@@ -644,6 +674,23 @@ const startBlinking = () => {
 			blink()
 		}
 	}, 3000)
+}
+
+// 启动/停止计时器
+const startDurationTimer = () => {
+	// 避免重复开启
+	if (durationInterval) return
+
+	durationInterval = setInterval(() => {
+		elapsedSeconds.value += 1
+	}, 1000)
+}
+
+const stopDurationTimer = () => {
+	if (durationInterval) {
+		clearInterval(durationInterval)
+		durationInterval = null
+	}
 }
 
 // 嘴巴动画
@@ -752,6 +799,26 @@ watch(
 onMounted(() => {
 	startBlinking()
 	animateEyebrow()
+
+	// 根据当前状态决定是否需要启动计时器
+	if (isOnline.value) {
+		startDurationTimer()
+	}
+
+	// 监听面试状态变化，控制计时器
+	watch(
+		() => interviewStore.interviewStatus,
+		(status) => {
+			if (status === 'in_progress') {
+				// 重新开始面试时从 0 开始计时
+				elapsedSeconds.value = 0
+				startDurationTimer()
+			} else if (status === 'ended' || status === 'idle') {
+				stopDurationTimer()
+			}
+		},
+		{ immediate: false }
+	)
 })
 
 onUnmounted(() => {
@@ -759,6 +826,7 @@ onUnmounted(() => {
 	if (mouthAnimationInterval) clearInterval(mouthAnimationInterval)
 	if (soundWaveInterval) clearInterval(soundWaveInterval)
 	if (eyebrowInterval) clearInterval(eyebrowInterval)
+	if (durationInterval) clearInterval(durationInterval)
 })
 </script>
 
