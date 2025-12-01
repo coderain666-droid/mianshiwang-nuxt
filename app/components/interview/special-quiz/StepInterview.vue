@@ -13,7 +13,7 @@
 					class="flex-1 overflow-y-auto p-6 space-y-4"
 				>
 					<div
-						v-if="messages.length === 0"
+						v-if="interviewStore.messages.length === 0"
 						class="flex items-center justify-center h-full"
 					>
 						<div class="text-center">
@@ -26,7 +26,7 @@
 					</div>
 
 					<div
-						v-for="(message, index) in messages"
+						v-for="(message, index) in interviewStore.messages"
 						:key="index"
 						:class="[
 							'flex gap-4',
@@ -63,10 +63,9 @@
 									: 'bg-white border border-gray-100 text-neutral-800 rounded-tl-none'
 							]"
 						>
-							<div
-								class="whitespace-pre-wrap wrap-break-word"
-								v-html="formatMessage(message.content)"
-							></div>
+							<div class="whitespace-pre-wrap wrap-break-word">
+								{{ message.content }}
+							</div>
 						</div>
 					</div>
 
@@ -189,7 +188,7 @@
 			</div>
 
 			<!-- 右侧：3D 数字人（占1列） -->
-			<ThreeDDigitalPeople />
+			<ThreeDDigitalPeople :interviewer-name="interviewerName" />
 		</div>
 
 		<!-- 倒计时遮罩 -->
@@ -214,6 +213,7 @@ import { useUserStore } from '@/stores/user'
 import { useToast } from '#imports'
 import { useGlobalModal } from '@/composables/useGlobalModal'
 import ThreeDDigitalPeople from '@/components/interview/3DDigitalPeople.vue'
+import { startMockInterviewAPI } from '@/api/interview'
 
 const emit = defineEmits(['complete', 'cancel'])
 
@@ -227,9 +227,7 @@ const countdown = ref(5)
 
 const inputMessage = ref('')
 const messagesContainerRef = ref(null)
-const eventSource = ref(null)
-
-const messages = computed(() => interviewStore.messages)
+let closeMockInterview = null
 
 const canSendMessage = computed(() => {
 	return (
@@ -237,13 +235,6 @@ const canSendMessage = computed(() => {
 		!interviewStore.isStreaming.value
 	)
 })
-
-// 格式化消息内容
-const formatMessage = (content) => {
-	if (!content) return ''
-	// 将换行符转换为 <br>
-	return content.replace(/\n/g, '<br>')
-}
 
 // 滚动到底部
 const scrollToBottom = () => {
@@ -257,38 +248,72 @@ const scrollToBottom = () => {
 
 // 监听消息变化，自动滚动
 watch(
-	messages,
+	interviewStore.messages,
 	() => {
 		scrollToBottom()
 	},
 	{ deep: true }
 )
 
+// 面试的链接 ID
+const sessionId = ref(null)
+// 面试官名称
+const interviewerName = ref(null)
 // 开始面试
 const startInterview = async () => {
 	try {
-		// TODO: 调用 API 开始面试
-		// const response = await $api('/interview/start', {
-		// 	method: 'POST',
-		// 	body: {
-		// 		positionId: interviewStore.selectedPosition.id,
-		// 		resumeUrl: interviewStore.resumeUrl,
-		// 		resumeText: interviewStore.resumeText
-		// 	}
-		// })
+		// TODO: 调用 API 开始面试，返回关闭链接的 方法
 
-		// 模拟 API 响应
-		const interviewId = `interview_${Date.now()}`
-		interviewStore.startInterview(interviewId)
+		const params = {
+			interviewType: 'special',
+			resumeId: interviewStore.resumeId,
+			resumeContent: interviewStore.resumeText,
+			company: interviewStore.selectedPosition.company || '',
+			positionName: interviewStore.selectedPosition.positionName || '',
+			minSalary: interviewStore.selectedPosition.minSalary || '',
+			maxSalary: interviewStore.selectedPosition.maxSalary || '',
+			jd: interviewStore.selectedPosition.jd || ''
+		}
 
-		// 开始 SSE 连接
-		connectSSE(interviewId)
+		// 获取配置
+		const config = useRuntimeConfig()
 
-		toast.add({
-			title: '面试开始',
-			color: 'success'
+		const { close } = startMockInterviewAPI(params, {
+			token: userStore.token,
+			baseURL: config.public.apiBase,
+			callbacks: {
+				onMessage: (data) => {
+					console.log('SSE Message:', data)
+
+					const { type } = data
+					// 面试开始，包含开场白
+					if (type === 'start') {
+						sessionId.value = data.sessionId
+						interviewerName.value = data.interviewerName
+						interviewStore.messages.push({
+							...data,
+							role: 'interviewer'
+						})
+					}
+					// 等待候选人回答
+					else if (type === 'waiting') {
+					}
+					// 发生错误
+					else if (type === 'error') {
+					}
+				},
+				onError: (error) => {
+					console.error('SSE Error:', error)
+
+					toast.add({
+						title: '面试启动失败',
+						description: error.message || '网络错误，请稍后重试',
+						color: 'error'
+					})
+				}
+			}
 		})
-
+		closeMockInterview = close
 		// 改变状态标记
 		interviewStore.interviewStatus = 'in_progress'
 	} catch (error) {
@@ -304,42 +329,11 @@ const startInterview = async () => {
 // 连接 SSE 流式输出
 const connectSSE = (interviewId) => {
 	// 关闭旧的连接
-	if (eventSource.value) {
-		eventSource.value.close()
+	if (closeMockInterview) {
+		closeMockInterview()
 	}
 
-	// TODO: 实际 SSE 连接地址
-	// const sseUrl = `/api/interview/${interviewId}/stream`
-
-	// 模拟 SSE 连接（实际应使用 EventSource）
-	// eventSource.value = new EventSource(sseUrl, {
-	// 	withCredentials: true
-	// })
-
-	// 模拟流式输出（实际应从 SSE 接收数据）
-	setTimeout(() => {
-		const welcomeMessage = `你好！我是今天的 AI 面试官。我看到你申请的是 ${interviewStore.selectedPosition?.name} 岗位。让我们开始今天的面试吧。
-
-首先，请你简单介绍一下自己，并说明为什么对这个岗位感兴趣？`
-
-		interviewStore.setStreaming(true)
-		simulateStreaming(welcomeMessage)
-	}, 1000)
-
-	// 实际 SSE 事件处理
-	// eventSource.value.onmessage = (event) => {
-	// 	const data = JSON.parse(event.data)
-	// 	if (data.type === 'message') {
-	// 		interviewStore.updateLastMessage(data.content)
-	// 	} else if (data.type === 'done') {
-	// 		interviewStore.setStreaming(false)
-	// 	}
-	// }
-
-	// eventSource.value.onerror = (error) => {
-	// 	console.error('SSE error:', error)
-	// 	eventSource.value.close()
-	// }
+	startInterview()
 }
 
 // 模拟流式输出
@@ -496,9 +490,9 @@ onMounted(() => {
 
 onUnmounted(() => {
 	// 清理 SSE 连接
-	if (eventSource.value) {
-		eventSource.value.close()
-		eventSource.value = null
+	if (closeMockInterview) {
+		closeMockInterview()
+		closeMockInterview = null
 	}
 })
 
@@ -547,9 +541,9 @@ const endInterview = () => {
 						interviewStore.endInterview()
 
 						// 关闭 SSE 连接
-						if (eventSource.value) {
-							eventSource.value.close()
-							eventSource.value = null
+						if (closeMockInterview) {
+							closeMockInterview()
+							closeMockInterview = null
 						}
 
 						toast.add({

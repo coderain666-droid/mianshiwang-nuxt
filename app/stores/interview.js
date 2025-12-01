@@ -36,7 +36,11 @@ jd: ''
 		// suspend：用户点击了暂停面试的按钮，但并不意味着面试结束
 		// ended：面试已经结束
 		interviewStatus: 'idle',
-		messages: [], // 对话消息列表 [{ role: 'user'|'assistant', content: string, timestamp: Date }]
+		/*
+		所有的对话集合，包括了：面试官（interviewer） + 候选人（user）
+	 {"role": "interviewer","type":"start","sessionId":"f61f5e8c-8b2b-4793-b015-711dfa0ab7d2","interviewerName":"孙娜","content":"你好，","questionNumber":0,"totalQuestions":12,"elapsedMinutes":0}
+*/
+		messages: [],
 		isStreaming: false, // 是否正在流式输出
 
 		// 第三步：报告

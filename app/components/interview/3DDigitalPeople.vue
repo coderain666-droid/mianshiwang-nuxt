@@ -548,9 +548,9 @@
 				<!-- 名称和状态 -->
 				<div class="text-center">
 					<h4 class="text-lg font-semibold text-neutral-800 mb-1">
-						{{ interviewerName }}
+						{{ interviewerName || '正在分配面试官...' }}
 					</h4>
-					<p class="text-sm text-neutral-500 mb-2">{{ interviewerTitle }}</p>
+					<p class="text-sm text-neutral-500 mb-2">资深技术面试官</p>
 					<div
 						class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300"
 						:class="statusClass"
@@ -580,11 +580,16 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import InterviewTip from '@/components/interview/interviewTip.vue'
 import { useInterviewStore } from '@/stores/interview'
 
+defineProps({
+	interviewerName: {
+		type: String,
+		default: '张老师'
+	}
+})
+
 const interviewStore = useInterviewStore()
 
 // 面试官信息
-const interviewerName = ref('张老师')
-const interviewerTitle = ref('资深技术面试官')
 
 // 动画状态
 const isBlinking = ref(false)
