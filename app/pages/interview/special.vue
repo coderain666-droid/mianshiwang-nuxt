@@ -13,6 +13,7 @@
 				interviewStore.interviewStatus === 'in_progress' ||
 				interviewStore.interviewStatus === 'suspend'
 			"
+			service-type="special"
 			@endInterview="handleEndInterview"
 		/>
 
@@ -103,16 +104,6 @@ const handleComplete = () => {
 		},
 		buttons: [],
 		preventClose: true
-	})
-}
-
-const handleCancel = () => {
-	interviewStore.interviewStatus = 'idle'
-
-	toast.add({
-		title: '面试已取消',
-		description: '面试次数已返还至账户',
-		color: 'error'
 	})
 }
 

@@ -4,9 +4,11 @@
 	>
 		<div class="p-5 border-b border-gray-100 flex items-center justify-between">
 			<div>
-				<h3 class="font-bold text-neutral-900">AI 面试官</h3>
+				<h3 class="font-bold text-neutral-900 flex items-end">AI 面试官</h3>
 				<p class="text-xs text-neutral-500 mt-0.5">
-					{{ interviewStore.selectedPosition?.positionName || '通用岗位' }}
+					{{ interviewStore.selectedPosition?.positionName || '通用岗位' }}（{{
+						serviceType === 'special' ? '专项面试' : '行测 + HR面试'
+					}}）
 				</p>
 			</div>
 			<div class="flex flex-col justify-around h-full">
@@ -585,6 +587,13 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import InterviewTip from '@/components/interview/interviewTip.vue'
 import { useInterviewStore } from '@/stores/interview'
+
+defineProps({
+	serviceType: {
+		type: String,
+		required: true
+	}
+})
 
 const interviewStore = useInterviewStore()
 

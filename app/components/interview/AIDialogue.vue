@@ -212,6 +212,13 @@ import { useRoute, useRouter } from '#imports'
 import EndingProgressModal from '@/components/interview/EndingProgressModal.vue'
 import AnswerAdviceModal from '@/components/interview/AnswerAdviceModal.vue'
 
+const props = defineProps({
+	serviceType: {
+		type: String,
+		required: true
+	}
+})
+
 const emit = defineEmits(['endInterview'])
 
 const route = useRoute()
@@ -266,7 +273,7 @@ const startInterview = async () => {
 	}
 	try {
 		const params = {
-			interviewType: 'special',
+			interviewType: props.serviceType,
 			resumeId: interviewStore.resumeId,
 			resumeContent: interviewStore.resumeText,
 			company: interviewStore.selectedPosition.company || '',

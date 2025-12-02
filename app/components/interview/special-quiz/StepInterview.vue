@@ -6,11 +6,12 @@
 			<!-- 左侧：对话区域（占2列） -->
 			<AIDialogue
 				ref="AIDialogueRef"
+				:service-type="serviceType"
 				@endInterview="$emit('endInterview', $event)"
 			/>
 
 			<!-- 右侧：3D 数字人（占1列） -->
-			<ThreeDDigitalPeople />
+			<ThreeDDigitalPeople :service-type="serviceType" />
 		</div>
 
 		<!-- 倒计时遮罩 -->
@@ -34,6 +35,13 @@ import { useInterviewStore } from '@/stores/interview'
 import { useGlobalModal } from '@/composables/useGlobalModal'
 import ThreeDDigitalPeople from '@/components/interview/3DDigitalPeople.vue'
 import AIDialogue from '@/components/interview/AIDialogue.vue'
+
+defineProps({
+	serviceType: {
+		type: String,
+		required: true
+	}
+})
 
 const emit = defineEmits(['handleEndInterview'])
 
