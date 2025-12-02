@@ -1,3 +1,74 @@
+const ssePost = (path, params, options) => {
+	if (typeof window === 'undefined') {
+		return { close: () => {} }
+	}
+
+	const { token, baseURL = '', callbacks = {} } = options || {}
+	const { onMessage, onError, onComplete } = callbacks
+
+	const url = `${baseURL}${path.startsWith('/') ? path : `/${path}`}`
+	let controller = null
+
+	const connect = async () => {
+		try {
+			controller = new AbortController()
+			const headers = {
+				'Content-Type': 'application/json',
+				Accept: 'text/event-stream'
+			}
+			if (token) headers.Authorization = `Bearer ${token}`
+			const response = await fetch(url, {
+				method: 'POST',
+				headers,
+				body: JSON.stringify(params),
+				credentials: 'include',
+				signal: controller.signal
+			})
+			if (!response.ok) {
+				const errorText = await response.text()
+				throw new Error(
+					`HTTP ${response.status}: ${errorText || response.statusText}`
+				)
+			}
+			const reader = response.body.getReader()
+			const decoder = new TextDecoder()
+			let buffer = ''
+			while (true) {
+				const { done, value } = await reader.read()
+				if (done) {
+					onComplete?.()
+					break
+				}
+				buffer += decoder.decode(value, { stream: true })
+				const lines = buffer.split('\n')
+				buffer = lines.pop() || ''
+				for (const line of lines) {
+					if (line.startsWith('data: ')) {
+						const data = line.slice(6).trim()
+						if (data === '[DONE]') {
+							onComplete?.()
+							return
+						}
+						try {
+							const parsed = JSON.parse(data)
+							onMessage?.(parsed)
+						} catch {
+							onMessage?.({ content: data })
+						}
+					}
+				}
+			}
+		} catch (error) {
+			if (error.name !== 'AbortError') {
+				onError?.(error)
+			}
+		}
+	}
+
+	connect()
+	return { close: () => controller?.abort() }
+}
+
 /**
  * 处理简历押题 - SSE 流式接口
  *
@@ -23,116 +94,7 @@
  * @returns {Object} 返回包含 close 方法的控制器对象
  */
 export const generateResumeQuizSSE = (params, options) => {
-	// 仅在浏览器环境中可用
-	if (typeof window === 'undefined') {
-		console.warn('SSE is only available in browser environment')
-		return { close: () => {} }
-	}
-
-	const { token, baseURL = '', callbacks = {} } = options
-	const { onMessage, onError, onComplete } = callbacks
-
-	// 构建完整的 URL
-	const url = `${baseURL}/interview/resume/quiz/stream`
-
-	// AbortController 用于取消请求
-	let controller = null
-
-	const connectSSE = async () => {
-		try {
-			controller = new AbortController()
-
-			// 构建请求头
-			const headers = {
-				'Content-Type': 'application/json',
-				Accept: 'text/event-stream'
-			}
-
-			// 添加 Authorization
-			if (token) {
-				headers.Authorization = `Bearer ${token}`
-			}
-
-			// 使用原生 fetch（SSE 必须）
-			const response = await fetch(url, {
-				method: 'POST',
-				headers,
-				body: JSON.stringify(params),
-				credentials: 'include', // 与 $api 保持一致
-				signal: controller.signal
-			})
-
-			// HTTP 错误处理
-			if (!response.ok) {
-				const errorText = await response.text()
-				throw new Error(
-					`HTTP ${response.status}: ${errorText || response.statusText}`
-				)
-			}
-
-			// 获取流式读取器
-			const reader = response.body.getReader()
-			const decoder = new TextDecoder()
-			let buffer = ''
-
-			// 持续读取流式数据
-			while (true) {
-				const { done, value } = await reader.read()
-
-				if (done) {
-					onComplete?.()
-					break
-				}
-
-				// 解码数据块
-				buffer += decoder.decode(value, { stream: true })
-
-				// 按行分割（SSE 以换行符分隔消息）
-				const lines = buffer.split('\n')
-				buffer = lines.pop() || '' // 保留最后一个不完整的行
-
-				// 处理每一行
-				for (const line of lines) {
-					if (line.startsWith('data: ')) {
-						const data = line.slice(6).trim()
-
-						// 处理完成标记
-						if (data === '[DONE]') {
-							onComplete?.()
-							return
-						}
-
-						// 解析 JSON 数据
-						try {
-							const parsed = JSON.parse(data)
-							onMessage?.(parsed)
-						} catch (e) {
-							// 如果不是 JSON，直接传递原始数据
-							onMessage?.({ content: data })
-						}
-					}
-				}
-			}
-		} catch (error) {
-			// 用户主动取消不算错误
-			if (error.name === 'AbortError') {
-				console.log('SSE connection aborted by user')
-			} else {
-				console.error('SSE error:', error)
-				onError?.(error)
-			}
-		}
-	}
-
-	// 立即启动连接
-	connectSSE()
-
-	// 返回控制器（用于关闭连接）
-	return {
-		close: () => {
-			controller?.abort()
-		}
-	}
+	return ssePost('/interview/resume/quiz/stream', params, options)
 }
 
 /**
@@ -186,116 +148,7 @@ export const generateResumeQuizAPI = ($api, params) => {
  *
  */
 export const startMockInterviewAPI = (params, options) => {
-	// 仅在浏览器环境中可用
-	if (typeof window === 'undefined') {
-		console.warn('SSE is only available in browser environment')
-		return { close: () => {} }
-	}
-
-	const { token, baseURL = '', callbacks = {} } = options
-	const { onMessage, onError, onComplete } = callbacks
-
-	// 构建完整的 URL
-	const url = `${baseURL}/interview/mock/start`
-
-	// AbortController 用于取消请求
-	let controller = null
-
-	const connectSSE = async () => {
-		try {
-			controller = new AbortController()
-
-			// 构建请求头
-			const headers = {
-				'Content-Type': 'application/json',
-				Accept: 'text/event-stream'
-			}
-
-			// 添加 Authorization
-			if (token) {
-				headers.Authorization = `Bearer ${token}`
-			}
-
-			// 使用原生 fetch（SSE 必须）
-			const response = await fetch(url, {
-				method: 'POST',
-				headers,
-				body: JSON.stringify(params),
-				credentials: 'include', // 与 $api 保持一致
-				signal: controller.signal
-			})
-
-			// HTTP 错误处理
-			if (!response.ok) {
-				const errorText = await response.text()
-				throw new Error(
-					`HTTP ${response.status}: ${errorText || response.statusText}`
-				)
-			}
-
-			// 获取流式读取器
-			const reader = response.body.getReader()
-			const decoder = new TextDecoder()
-			let buffer = ''
-
-			// 持续读取流式数据
-			while (true) {
-				const { done, value } = await reader.read()
-
-				if (done) {
-					onComplete?.()
-					break
-				}
-
-				// 解码数据块
-				buffer += decoder.decode(value, { stream: true })
-
-				// 按行分割（SSE 以换行符分隔消息）
-				const lines = buffer.split('\n')
-				buffer = lines.pop() || '' // 保留最后一个不完整的行
-
-				// 处理每一行
-				for (const line of lines) {
-					if (line.startsWith('data: ')) {
-						const data = line.slice(6).trim()
-
-						// 处理完成标记
-						if (data === '[DONE]') {
-							onComplete?.()
-							return
-						}
-
-						// 解析 JSON 数据
-						try {
-							const parsed = JSON.parse(data)
-							onMessage?.(parsed)
-						} catch (e) {
-							// 如果不是 JSON，直接传递原始数据
-							onMessage?.({ content: data })
-						}
-					}
-				}
-			}
-		} catch (error) {
-			// 用户主动取消不算错误
-			if (error.name === 'AbortError') {
-				console.log('SSE connection aborted by user')
-			} else {
-				console.error('SSE error:', error)
-				onError?.(error)
-			}
-		}
-	}
-
-	// 立即启动连接
-	connectSSE()
-
-	// 返回控制器（用于关闭连接）
-	return {
-		close: () => {
-			controller?.abort()
-		}
-	}
+	return ssePost('/interview/mock/start', params, options)
 }
 
 /**
@@ -307,114 +160,5 @@ export const startMockInterviewAPI = (params, options) => {
  *
  */
 export const answerInterviewQuestionAPI = (params, options) => {
-	// 仅在浏览器环境中可用
-	if (typeof window === 'undefined') {
-		console.warn('SSE is only available in browser environment')
-		return { close: () => {} }
-	}
-
-	const { token, baseURL = '', callbacks = {} } = options
-	const { onMessage, onError, onComplete } = callbacks
-
-	// 构建完整的 URL
-	const url = `${baseURL}/interview/mock/answer`
-
-	// AbortController 用于取消请求
-	let controller = null
-
-	const connectSSE = async () => {
-		try {
-			controller = new AbortController()
-
-			// 构建请求头
-			const headers = {
-				'Content-Type': 'application/json',
-				Accept: 'text/event-stream'
-			}
-
-			// 添加 Authorization
-			if (token) {
-				headers.Authorization = `Bearer ${token}`
-			}
-
-			// 使用原生 fetch（SSE 必须）
-			const response = await fetch(url, {
-				method: 'POST',
-				headers,
-				body: JSON.stringify(params),
-				credentials: 'include', // 与 $api 保持一致
-				signal: controller.signal
-			})
-
-			// HTTP 错误处理
-			if (!response.ok) {
-				const errorText = await response.text()
-				throw new Error(
-					`HTTP ${response.status}: ${errorText || response.statusText}`
-				)
-			}
-
-			// 获取流式读取器
-			const reader = response.body.getReader()
-			const decoder = new TextDecoder()
-			let buffer = ''
-
-			// 持续读取流式数据
-			while (true) {
-				const { done, value } = await reader.read()
-
-				if (done) {
-					onComplete?.()
-					break
-				}
-
-				// 解码数据块
-				buffer += decoder.decode(value, { stream: true })
-
-				// 按行分割（SSE 以换行符分隔消息）
-				const lines = buffer.split('\n')
-				buffer = lines.pop() || '' // 保留最后一个不完整的行
-
-				// 处理每一行
-				for (const line of lines) {
-					if (line.startsWith('data: ')) {
-						const data = line.slice(6).trim()
-
-						// 处理完成标记
-						if (data === '[DONE]') {
-							onComplete?.()
-							return
-						}
-
-						// 解析 JSON 数据
-						try {
-							const parsed = JSON.parse(data)
-							onMessage?.(parsed)
-						} catch (e) {
-							// 如果不是 JSON，直接传递原始数据
-							onMessage?.({ content: data })
-						}
-					}
-				}
-			}
-		} catch (error) {
-			// 用户主动取消不算错误
-			if (error.name === 'AbortError') {
-				console.log('SSE connection aborted by user')
-			} else {
-				console.error('SSE error:', error)
-				onError?.(error)
-			}
-		}
-	}
-
-	// 立即启动连接
-	connectSSE()
-
-	// 返回控制器（用于关闭连接）
-	return {
-		close: () => {
-			controller?.abort()
-		}
-	}
+	return ssePost('/interview/mock/answer', params, options)
 }
