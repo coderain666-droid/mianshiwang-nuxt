@@ -257,8 +257,6 @@ const startInterview = async () => {
 			baseURL: config.public.apiBase,
 			callbacks: {
 				onMessage: (data) => {
-					console.log('SSE Message:', data)
-
 					const { type, content } = data
 
 					// 面试开始，包含开场白（流式输出）
@@ -334,7 +332,8 @@ const scrollToBottom = () => {
 const canSendMessage = computed(() => {
 	return (
 		interviewStore.interviewStatus === 'in_progress' &&
-		interviewStore.interviewEventType === 'waiting'
+		(interviewStore.interviewEventType === 'waiting' ||
+			interviewStore.interviewEventType === 'error')
 	)
 })
 
@@ -383,7 +382,6 @@ const handleSendMessage = async () => {
 			baseURL: config.public.apiBase,
 			callbacks: {
 				onMessage: (data) => {
-					console.log('SSE Message:', data)
 					const { type, content } = data
 					// 面试官提问（流式输出）
 					if (type === 'question') {
