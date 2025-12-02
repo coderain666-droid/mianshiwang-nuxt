@@ -197,6 +197,7 @@ import { useUserStore } from '@/stores/user'
 import { useToast } from '#imports'
 import { useGlobalModal } from '@/composables/useGlobalModal'
 import { useRoute, useRouter } from '#imports'
+import EndingProgressModal from '@/components/interview/EndingProgressModal.vue'
 
 const emit = defineEmits(['endInterview'])
 
@@ -536,28 +537,43 @@ const endInterview = () => {
 				color: 'error',
 				onClick: async () => {
 					try {
-						// 修改面试状态为已结束
-						interviewStore.interviewStatus = 'ended'
-
-						// 去掉 URL 中的 sessionId 参数，增加 resultId 参数
-						useRouter().replace({
-							query: {
-								sessionId: undefined,
-								resultId: resultId
+						globalModal.showModal({
+							title: '正在生成面试报告',
+							buttons: [],
+							preventClose: true,
+							contentComponent: EndingProgressModal,
+							contentProps: {
+								onFinished: async () => {
+									try {
+										const res = await endInterviewAPI(
+											$api,
+											interviewStore.sessionId
+										)
+										const resultId = res?.resultId || res?.data?.resultId
+										interviewStore.interviewStatus = 'ended'
+										useRouter().replace({
+											query: {
+												sessionId: undefined,
+												resultId: resultId
+											}
+										})
+										emit('endInterview', resultId)
+									} catch (error) {
+										toast.add({
+											title: '结束失败',
+											description: error.message || '请稍后重试',
+											color: 'error'
+										})
+									}
+								}
 							}
 						})
-
-						// 结束面试，传递事件到上层组件，在 special 组件中获取报告数据，并展示报告页面
-						emit('endInterview', resultId)
 					} catch (error) {
 						toast.add({
 							title: '结束失败',
 							description: error.message || '请稍后重试',
 							color: 'error'
 						})
-					} finally {
-						isEnding.value = false
-						endingProgress.value = ''
 					}
 				}
 			}
