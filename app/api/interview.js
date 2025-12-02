@@ -162,3 +162,31 @@ export const startMockInterviewAPI = (params, options) => {
 export const answerInterviewQuestionAPI = (params, options) => {
 	return ssePost('/interview/mock/answer', params, options)
 }
+
+/**
+ * 暂停面试
+ */
+export const pauseInterviewAPI = ($api, sessionId) => {
+	return $api(`/interview/mock/pause/${sessionId}`, { method: 'POST' })
+}
+
+/**
+ * 恢复面试
+ */
+export const resumeInterviewAPI = ($api, sessionId) => {
+	return $api(`/interview/mock/resume/${sessionId}`, { method: 'POST' })
+}
+
+/**
+ * 获取未完成的面试列表
+ */
+export const getUnfinishedInterviewListAPI = ($api) => {
+	return $api(`/interview/mock/unfinished`, { method: 'GET' })
+}
+
+/**
+ * 结束面试
+ */
+export const endInterviewAPI = ($api, sessionId) => {
+	return $api(`/interview/mock/end/${sessionId}`, { method: 'POST' })
+}

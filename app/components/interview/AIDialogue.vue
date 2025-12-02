@@ -159,7 +159,7 @@
 						暂停面试
 					</UButton>
 					<UButton
-						v-else-if="interviewStore.interviewStatus === 'suspended'"
+						v-else-if="interviewStore.interviewStatus === 'suspend'"
 						color="warning"
 						size="xs"
 						variant="soft"
@@ -187,12 +187,17 @@
 import { useInterviewStore } from '@/stores/interview'
 import {
 	startMockInterviewAPI,
-	answerInterviewQuestionAPI
+	answerInterviewQuestionAPI,
+	pauseInterviewAPI,
+	resumeInterviewAPI,
+	endInterviewAPI
 } from '@/api/interview'
 import { onMounted, onUnmounted, ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useToast } from '#imports'
 import { useGlobalModal } from '@/composables/useGlobalModal'
+
+const { $api } = useNuxtApp()
 const globalModal = useGlobalModal()
 
 const interviewStore = useInterviewStore()
@@ -434,23 +439,74 @@ const handleSendMessage = async () => {
 /**
  * 暂停面试
  */
-const suspendInterview = () => {
-	// TODO：暂停面试的流程
-	interviewStore.interviewStatus = 'suspend'
+const suspendInterview = async () => {
+	// 执行暂停面试的流程
+	try {
+		await pauseInterviewAPI($api, interviewStore.sessionId)
+		// 修改面试状态为暂停
+		interviewStore.interviewStatus = 'suspend'
+
+		// 给用户提示
+		globalModal.showModal({
+			title: '面试已暂停',
+			description: '可在「服务记录」查看该面试记录',
+			buttons: [
+				{
+					label: '继续面试',
+					color: 'success',
+					onClick: () => {
+						restartInterview()
+					}
+				}
+			]
+		})
+	} catch (error) {
+		toast.add({
+			title: '暂停面试失败',
+			description: error.message || '请稍后重试',
+			color: 'error'
+		})
+	}
 }
 
 /**
  * 恢复面试
  */
-const restartInterview = () => {
-	// TODO：恢复面试的流程
-	interviewStore.interviewStatus = 'in_progress'
+const restartInterview = async () => {
+	// 恢复面试的流程
+
+	try {
+		await resumeInterviewAPI($api, interviewStore.sessionId)
+		// 修改面试状态为进行中
+		interviewStore.interviewStatus = 'in_progress'
+
+		// 给用户提示
+		toast.add({
+			title: '继续面试',
+			color: 'success'
+		})
+	} catch (error) {
+		toast.add({
+			title: '恢复面试失败',
+			description: error.message || '请稍后重试',
+			color: 'error'
+		})
+	}
 }
 
 /**
  * 结束面试
  */
 const endInterview = () => {
+	// 先判断当前面试的状态，暂停中的面试不能结束
+	if (interviewStore.interviewStatus === 'suspend') {
+		globalModal.showModal({
+			title: '暂停中的面试不能结束',
+			description: '请先点击「继续面试」按钮'
+		})
+		return
+	}
+
 	globalModal.showModal({
 		title: '提示',
 		description: '确定要主动结束当前面试吗？结束后将生成面试报告。',
@@ -462,22 +518,18 @@ const endInterview = () => {
 				onClick: () => {}
 			},
 			{
-				label: '确定',
+				label: '确定结束面试',
 				color: 'error',
-				onClick: () => {
+				onClick: async () => {
 					try {
-						interviewStore.endInterview()
+						// 执行结束面试的流程
+						await endInterviewAPI($api, interviewStore.sessionId)
 
-						toast.add({
-							title: '面试已结束',
-							description: '正在生成评估报告...',
-							color: 'info'
-						})
+						// 修改面试状态为已结束
+						interviewStore.interviewStatus = 'ended'
 
-						// 自动生成报告
-						setTimeout(() => {
-							handleComplete()
-						}, 1500)
+						// TODO：结束面试，生成报告
+						// handleComplete()
 					} catch (error) {
 						toast.add({
 							title: '结束失败',

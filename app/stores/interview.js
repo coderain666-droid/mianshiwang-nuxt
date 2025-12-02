@@ -139,11 +139,6 @@ jd: ''
 			}
 		},
 
-		// 结束面试
-		endInterview() {
-			this.interviewStatus = 'ended'
-		},
-
 		// 设置报告
 		setReport(report, plan7Days) {
 			this.report = report
