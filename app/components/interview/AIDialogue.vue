@@ -593,17 +593,13 @@ const endInterview = () => {
 									try {
 										const res = await endInterviewAPI(
 											$api,
-											interviewStore.sessionId
+											interviewStore.resultId
 										)
-										const resultId = res?.resultId || res?.data?.resultId
 										interviewStore.interviewStatus = 'ended'
-										emit('endInterview', resultId)
+										emit('endInterview', interviewStore.resultId)
 									} catch (error) {
-										toast.add({
-											title: '结束失败',
-											description: error.message || '请稍后重试',
-											color: 'error'
-										})
+										interviewStore.interviewStatus = 'ended'
+										emit('endInterview', interviewStore.resultId)
 									}
 								}
 							}

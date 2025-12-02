@@ -123,11 +123,11 @@ const handleNextStep = async (resultId) => {
 		// 确定接口数据可以获取到之后，再进行跳转，否则给出提示
 		navigateTo(`/interview/report?resultId=${resultId}`)
 	} catch (error) {
-		toast.add({
-			title: '获取报告失败',
-			description: error.message,
-			color: 'warning'
-		})
+		// toast.add({
+		// 	title: '获取报告失败',
+		// 	description: error.message,
+		// 	color: 'warning'
+		// })
 	}
 }
 </script>
