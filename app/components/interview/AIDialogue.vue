@@ -410,6 +410,11 @@ const handleSendMessage = async () => {
 		// 获取配置
 		const config = useRuntimeConfig()
 
+		// 生成一个 标准答案的 Index。该 index 一定是和 interviewer 的回答对应的。不需要 -1 ，因为后面一定会增加一个新的问题
+		const referenceAnswerIndex = interviewStore.messages.filter(
+			(message) => message.role === 'interviewer'
+		).length
+
 		answerInterviewQuestionAPI(params, {
 			token: userStore.token,
 			baseURL: config.public.apiBase,
@@ -427,6 +432,10 @@ const handleSendMessage = async () => {
 					// 等待候选人回答
 					else if (type === 'waiting') {
 						interviewStore.interviewEventType = 'waiting'
+					}
+					// 生成的标准答案
+					else if (type === 'reference_answer') {
+						interviewStore.updateReferenceAnswer(content, referenceAnswerIndex)
 					}
 					// 面试结束
 					else if (type === 'end') {
@@ -597,20 +606,14 @@ const endInterview = () => {
 
 const showAdvice = (message) => {
 	const content = message?.content || ''
-	const markdown = buildDefaultAdviceMarkdown(content)
 	globalModal.showModal({
 		title: '回答建议',
 		buttons: [],
 		preventClose: false,
 		ui: { content: 'sm:max-w-xl' },
 		contentComponent: AnswerAdviceModal,
-		contentProps: { markdown }
+		contentProps: { questionContent: content }
 	})
-}
-
-const buildDefaultAdviceMarkdown = (question) => {
-	const q = (question || '').trim()
-	return `# 作答结构（示例）\n\n- 开场概述：1-2句概括核心观点\n- 关键点展开：3-4个要点，每点举例或数据\n- 风险与取舍：说明边界与权衡\n- 收尾总结：回到题目重点，强调结果与影响\n\n## 针对本题\n> ${q}\n\n- 题目意图：明确考察技能或场景\n- 思路框架：列出步骤（如分析→方案→实现→优化）\n- 示例回答：用 STAR（情景-任务-行动-结果）描述\n\n---\n提示：根据自身项目经历替换示例与数据。`
 }
 
 defineExpose({

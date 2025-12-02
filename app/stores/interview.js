@@ -41,6 +41,8 @@ jd: ''
 	 {"role": "interviewer","type":"start","sessionId":"f61f5e8c-8b2b-4793-b015-711dfa0ab7d2","interviewerName":"孙娜","content":"你好，","questionNumber":0,"totalQuestions":12,"elapsedMinutes":0}
 */
 		messages: [],
+		// 记录标准答案
+		referenceAnswer: [],
 		// 面试官名称：
 		interviewerName: '正在分配面试官...',
 
@@ -124,6 +126,11 @@ jd: ''
 				// 否则创建新消息
 				this.addMessage(role, content)
 			}
+		},
+
+		// 更新标准答案（注：只有面试官的提问才有标准答案）
+		updateReferenceAnswer(content, index) {
+			this.referenceAnswer[index] = content
 		},
 
 		// 开始流式消息（创建占位消息）
