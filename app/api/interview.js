@@ -190,3 +190,12 @@ export const getUnfinishedInterviewListAPI = ($api) => {
 export const endInterviewAPI = ($api, sessionId) => {
 	return $api(`/interview/mock/end/${sessionId}`, { method: 'POST' })
 }
+
+/**
+ * 获取模拟面试的问答结果
+ */
+export const getMockInterviewQAResultAPI = ($api, resultId) => {
+	return $api(`/interview/mock/result/${resultId}/qa`, {
+		method: 'GET'
+	})
+}

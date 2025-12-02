@@ -13,15 +13,16 @@
 				interviewStore.interviewStatus === 'in_progress' ||
 				interviewStore.interviewStatus === 'suspend'
 			"
+			@endInterview="handleEndInterview"
 		/>
 
-		<!-- TODO：临时的展示 -->
-		<div v-else>
-			面试结束，展示面试报告
-			<UButton @click="interviewStore.interviewStatus = 'idle'"
-				>重新开始</UButton
-			>
-		</div>
+		<StepComplete
+			v-else
+			service-type="special"
+			:prediction-results="predictionResults"
+			@next-step="handleNextStep"
+			@navigate-history="navigateTo('/history')"
+		/>
 	</div>
 </template>
 
@@ -37,7 +38,10 @@ import { useUserStore } from '@/stores/user'
 import { useGlobalModal } from '@/composables/useGlobalModal'
 import StepInput from '@/components/interview/resume-quiz/StepInput.vue'
 import StepInterview from '@/components/interview/special-quiz/StepInterview.vue'
+import StepComplete from '@/components/interview/resume-quiz/StepComplete.vue'
+import { getMockInterviewQAResultAPI } from '@/api/interview'
 import { useToast } from '#imports'
+import { useRoute } from 'vue-router'
 
 definePageMeta({
 	requiresAuth: true,
@@ -55,7 +59,9 @@ useHead({
 	]
 })
 
+const route = useRoute()
 const toast = useToast()
+const { $api } = useNuxtApp()
 const globalModal = useGlobalModal()
 const interviewStore = useInterviewStore()
 // 确定当前为 第二步
@@ -70,7 +76,13 @@ const specialBalance = computed(
 	() => userStore.userInfo?.specialRemainingCount ?? 0
 )
 
-onMounted(() => {})
+onMounted(() => {
+	// 如果包含 resultId，则请求下面试记录的接口
+	const resultId = route.query.resultId
+	if (resultId) {
+		handleEndInterview(resultId)
+	}
+})
 
 const handleComplete = () => {
 	globalModal.showModal({
@@ -81,24 +93,6 @@ const handleComplete = () => {
 			serviceType: 'special',
 			remainingCount: specialBalance.value,
 			onConfirm: () => {
-				// 验证是否有专项面试剩余次数
-				if (specialBalance.value < 1) {
-					globalModal.closeModal()
-					globalModal.showModal({
-						title: '面试押题次数不足，请先充值',
-						description: '当前剩余次数：' + specialBalance.value,
-						buttons: [
-							{
-								label: '去充值',
-								onClick: () => {
-									navigateTo('/profile')
-								}
-							}
-						]
-					})
-					return
-				}
-
 				globalModal.closeModal()
 				// 开始专项面试流程
 				interviewStore.interviewStatus = 'starting'
@@ -117,5 +111,21 @@ const handleCancel = () => {
 		description: '面试次数已返还至账户',
 		color: 'error'
 	})
+}
+
+// 初始化预测结果
+const predictionResults = ref([])
+// 初始化总结
+// const predictionSummary = ref('')
+const handleEndInterview = async (resultId) => {
+	const res = await getMockInterviewQAResultAPI($api, resultId)
+	predictionResults.value = res.questions
+}
+
+const handleNextStep = (resultId) => {
+	if (!resultId) {
+		resultId = route.query.resultId
+	}
+	navigateTo(`/interview/report?resultId=${resultId}`)
 }
 </script>

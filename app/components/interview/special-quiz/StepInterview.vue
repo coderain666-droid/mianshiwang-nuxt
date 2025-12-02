@@ -4,7 +4,10 @@
 			class="grid lg:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)] gap-6 flex-1 min-h-0"
 		>
 			<!-- 左侧：对话区域（占2列） -->
-			<AIDialogue ref="AIDialogueRef" />
+			<AIDialogue
+				ref="AIDialogueRef"
+				@endInterview="$emit('endInterview', $event)"
+			/>
 
 			<!-- 右侧：3D 数字人（占1列） -->
 			<ThreeDDigitalPeople />
@@ -32,7 +35,7 @@ import { useGlobalModal } from '@/composables/useGlobalModal'
 import ThreeDDigitalPeople from '@/components/interview/3DDigitalPeople.vue'
 import AIDialogue from '@/components/interview/AIDialogue.vue'
 
-const emit = defineEmits(['complete', 'cancel'])
+const emit = defineEmits(['handleEndInterview'])
 
 const interviewStore = useInterviewStore()
 
@@ -42,49 +45,6 @@ const showCountdown = ref(false)
 const countdown = ref(5)
 
 const AIDialogueRef = ref(null)
-
-// 完成并查看报告
-const handleComplete = async () => {
-	// TODO: 调用 API 生成报告
-	// const response = await $api(`/interview/${interviewStore.interviewId}/report`, {
-	// 	method: 'GET'
-	// })
-
-	// 模拟报告数据
-	const mockReport = {
-		overall: {
-			score: 85,
-			level: '良好',
-			summary: '整体表现良好，建议在技术深度方面进一步强化'
-		},
-		star: {
-			score: 80,
-			feedback: '能够使用 STAR 方法，但情境描述可以更具体'
-		},
-		skills: [
-			{ name: '技术能力', score: 90 },
-			{ name: '沟通表达', score: 85 },
-			{ name: '逻辑思维', score: 80 },
-			{ name: '项目经验', score: 75 }
-		],
-		risks: ['部分回答缺乏具体数据支撑', '对某些技术细节的理解不够深入'],
-		suggestions: [
-			'建议准备更多具体的项目案例和数据',
-			'加强技术知识的系统化学习'
-		]
-	}
-
-	const mockPlan = {
-		days: Array.from({ length: 7 }, (_, i) => ({
-			day: i + 1,
-			date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).toLocaleDateString(),
-			tasks: [`第${i + 1}天的学习任务 1`, `第${i + 1}天的学习任务 2`]
-		}))
-	}
-
-	interviewStore.setReport(mockReport, mockPlan)
-	emit('complete')
-}
 
 const startCountdown = () => {
 	showCountdown.value = true

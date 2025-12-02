@@ -6,7 +6,16 @@
 		>
 			<div class="flex items-center gap-2 text-sm text-neutral-600">
 				<UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-green-500" />
-				<span>押题完成，共生成 {{ predictionResults.length }} 道预测题</span>
+				<span v-if="serviceType === 'resume'"
+					>押题完成，共生成 {{ predictionResults.length }} 道预测题</span
+				>
+				<span v-else-if="serviceType === 'special'"
+					>专项面试完成，共提问 {{ predictionResults.length }} 道题目</span
+				>
+				<span v-else-if="serviceType === 'behavior'"
+					>行测 + HR 面试完成，共提问
+					{{ predictionResults.length }} 道题目</span
+				>
 				<span
 					class="text-xs text-success-500 cursor-pointer underline hover:text-success-600 transition-colors"
 					@click="$emit('navigate-history')"
@@ -21,7 +30,7 @@
 					class="flex-1 sm:flex-none"
 					@click="handleRetry"
 				>
-					重新押题
+					重新开始
 				</UButton>
 				<UButton
 					color="primary"
@@ -198,6 +207,13 @@ import { useInterviewStore } from '@/stores/interview'
 import { navigateTo } from '#imports'
 
 defineProps({
+	// resume: 面试押题
+	// special: 专项面试
+	// behavior: 行测 + HR 面试
+	serviceType: {
+		type: String,
+		default: 'resume'
+	},
 	predictionResults: {
 		type: Array,
 		required: true
@@ -235,18 +251,16 @@ const globalModal = useGlobalModal()
 
 const handleRetry = () => {
 	globalModal.showModal({
-		title: '温馨提示',
-		description: '重新押题将清空当前选择的所有内容',
-		content: '是否继续？',
+		title: '趁热打铁，再来一次？',
 		buttons: [
 			{
-				label: '取消',
+				label: '点错了',
 				color: 'gray',
 				variant: 'ghost',
 				onClick: () => console.log('cancel')
 			},
 			{
-				label: '继续',
+				label: '那必须的',
 				color: 'primary',
 				onClick: () => {
 					// 清空选择的所有内容

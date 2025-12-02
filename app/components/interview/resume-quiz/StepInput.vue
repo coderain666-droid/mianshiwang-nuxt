@@ -107,6 +107,11 @@
 								class="w-4 h-4 text-neutral-400 group-focus-within:text-primary-500 transition-colors"
 							/>
 							薪资范围
+							<span
+								class="text-[10px] font-medium text-red-500 bg-red-50 px-2 py-0.5 rounded-full border border-red-100"
+								>必填</span
+							>
+							<span class="text-xs text-neutral-400">以 千（K）为单位</span>
 						</span>
 					</label>
 					<div class="flex items-center gap-3">
@@ -354,8 +359,20 @@ const serviceConfig = computed(() => {
  * 提交押题
  */
 const handleSubmit = () => {
-	// JD 字数判断 50 ~ 800 字之间
+	// 薪资范围也是必填的
+	if (
+		!interviewStore.selectedPosition.minSalary ||
+		!interviewStore.selectedPosition.maxSalary
+	) {
+		toast.add({
+			title: '请填写薪资范围',
+			description: '以便生成更加准确的服务数据',
+			color: 'error'
+		})
+		return
+	}
 
+	// JD 字数判断 50 ~ 800 字之间
 	if (
 		interviewStore.selectedPosition.jd?.trim().length < MIN_JD_LENGTH ||
 		interviewStore.selectedPosition.jd?.trim().length > MAX_JD_LENGTH

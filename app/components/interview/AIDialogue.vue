@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col min-h-0"
+		class="bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col min-h-0 relative"
 	>
 		<!-- 对话消息列表 -->
 		<div
@@ -197,6 +197,8 @@ import { useUserStore } from '@/stores/user'
 import { useToast } from '#imports'
 import { useGlobalModal } from '@/composables/useGlobalModal'
 import { useRoute, useRouter } from '#imports'
+
+const emit = defineEmits(['endInterview'])
 
 const route = useRoute()
 const { $api } = useNuxtApp()
@@ -534,20 +536,28 @@ const endInterview = () => {
 				color: 'error',
 				onClick: async () => {
 					try {
-						// 执行结束面试的流程
-						await endInterviewAPI($api, interviewStore.sessionId)
-
 						// 修改面试状态为已结束
 						interviewStore.interviewStatus = 'ended'
 
-						// TODO：结束面试，生成报告
-						// handleComplete()
+						// 去掉 URL 中的 sessionId 参数，增加 resultId 参数
+						useRouter().replace({
+							query: {
+								sessionId: undefined,
+								resultId: resultId
+							}
+						})
+
+						// 结束面试，传递事件到上层组件，在 special 组件中获取报告数据，并展示报告页面
+						emit('endInterview', resultId)
 					} catch (error) {
 						toast.add({
 							title: '结束失败',
 							description: error.message || '请稍后重试',
 							color: 'error'
 						})
+					} finally {
+						isEnding.value = false
+						endingProgress.value = ''
 					}
 				}
 			}

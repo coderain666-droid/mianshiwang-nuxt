@@ -184,24 +184,6 @@ const handlePredictClick = () => {
 			serviceType: 'resume',
 			remainingCount: resumeBalance.value,
 			onConfirm: () => {
-				// 验证是否有面试押题剩余次数
-				if (resumeBalance.value < 1) {
-					globalModal.closeModal()
-					globalModal.showModal({
-						title: '面试押题次数不足，请先充值',
-						description: '当前剩余次数：' + resumeBalance.value,
-						buttons: [
-							{
-								label: '去充值',
-								onClick: () => {
-									navigateTo('/profile')
-								}
-							}
-						]
-					})
-					return
-				}
-
 				globalModal.closeModal()
 				// 传递 requestId 到处理函数
 				startPredictionProcess(requestId)

@@ -73,6 +73,7 @@
 import { ref, watch, computed } from 'vue'
 import { SERVICE_TAGS } from '@/constants/vip'
 import { useInterviewStore } from '@/stores/interview'
+import { useGlobalModal } from '@/composables/useGlobalModal'
 
 const props = defineProps({
 	/**
@@ -106,6 +107,7 @@ const props = defineProps({
 	}
 })
 
+const globalModal = useGlobalModal()
 const interviewStore = useInterviewStore()
 
 // 服务配置映射
