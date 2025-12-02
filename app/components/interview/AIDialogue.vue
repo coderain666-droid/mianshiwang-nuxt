@@ -256,9 +256,10 @@ watch(
 
 onMounted(async () => {
 	// 如果面试已开始，获取历史数据
-	if (interviewStore.sessionId) {
+	const resultId = route.query.resultId
+	if (resultId) {
 		const { conversationHistory, sessionInfo } =
-			await getMockInterviewSessionHistoryAPI($api, interviewStore.sessionId)
+			await getMockInterviewSessionHistoryAPI($api, resultId)
 		// 设置历史记录
 		interviewStore.messages = conversationHistory
 		// 设置标准答案
@@ -279,8 +280,8 @@ onMounted(async () => {
 
 // 开始面试
 const startInterview = async () => {
-	// 如果 url 中包含 sessionId 参数，则表示当前面试已经开始过了，不需要重新开始面试
-	if (route.query.sessionId) {
+	// 如果 url 中包含 resultId 参数，则表示当前面试已经开始过了，不需要重新开始面试
+	if (route.query.resultId) {
 		return
 	}
 	try {
@@ -308,13 +309,16 @@ const startInterview = async () => {
 					// 面试开始，包含开场白（流式输出）
 					if (type === 'start') {
 						interviewStore.interviewEventType = 'start'
-						interviewStore.sessionId = data.sessionId
-						// 修改 url 中的 query 参数，但是不让页面发生跳转
+
+						// 保存 resultId 到 URL 中
 						useRouter().replace({
 							query: {
-								sessionId: data.sessionId
+								resultId: data.resultId
 							}
 						})
+						interviewStore.resultId = data.resultId
+						interviewStore.sessionId = data.sessionId
+
 						interviewStore.interviewerName = data.interviewerName
 
 						// 开始流式消息（创建占位消息）
@@ -498,7 +502,7 @@ const handleSendMessage = async () => {
 const suspendInterview = async () => {
 	// 执行暂停面试的流程
 	try {
-		await pauseInterviewAPI($api, interviewStore.sessionId)
+		await pauseInterviewAPI($api, interviewStore.resultId)
 		// 修改面试状态为暂停
 		interviewStore.interviewStatus = 'suspend'
 
@@ -532,7 +536,7 @@ const restartInterview = async () => {
 	// 恢复面试的流程
 
 	try {
-		await resumeInterviewAPI($api, interviewStore.sessionId)
+		await resumeInterviewAPI($api, interviewStore.resultId)
 		// 修改面试状态为进行中
 		interviewStore.interviewStatus = 'in_progress'
 
@@ -593,12 +597,6 @@ const endInterview = () => {
 										)
 										const resultId = res?.resultId || res?.data?.resultId
 										interviewStore.interviewStatus = 'ended'
-										useRouter().replace({
-											query: {
-												sessionId: undefined,
-												resultId: resultId
-											}
-										})
 										emit('endInterview', resultId)
 									} catch (error) {
 										toast.add({

@@ -166,15 +166,15 @@ export const answerInterviewQuestionAPI = (params, options) => {
 /**
  * 暂停面试
  */
-export const pauseInterviewAPI = ($api, sessionId) => {
-	return $api(`/interview/mock/pause/${sessionId}`, { method: 'POST' })
+export const pauseInterviewAPI = ($api, resultId) => {
+	return $api(`/interview/mock/pause/${resultId}`, { method: 'POST' })
 }
 
 /**
  * 恢复面试
  */
-export const resumeInterviewAPI = ($api, sessionId) => {
-	return $api(`/interview/mock/resume/${sessionId}`, { method: 'POST' })
+export const resumeInterviewAPI = ($api, resultId) => {
+	return $api(`/interview/mock/resume/${resultId}`, { method: 'POST' })
 }
 
 /**
@@ -187,8 +187,8 @@ export const getUnfinishedInterviewListAPI = ($api) => {
 /**
  * 结束面试
  */
-export const endInterviewAPI = ($api, sessionId) => {
-	return $api(`/interview/mock/end/${sessionId}`, { method: 'POST' })
+export const endInterviewAPI = ($api, resultId) => {
+	return $api(`/interview/mock/end/${resultId}`, { method: 'POST' })
 }
 
 /**
@@ -203,8 +203,8 @@ export const getMockInterviewQAResultAPI = ($api, resultId) => {
 /**
  * 获取面试会话的历史问答记录
  */
-export const getMockInterviewSessionHistoryAPI = ($api, sessionId) => {
-	return $api(`/interview/mock/session/${sessionId}/history`, {
+export const getMockInterviewSessionHistoryAPI = ($api, resultId) => {
+	return $api(`/interview/mock/history/${resultId}`, {
 		method: 'GET'
 	})
 }

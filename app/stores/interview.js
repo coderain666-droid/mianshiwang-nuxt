@@ -46,7 +46,9 @@ jd: ''
 		// 面试官名称：
 		interviewerName: '正在分配面试官...',
 
-		// 面试会话 ID
+		// 持久化生效的 面试链接 ID
+		resultId: null,
+		// 面试会话 ID。注意：该 id 保存在内存中，服务器是会清除的
 		sessionId: null,
 		/*
 		  START = 'start', // 面试开始
