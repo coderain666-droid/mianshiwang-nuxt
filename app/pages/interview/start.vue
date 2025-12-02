@@ -245,15 +245,8 @@ const userStore = useUserStore()
 const interviewStore = useInterviewStore()
 // 确定当前为 第一步
 interviewStore.currentStep = 1
-// 只要不是在 面试中 ｜｜ 暂停中，那么就需要重置面试状态
-if (
-	interviewStore.interviewStatus !== 'starting' &&
-	interviewStore.interviewStatus !== 'in_progress' &&
-	interviewStore.interviewStatus !== 'suspend'
-) {
-	// 重置面试状态
-	interviewStore.reset()
-}
+// 重置面试状态
+interviewStore.reset()
 
 const toast = useToast()
 const globalModal = useGlobalModal()

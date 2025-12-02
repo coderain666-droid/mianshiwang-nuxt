@@ -19,7 +19,7 @@
 				{{ countdown }}
 			</div>
 			<div class="text-3xl font-medium tracking-wider animate-bounce">
-				请做好准备，面试即将开始
+				面试中请保持网络稳定，如遇网络波动导致面试中断，可刷新页面继续进行面试
 			</div>
 		</div>
 	</div>
@@ -102,35 +102,10 @@ const startCountdown = () => {
 onMounted(() => {
 	// 只有空闲状态才需要进行这样的提示
 	if (interviewStore.interviewStatus === 'starting') {
-		globalModal.showModal({
-			title: '提示',
-			description:
-				'面试中请保持网络稳定，如遇网络波动导致面试中断，可刷新页面继续进行面试',
-			content: '点击确定按钮，面试将在「5秒」后开始。点击取消按钮，返回上一步',
-			dismissible: false,
-			preventClose: true,
-			close: false,
-			buttons: [
-				{
-					label: '取消面试，返回上层',
-					color: 'error',
-					variant: 'ghost',
-					onClick: () => {
-						emit('cancel')
-					}
-				},
-				{
-					label: '我知道了，开始面试',
-					color: 'success',
-					onClick: () => {
-						// 改变面试的状态标记
-						interviewStore.interviewStatus = 'starting'
-						// 开始倒计时
-						startCountdown()
-					}
-				}
-			]
-		})
+		// 改变面试的状态标记
+		interviewStore.interviewStatus = 'starting'
+		// 开始倒计时
+		startCountdown()
 	}
 })
 </script>

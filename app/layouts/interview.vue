@@ -115,6 +115,10 @@ onMounted(() => {
 	if (route.query.resultId) {
 		return
 	}
+	// 如果 url 中包含 sessionId 参数，则表示当前面试已经开始过，不需要执行守卫
+	if (route.query.sessionId) {
+		return
+	}
 
 	// 根据当前面试的状态，来决定后续跳转的逻辑。
 	// 如果当前面试处于 进行中 ｜｜ 暂停中 的状态，则表示面试尚未结束，那么此时需要跳转到面试页面

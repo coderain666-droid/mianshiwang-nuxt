@@ -13,8 +13,6 @@
 				interviewStore.interviewStatus === 'in_progress' ||
 				interviewStore.interviewStatus === 'suspend'
 			"
-			@cancel="handleCancel"
-			@complete="handleComplete"
 		/>
 
 		<!-- TODO：临时的展示 -->

@@ -196,7 +196,9 @@ import { onMounted, onUnmounted, ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useToast } from '#imports'
 import { useGlobalModal } from '@/composables/useGlobalModal'
+import { useRoute, useRouter } from '#imports'
 
+const route = useRoute()
 const { $api } = useNuxtApp()
 const globalModal = useGlobalModal()
 
@@ -242,6 +244,10 @@ onMounted(() => {
 
 // 开始面试
 const startInterview = async () => {
+	// 如果 url 中包含 sessionId 参数，则表示当前面试已经开始过了，不需要重新开始面试
+	if (route.query.sessionId) {
+		return
+	}
 	try {
 		const params = {
 			interviewType: 'special',
@@ -268,6 +274,12 @@ const startInterview = async () => {
 					if (type === 'start') {
 						interviewStore.interviewEventType = 'start'
 						interviewStore.sessionId = data.sessionId
+						// 修改 url 中的 query 参数，但是不让页面发生跳转
+						useRouter().replace({
+							query: {
+								sessionId: data.sessionId
+							}
+						})
 						interviewStore.interviewerName = data.interviewerName
 
 						// 开始流式消息（创建占位消息）
