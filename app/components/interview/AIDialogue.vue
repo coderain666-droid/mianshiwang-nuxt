@@ -537,6 +537,7 @@ const endInterview = () => {
 				color: 'error',
 				onClick: async () => {
 					try {
+						// 增加结束面试时的延迟，从而给后端 AI 生成标准答案保存到数据库的时间
 						globalModal.showModal({
 							title: '正在生成面试报告',
 							buttons: [],

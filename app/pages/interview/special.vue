@@ -39,7 +39,10 @@ import { useGlobalModal } from '@/composables/useGlobalModal'
 import StepInput from '@/components/interview/resume-quiz/StepInput.vue'
 import StepInterview from '@/components/interview/special-quiz/StepInterview.vue'
 import StepComplete from '@/components/interview/resume-quiz/StepComplete.vue'
-import { getMockInterviewQAResultAPI } from '@/api/interview'
+import {
+	getMockInterviewQAResultAPI,
+	getAnalysisReportAPI
+} from '@/api/interview'
 import { useToast } from '#imports'
 import { useRoute } from 'vue-router'
 
@@ -122,10 +125,22 @@ const handleEndInterview = async (resultId) => {
 	predictionResults.value = res.questions
 }
 
-const handleNextStep = (resultId) => {
+const handleNextStep = async (resultId) => {
 	if (!resultId) {
 		resultId = route.query.resultId
 	}
-	navigateTo(`/interview/report?resultId=${resultId}`)
+
+	try {
+		// 接口生成需要等待 1 ～ 2 分钟的时间
+		await getAnalysisReportAPI($api, route.query.resultId)
+		// 确定接口数据可以获取到之后，再进行跳转，否则给出提示
+		navigateTo(`/interview/report?resultId=${resultId}`)
+	} catch (error) {
+		toast.add({
+			title: '获取报告失败',
+			description: error.message,
+			color: 'warning'
+		})
+	}
 }
 </script>

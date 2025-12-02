@@ -36,7 +36,7 @@
 					icon="i-heroicons-arrow-path"
 					@click="handleRestart"
 				>
-					重新开始
+					趁热打铁，再来一次～
 				</UButton>
 			</div>
 		</div>
@@ -415,6 +415,8 @@ const reportData = ref({
 const getAnalysisReport = async () => {
 	try {
 		const res = await getAnalysisReportAPI($api, route.query.resultId)
+		console.log('res', res)
+
 		if (res) {
 			reportData.value = res
 		}
