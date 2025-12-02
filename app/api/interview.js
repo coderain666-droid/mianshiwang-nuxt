@@ -199,3 +199,12 @@ export const getMockInterviewQAResultAPI = ($api, resultId) => {
 		method: 'GET'
 	})
 }
+
+/**
+ * 获取面试会话的历史问答记录
+ */
+export const getMockInterviewSessionHistoryAPI = ($api, sessionId) => {
+	return $api(`/interview/mock/session/${sessionId}/history`, {
+		method: 'GET'
+	})
+}

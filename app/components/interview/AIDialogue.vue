@@ -25,20 +25,20 @@
 				:key="index"
 				:class="[
 					'flex gap-4',
-					message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+					message.role === 'candidate' ? 'flex-row-reverse' : 'flex-row'
 				]"
 			>
 				<!-- 头像 -->
 				<div
 					class="shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
 					:class="
-						message.role === 'user'
+						message.role === 'candidate'
 							? 'bg-primary-100'
 							: 'bg-linear-to-br from-indigo-500 to-purple-600 shadow-sm'
 					"
 				>
 					<UIcon
-						v-if="message.role === 'user'"
+						v-if="message.role === 'candidate'"
 						name="i-heroicons-user"
 						class="w-6 h-6 text-primary-600"
 					/>
@@ -53,7 +53,7 @@
 				<div
 					:class="[
 						'max-w-[80%] rounded-2xl px-5 py-3.5 shadow-sm text-sm leading-relaxed',
-						message.role === 'user'
+						message.role === 'candidate'
 							? 'bg-primary-600 text-white rounded-tr-none'
 							: 'bg-white border border-gray-100 text-neutral-800 rounded-tl-none'
 					]"
@@ -202,7 +202,8 @@ import {
 	answerInterviewQuestionAPI,
 	pauseInterviewAPI,
 	resumeInterviewAPI,
-	endInterviewAPI
+	endInterviewAPI,
+	getMockInterviewSessionHistoryAPI
 } from '@/api/interview'
 import { onMounted, onUnmounted, ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user'
@@ -253,14 +254,25 @@ watch(
 	{ deep: true }
 )
 
-onMounted(() => {
-	// 如果面试已开始，恢复 SSE 连接
-	if (
-		interviewStore.sessionId &&
-		interviewStore.interviewStatus === 'in_progress'
-	) {
-		startInterview()
-		// TODO：重新进入，设置为 waiting 状态
+onMounted(async () => {
+	// 如果面试已开始，获取历史数据
+	if (interviewStore.sessionId) {
+		const { conversationHistory, sessionInfo } =
+			await getMockInterviewSessionHistoryAPI($api, interviewStore.sessionId)
+		// 设置历史记录
+		interviewStore.messages = conversationHistory
+		// 设置标准答案
+		interviewStore.referenceAnswer = conversationHistory
+			.filter((item) => item.role === 'interviewer')
+			.map((item) => item.referenceAnswer || '')
+		// 设置 sessionId
+		interviewStore.sessionId = sessionInfo.sessionId
+		// 设置面试官名称
+		interviewStore.interviewerName = sessionInfo.interviewerName
+		// 设置岗位类型
+		interviewStore.selectedPosition.positionName = sessionInfo.position
+
+		// 重新进入，设置为 waiting 状态
 		interviewStore.interviewEventType = 'waiting'
 	}
 })
@@ -403,7 +415,7 @@ const handleSendMessage = async () => {
 	if (!inputMessage.value.trim() || !canSendMessage.value) return
 
 	const userMessage = inputMessage.value.trim()
-	interviewStore.addMessage('user', userMessage)
+	interviewStore.addMessage('candidate', userMessage)
 	inputMessage.value = ''
 
 	scrollToBottom()
