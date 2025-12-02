@@ -232,7 +232,8 @@ const getCategoryName = (category) => {
 		technical: '技术',
 		project: '项目经验',
 		'soft-skill': '软技能',
-		'problem-solving': '问题解决'
+		'problem-solving': '问题解决',
+		'self-introduction': '自我介绍'
 	}
 	return categoryMap[category] || category
 }
