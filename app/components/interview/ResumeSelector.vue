@@ -115,7 +115,7 @@
 		<div class="space-y-2">
 			<h3 class="text-sm font-semibold text-neutral-900">手动输入简历内容</h3>
 			<UTextarea
-				v-model="resumeText"
+				v-model="interviewStore.resumeText"
 				placeholder="粘贴你的简历内容..."
 				:rows="6"
 				class="w-full"
@@ -183,7 +183,6 @@ const { $api } = useNuxtApp()
 const config = useRuntimeConfig()
 
 const isUploadResumeModalVisible = ref(false)
-const resumeText = ref('')
 
 // 预览相关
 const previewModal = ref(false)
@@ -204,7 +203,7 @@ const formatDate = (date) => {
 // 选择简历
 const selectResume = (resume) => {
 	interviewStore.resumeId = resume.resumeId
-	resumeText.value = '' // 清空手动输入
+	interviewStore.resumeText = '' // 清空手动输入
 	emit('update:modelValue', {
 		type: 'resume',
 		resumeId: resume.resumeId,
@@ -305,11 +304,11 @@ watch(
 		}
 
 		if (newValue.type === 'text') {
-			resumeText.value = newValue.text || ''
+			interviewStore.resumeText = newValue.text || ''
 			interviewStore.resumeId = null
 		} else if (newValue.type === 'resume') {
 			interviewStore.resumeId = newValue.resumeId
-			resumeText.value = ''
+			interviewStore.resumeText = ''
 		}
 	},
 	{ immediate: true }

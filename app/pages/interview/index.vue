@@ -272,7 +272,14 @@ const startResumeQuiz = async (requestId) => {
 					}
 					progressSteps.value.push(currentProgressStep.value)
 				} else if (data.type === 'complete') {
+					debugger
 					resultId = data.data.resultId
+					router.replace({
+						query: {
+							...route.query,
+							resultId
+						}
+					})
 					if (data.data?.questions) {
 						predictionResults.value = data.data.questions.map((item) => ({
 							...item,

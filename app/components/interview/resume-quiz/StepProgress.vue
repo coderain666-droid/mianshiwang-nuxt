@@ -33,7 +33,7 @@
 				>
 					<span class="flex items-center gap-1.5">
 						<UIcon name="i-heroicons-clock" class="w-3.5 h-3.5" />
-						预计耗时 5 分钟
+						预计耗时 5 - 7 分钟
 					</span>
 					<span class="flex items-center gap-2">
 						<span class="font-mono">已耗时 {{ formattedElapsedTime }}</span>

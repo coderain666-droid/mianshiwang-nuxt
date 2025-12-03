@@ -124,7 +124,7 @@ const serviceConfig = computed(() => {
 				},
 				{
 					icon: 'i-heroicons-clock',
-					text: '预计生成时长：<span class="text-blue-600 font-semibold">3-5 分钟</span>。'
+					text: '预计生成时长：<span class="text-blue-600 font-semibold"> 5 - 7 分钟</span>。'
 				},
 				{
 					icon: 'i-heroicons-credit-card',
