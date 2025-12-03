@@ -235,6 +235,7 @@ const props = defineProps({
 const emit = defineEmits(['endInterview'])
 
 const route = useRoute()
+const router = useRouter()
 const { $api } = useNuxtApp()
 const globalModal = useGlobalModal()
 
@@ -330,10 +331,8 @@ const startInterview = async () => {
 						interviewStore.interviewEventType = 'start'
 
 						// 保存 resultId 到 URL 中
-						useRouter().replace({
-							query: {
-								resultId: data.resultId
-							}
+						router.replace({
+							query: { ...route.query, resultId: data.resultId }
 						})
 						interviewStore.resultId = data.resultId
 						interviewStore.sessionId = data.sessionId

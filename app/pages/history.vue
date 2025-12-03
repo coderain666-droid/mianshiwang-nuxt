@@ -41,14 +41,14 @@
 									/>
 								</div>
 								<p class="text-gray-500">暂无{{ item.label }}记录</p>
-								<UButton
-									v-if="item.key === 'resume'"
-									to="/interview/resume"
-									color="primary"
-									variant="soft"
-								>
-									去体验
-								</UButton>
+							<UButton
+								v-if="item.key === 'resume'"
+								to="/interview?serviceType=resume&step=input"
+								color="primary"
+								variant="soft"
+							>
+								去体验
+							</UButton>
 							</div>
 
 							<!-- 列表展示 -->
@@ -206,7 +206,7 @@ const formatDate = (date) => {
  */
 const handleView = (record) => {
 	if (record.resultId) {
-		navigateTo(`/interview/resume?resultId=${record.resultId}`)
+		navigateTo(`/interview?serviceType=resume&resultId=${record.resultId}`)
 	} else {
 		console.warn('记录缺少 resultId', record)
 	}

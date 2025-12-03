@@ -214,6 +214,20 @@ const toggleSidebar = () => {
 }
 
 /**
+ * 判断是否处于 押题进度条环节
+ */
+const isProgressing = computed(() => {
+	return route.query.step === 'progress'
+})
+
+/**
+ * 判断是否处于 面试中
+ */
+const isInterviewing = computed(() => {
+	return route.query.step === 'interview' && route.query.resultId
+})
+
+/**
  * 处理步骤点击事件
  * 规则：
  * 1. 只能点击已完成或当前步骤
@@ -222,26 +236,22 @@ const toggleSidebar = () => {
  * 4. Step 3: 只有在报告生成后才能访问
  */
 const handleStepClick = (stepId) => {
-	// 查看历史报告，不允许切换步骤
-	if (route.query.resultId) {
-		globalModal.showModal({
-			title: '温馨提示',
-			description: '查看历史报告，不允许切换步骤',
+	// 当前处于押题进度条环节，不允许点击步骤
+	if (isProgressing.value) {
+		toast.add({
+			title: '不要呀～～',
+			description: '这时跳转会导致白白浪费一次押题机会哦～～',
 			color: 'warning',
 			icon: 'i-heroicons-lock-closed'
 		})
 		return
 	}
 
-	// 当前处于面试状态中，不需要切换步骤
-	if (
-		interviewStore.interviewStatus === 'starting' ||
-		interviewStore.interviewStatus === 'in_progress' ||
-		interviewStore.interviewStatus === 'suspend'
-	) {
+	// 如果是在面试中，那么需要给用户提示，先结束面试
+	if (isInterviewing.value) {
 		toast.add({
-			title: '温馨提示',
-			description: '您当前正在面试中，请先完成面试后再进行切换',
+			title: '请先结束面试，再进行跳转',
+			description: '注意：中途结束面试，会导致消费一次面试机会哦～～',
 			color: 'warning',
 			icon: 'i-heroicons-lock-closed'
 		})
@@ -251,8 +261,8 @@ const handleStepClick = (stepId) => {
 	// 禁止点击未解锁的步骤
 	if (stepId > interviewStore.currentStep) {
 		toast.add({
-			title: '步骤未解锁',
-			description: '请先完成当前步骤',
+			title: '不要着急嘛',
+			description: '先把当前的步骤做完呗～',
 			color: 'warning',
 			icon: 'i-heroicons-lock-closed'
 		})
@@ -270,9 +280,15 @@ const handleStepClick = (stepId) => {
 		const resultId = route.query.resultId
 		const queryString = resultId ? `?resultId=${resultId}` : ''
 		const serviceRouteMap = {
-			[SERVICE_TAGS.SPECIAL]: `/interview/special${queryString}`,
-			[SERVICE_TAGS.RESUME]: `/interview/resume${queryString}`,
-			[SERVICE_TAGS.BEHAVIOR]: `/interview/behavior${queryString}`
+			[SERVICE_TAGS.SPECIAL]: `/interview?serviceType=special${
+				queryString ? '&' + queryString.slice(1) : ''
+			}`,
+			[SERVICE_TAGS.RESUME]: `/interview?serviceType=resume${
+				queryString ? '&' + queryString.slice(1) : ''
+			}`,
+			[SERVICE_TAGS.BEHAVIOR]: `/interview?serviceType=behavior${
+				queryString ? '&' + queryString.slice(1) : ''
+			}`
 		}
 
 		const targetPath = serviceRouteMap[interviewStore.selectedService]

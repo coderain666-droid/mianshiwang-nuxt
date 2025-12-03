@@ -240,7 +240,6 @@
 					size="xl"
 					:color="serviceConfig.buttonColor"
 					class="w-full sm:w-auto px-12 hover:shadow-primary-500/30 hover:-translate-y-0.5 transition-all duration-300"
-					:loading="isProcessing"
 					@click="handleSubmit"
 					:ui="{ rounded: 'rounded-xl' }"
 				>
@@ -266,10 +265,6 @@ import { useToast } from '#imports'
 import { MIN_JD_LENGTH, MAX_JD_LENGTH } from '@/constants'
 
 const props = defineProps({
-	isProcessing: {
-		type: Boolean,
-		default: false
-	},
 	serviceType: {
 		type: String,
 		default: 'resume', // 'resume' | 'special' | 'behavior'

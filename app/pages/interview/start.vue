@@ -360,9 +360,9 @@ const serviceOptions = computed(() =>
 )
 
 const serviceRouteMap = {
-	[SERVICE_TAGS.RESUME]: '/interview/resume',
-	[SERVICE_TAGS.SPECIAL]: '/interview/special',
-	[SERVICE_TAGS.BEHAVIOR]: '/interview/behavior'
+	[SERVICE_TAGS.RESUME]: '/interview?serviceType=resume&step=input',
+	[SERVICE_TAGS.SPECIAL]: '/interview?serviceType=special&step=input',
+	[SERVICE_TAGS.BEHAVIOR]: '/interview?serviceType=behavior&step=input'
 }
 
 const presentServiceSelection = () => {
