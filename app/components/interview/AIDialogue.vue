@@ -2,10 +2,30 @@
 	<div
 		class="bg-white rounded-2xl border border-gray-200 shadow-sm flex flex-col min-h-0 relative"
 	>
+		<!-- 语音播报开关 -->
+		<div v-if="speechSupported" class="absolute top-4 right-4 z-10">
+			<UButton
+				:color="speechEnabled ? 'primary' : 'error'"
+				:variant="speechEnabled ? 'soft' : 'ghost'"
+				size="xs"
+				:icon="
+					speechEnabled
+						? speechSpeaking
+							? 'i-heroicons-speaker-wave'
+							: 'i-heroicons-speaker-x-mark'
+						: 'i-heroicons-speaker-x-mark'
+				"
+				@click="toggleSpeech()"
+				:ui="{ rounded: 'rounded-lg' }"
+			>
+				{{ speechEnabled ? '语音播报已开启' : '语音播报已关闭' }}
+			</UButton>
+		</div>
+
 		<!-- 对话消息列表 -->
 		<div
 			ref="messagesContainerRef"
-			class="flex-1 overflow-y-auto p-6 space-y-4"
+			class="flex-1 overflow-y-auto p-6 space-y-4 pt-16"
 		>
 			<div
 				v-if="interviewStore.messages.length === 0"
@@ -225,6 +245,7 @@ import { useRoute, useRouter } from '#imports'
 import EndingProgressModal from '@/components/interview/EndingProgressModal.vue'
 import AnswerAdviceModal from '@/components/interview/AnswerAdviceModal.vue'
 import VoiceInputModal from '@/components/interview/VoiceInputModal.vue'
+import { useSpeechSynthesis } from '@/composables/useSpeechSynthesis'
 
 const props = defineProps({
 	serviceType: {
@@ -249,6 +270,20 @@ const inputMessage = ref('')
 const messagesContainerRef = ref(null)
 const isComposing = ref(false) // 是否正在使用输入法组合输入
 const isSpeechSupported = ref(false)
+
+// 语音朗读功能
+const {
+	isEnabled: speechEnabled,
+	isSpeaking: speechSpeaking,
+	isSupported: speechSupported,
+	handleStreamText: handleSpeechStreamText,
+	stop: stopSpeech,
+	toggle: toggleSpeech,
+	reset: resetSpeech
+} = useSpeechSynthesis()
+
+// 用于存储上一次的消息内容，以便计算增量
+const lastInterviewerMessage = ref('')
 /**
  * 是否正在流式输出（AI 正在说话）
  */
@@ -275,9 +310,11 @@ const isSpacePressed = ref(false)
 
 // 输入框焦点事件处理
 const onInputFocus = () => {
+	console.log('输入框焦点事件处理')
 	isInputFocused.value = true
 }
 const onInputBlur = () => {
+	console.log('输入框焦点事件 离开～～～～')
 	isInputFocused.value = false
 }
 
@@ -286,6 +323,11 @@ const onInputBlur = () => {
  * 处理空格长按唤起语音输入
  */
 const handleGlobalKeydown = (e) => {
+	console.log('isInputFocused.value', isInputFocused.value)
+	console.log('isSpacePressed.value', isSpacePressed.value)
+	console.log('isComposing.value', isComposing.value)
+	console.log('isSpeechSupported.value', isSpeechSupported.value)
+	console.log('canSendMessage.value', canSendMessage.value)
 	if (
 		e.code === 'Space' &&
 		!isInputFocused.value &&
@@ -356,6 +398,11 @@ const startInterview = async () => {
 	if (route.query.resultId) {
 		return
 	}
+
+	// 重置语音状态
+	resetSpeech()
+	lastInterviewerMessage.value = ''
+
 	try {
 		const params = {
 			interviewType: props.serviceType,
@@ -396,6 +443,15 @@ const startInterview = async () => {
 						// 更新消息内容（流式追加）
 						interviewStore.updateLastMessage(content, 'interviewer')
 						scrollToBottom()
+
+						// 处理语音播报（增量文本）
+						const incrementalText = content.substring(
+							lastInterviewerMessage.value.length
+						)
+						if (incrementalText) {
+							handleSpeechStreamText(incrementalText, false)
+							lastInterviewerMessage.value = content
+						}
 					}
 					// 等待候选人回答
 					else if (type === 'waiting') {
@@ -521,10 +577,22 @@ const handleSendMessage = async () => {
 						// 更新最后一条面试官消息（流式追加）
 						interviewStore.updateLastMessage(content, 'interviewer')
 						scrollToBottom()
+
+						// 处理语音播报（增量文本）
+						const incrementalText = content.substring(
+							lastInterviewerMessage.value.length
+						)
+						if (incrementalText) {
+							handleSpeechStreamText(incrementalText, false)
+							lastInterviewerMessage.value = content
+						}
 					}
 					// 等待候选人回答
 					else if (type === 'waiting') {
 						interviewStore.interviewEventType = 'waiting'
+						// 标记当前消息为最终文本
+						handleSpeechStreamText('', true)
+						lastInterviewerMessage.value = ''
 					}
 					// 生成的标准答案
 					else if (type === 'reference_answer') {
@@ -535,6 +603,18 @@ const handleSendMessage = async () => {
 						// 增加面试结束的内容展示
 						interviewStore.updateLastMessage(content, 'interviewer')
 						scrollToBottom()
+
+						// 处理语音播报（最终文本）
+						const incrementalText = content.substring(
+							lastInterviewerMessage.value.length
+						)
+						if (incrementalText) {
+							handleSpeechStreamText(incrementalText, true)
+						} else {
+							handleSpeechStreamText('', true)
+						}
+						lastInterviewerMessage.value = ''
+
 						// 改变标记位置
 						interviewStore.interviewEventType = 'end'
 						interviewStore.interviewStatus = 'ended'
