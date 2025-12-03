@@ -128,6 +128,17 @@
 				/>
 				<div class="absolute bottom-3 right-3 flex items-center gap-2">
 					<UButton
+						v-if="isSpeechSupported && canSendMessage"
+						color="gray"
+						variant="soft"
+						size="xs"
+						:ui="{ rounded: 'rounded-lg' }"
+						icon="i-heroicons-microphone"
+						@click="showVoiceModal"
+					>
+						语音输入
+					</UButton>
+					<UButton
 						color="primary"
 						:disabled="!canSendMessage || !inputMessage.trim()"
 						:ui="{ rounded: 'rounded-lg' }"
@@ -212,6 +223,7 @@ import { useGlobalModal } from '@/composables/useGlobalModal'
 import { useRoute, useRouter } from '#imports'
 import EndingProgressModal from '@/components/interview/EndingProgressModal.vue'
 import AnswerAdviceModal from '@/components/interview/AnswerAdviceModal.vue'
+import VoiceInputModal from '@/components/interview/VoiceInputModal.vue'
 
 const props = defineProps({
 	serviceType: {
@@ -234,6 +246,7 @@ const toast = useToast()
 const inputMessage = ref('')
 const messagesContainerRef = ref(null)
 const isComposing = ref(false) // 是否正在使用输入法组合输入
+const isSpeechSupported = ref(false)
 /**
  * 是否正在流式输出（AI 正在说话）
  */
@@ -275,6 +288,12 @@ onMounted(async () => {
 
 		// 重新进入，设置为 waiting 状态
 		interviewStore.interviewEventType = 'waiting'
+	}
+
+	// 语音识别能力检测（仅浏览器）
+	if (typeof window !== 'undefined') {
+		isSpeechSupported.value =
+			'webkitSpeechRecognition' in window || 'SpeechRecognition' in window
 	}
 })
 
@@ -626,6 +645,22 @@ const showAdvice = (message) => {
 		ui: { content: 'sm:max-w-xl' },
 		contentComponent: AnswerAdviceModal,
 		contentProps: { questionContent: content }
+	})
+}
+
+const showVoiceModal = () => {
+	globalModal.showModal({
+		title: '语音输入',
+		description: '请允许麦克风权限，并开始语音输入',
+		buttons: [],
+		preventClose: false,
+		ui: { content: 'sm:max-w-xl' },
+		contentComponent: VoiceInputModal,
+		contentProps: {
+			onConfirm: (text) => {
+				inputMessage.value = text || ''
+			}
+		}
 	})
 }
 
