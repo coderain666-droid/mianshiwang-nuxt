@@ -120,6 +120,32 @@ export const getInterviewResumeHistoryAPI = ($api, page, limit) => {
 }
 
 /**
+ * 获取专项面试历史记录
+ */
+export const getInterviewSpecialHistoryAPI = ($api, page, limit) => {
+	return $api('/interview/special/history', {
+		method: 'GET',
+		query: {
+			page,
+			limit
+		}
+	})
+}
+
+/**
+ * 获取行测+HR面试历史记录
+ */
+export const getInterviewBehaviorHistoryAPI = ($api, page, limit) => {
+	return $api('/interview/behavior/history', {
+		method: 'GET',
+		query: {
+			page,
+			limit
+		}
+	})
+}
+
+/**
  * 获取单个结果详情
  */
 export const getInterviewResultDetailAPI = ($api, resultId) => {

@@ -3,7 +3,7 @@
 
 /* 设计系统主题令牌（Tailwind v4 @theme） */
 @theme {
-  --color-primary: #2563EB;
+  --color-primary: #47b656;
   /* 品牌主色：沉稳蓝 */
   --color-accent: #10B981;
   /* 强调色：薄荷绿 */
