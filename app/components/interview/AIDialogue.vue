@@ -125,19 +125,17 @@
 					@keydown.enter.exact.prevent="handleEnterKey"
 					@compositionstart="handleCompositionStart"
 					@compositionend="handleCompositionEnd"
+					@focus="onInputFocus"
+					@blur="onInputBlur"
 				/>
 				<div class="absolute bottom-3 right-3 flex items-center gap-2">
-					<UButton
+					<span
 						v-if="isSpeechSupported && canSendMessage"
-						color="gray"
-						variant="soft"
-						size="xs"
-						:ui="{ rounded: 'rounded-lg' }"
-						icon="i-heroicons-microphone"
-						@click="showVoiceModal"
+						class="text-xs text-gray-400 flex items-baseline"
 					>
-						语音输入
-					</UButton>
+						<UIcon name="i-heroicons-microphone" class="w-4 h-4 mr-0.5" />
+						长按空格 语音输入</span
+					>
 					<UButton
 						color="primary"
 						:disabled="!canSendMessage || !inputMessage.trim()"
@@ -156,6 +154,8 @@
 					<UKbd size="xs">Enter</UKbd> 发送
 					<span class="mx-1">|</span>
 					<UKbd size="xs">Shift + Enter</UKbd> 换行
+					<span class="mx-1">|</span>
+					<UKbd size="xs">长按「空格」</UKbd> 语音输入
 				</span>
 				<div class="flex items-center gap-3">
 					<UButton
@@ -269,7 +269,58 @@ watch(
 	{ deep: true }
 )
 
+// 输入框是否有焦点
+const isInputFocused = ref(false)
+const isSpacePressed = ref(false)
+
+// 输入框焦点事件处理
+const onInputFocus = () => {
+	isInputFocused.value = true
+}
+const onInputBlur = () => {
+	isInputFocused.value = false
+}
+
+/**
+ * 全局按键按下事件处理
+ * 处理空格长按唤起语音输入
+ */
+const handleGlobalKeydown = (e) => {
+	if (
+		e.code === 'Space' &&
+		!isInputFocused.value &&
+		!isSpacePressed.value &&
+		!isComposing.value &&
+		isSpeechSupported.value &&
+		canSendMessage.value
+	) {
+		e.preventDefault() // 防止页面滚动
+		isSpacePressed.value = true
+		showVoiceModal(true) // 传入 true 表示 PTT (Push-To-Talk) 模式
+	}
+}
+
+/**
+ * 全局按键松开事件处理
+ * 处理松开空格结束语音输入
+ */
+const handleGlobalKeyup = (e) => {
+	if (e.code === 'Space' && isSpacePressed.value) {
+		e.preventDefault()
+		isSpacePressed.value = false
+		// 松开空格，关闭 modal (VoiceInputModal 会自动处理 stop 和 confirm 逻辑)
+		// 注意：我们这里假设 VoiceInputModal 能够响应关闭
+		// 由于我们使用的是 globalModal，关闭它会销毁组件
+		// 我们需要在 VoiceInputModal 销毁前把数据保存下来，但这由 VoiceInputModal 的 onRealtimeUpdate 处理了
+		// 这里的 closeModal 只是触发 UI 消失
+		globalModal.closeModal()
+	}
+}
+
 onMounted(async () => {
+	// 用来处理 语音输入 的逻辑
+	window.addEventListener('keydown', handleGlobalKeydown)
+	window.addEventListener('keyup', handleGlobalKeyup)
 	// 如果面试已开始，获取历史数据
 	const resultId = route.query.resultId
 	if (resultId) {
@@ -674,17 +725,25 @@ const showAdvice = (message) => {
 	})
 }
 
-const showVoiceModal = () => {
+const showVoiceModal = (autoStart = false) => {
 	globalModal.showModal({
 		title: '语音输入',
-		description: '请允许麦克风权限，并开始语音输入',
+		description: autoStart
+			? '松开空格键结束输入'
+			: '请允许麦克风权限，并开始语音输入',
 		buttons: [],
 		preventClose: false,
 		ui: { content: 'sm:max-w-xl' },
 		contentComponent: VoiceInputModal,
 		contentProps: {
-			onConfirm: (text) => {
+			initialText: inputMessage.value,
+			autoStart: autoStart, // 传入自动开始标记
+			onRealtimeUpdate: (text) => {
 				inputMessage.value = text || ''
+			},
+			onConfirm: () => {
+				handleSendMessage()
+				globalModal.closeModal()
 			}
 		}
 	})
