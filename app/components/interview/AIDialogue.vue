@@ -130,7 +130,10 @@
 			<div class="relative">
 				<UTextarea
 					v-model="inputMessage"
-					placeholder="请输入您的回答...（长按空格 语音输入）"
+					ref="textareaRef"
+					:placeholder="
+						isInputFocused ? '请输入您的回答...' : '长按空格 语音输入'
+					"
 					:rows="3"
 					:maxrows="6"
 					resize
@@ -143,6 +146,7 @@
 						placeholder: 'text-gray-400'
 					}"
 					@keydown.enter.exact.prevent="handleEnterKey"
+					@keydown.escape.exact.prevent="handleEscapeKey"
 					@compositionstart="handleCompositionStart"
 					@compositionend="handleCompositionEnd"
 					@focus="onInputFocus"
@@ -313,8 +317,11 @@ const onInputFocus = () => {
 	console.log('输入框焦点事件处理')
 	isInputFocused.value = true
 }
-const onInputBlur = () => {
-	console.log('输入框焦点事件 离开～～～～')
+const onInputBlur = (e) => {
+	if (e.code === 'Space') {
+		return
+	}
+	console.log('输入框焦点事件 离开～～～～', e.code)
 	isInputFocused.value = false
 }
 
@@ -323,11 +330,6 @@ const onInputBlur = () => {
  * 处理空格长按唤起语音输入
  */
 const handleGlobalKeydown = (e) => {
-	console.log('isInputFocused.value', isInputFocused.value)
-	console.log('isSpacePressed.value', isSpacePressed.value)
-	console.log('isComposing.value', isComposing.value)
-	console.log('isSpeechSupported.value', isSpeechSupported.value)
-	console.log('canSendMessage.value', canSendMessage.value)
 	if (
 		e.code === 'Space' &&
 		!isInputFocused.value &&
@@ -538,6 +540,13 @@ const handleEnterKey = (event) => {
 
 	// 否则发送消息
 	handleSendMessage()
+}
+
+const textareaRef = ref(null)
+// ESC 键处理
+const handleEscapeKey = () => {
+	// 让 textareaRef 失去焦点
+	textareaRef.value.textareaRef.blur()
 }
 
 // 发送消息

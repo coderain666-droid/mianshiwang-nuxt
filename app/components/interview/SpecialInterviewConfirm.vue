@@ -143,7 +143,7 @@ const serviceConfig = computed(() => {
 				},
 				{
 					icon: 'i-heroicons-clock',
-					text: '本次专项面试<span class="text-primary-600 font-semibold">时长约 1 小时</span>，包含提问与反馈环节。'
+					text: '本次专项面试<span class="text-primary-600 font-semibold">时长约 60 ～ 90 分钟</span>，包含提问与反馈环节。'
 				},
 				{
 					icon: 'i-heroicons-credit-card',
@@ -162,7 +162,7 @@ const serviceConfig = computed(() => {
 				},
 				{
 					icon: 'i-heroicons-clock',
-					text: '本次综合面试<span class="text-purple-600 font-semibold">时长约 45 分钟</span>，包含行测与 HR 问答。'
+					text: '本次综合面试<span class="text-purple-600 font-semibold">时长约 45 ～ 70 分钟</span>，包含行测与 HR 问答。'
 				},
 				{
 					icon: 'i-heroicons-credit-card',
