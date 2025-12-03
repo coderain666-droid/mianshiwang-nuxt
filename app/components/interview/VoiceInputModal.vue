@@ -21,6 +21,9 @@
 			>
 				{{ listening ? '正在聆听...' : '准备就绪' }}
 			</h3>
+			<p class="text-sm text-neutral-500">
+				^_^语音输入可能有误差，可稍后核对。<br />AI面试官也会自动纠错，请放心^_^
+			</p>
 			<p class="text-sm text-neutral-500" v-if="!autoStart">
 				<span v-if="!listening">按下 <UKbd>Space</UKbd> 键开始语音输入</span>
 				<span v-else>按下 <UKbd>Space</UKbd> 键暂停输入</span>
@@ -65,92 +68,195 @@ const props = defineProps({
 const transcript = ref(props.initialText || '')
 const listening = ref(false)
 const recognitionRef = ref(null)
+const lastFinalTime = ref(0) // 记录上次 final 结果的时间
+const sessionTranscript = ref('') // 当前会话的临时文本
 
 const getSR = () => {
 	if (typeof window === 'undefined') return null
 	return window.SpeechRecognition || window.webkitSpeechRecognition || null
 }
 
+/**
+ * 智能添加标点符号
+ * 根据停顿时间和语义规则添加标点
+ */
+const addSmartPunctuation = (text, timeSinceLastFinal) => {
+	if (!text) return text
+
+	// 移除文本首尾空格
+	text = text.trim()
+
+	// 如果文本为空，直接返回
+	if (!text) return text
+
+	// 如果上次结果距离现在超过 1.5 秒，认为是新的句子，前面加句号
+	const shouldAddPeriod = timeSinceLastFinal > 1500
+
+	// 常见的句子结尾词（可根据实际情况扩展）
+	const endPatterns = [
+		/[吗呢吧啊呀哇哎]$/, // 语气词结尾
+		/[了的地得]$/, // 助词结尾
+		/好$/, // 简短回答
+		/是$/,
+		/对$/,
+		/没有$/,
+		/可以$/,
+		/不是$/
+	]
+
+	// 检查是否需要添加问号
+	const needsQuestionMark =
+		text.includes('吗') ||
+		text.includes('呢') ||
+		text.startsWith('为什么') ||
+		text.startsWith('怎么') ||
+		text.startsWith('什么') ||
+		text.startsWith('哪') ||
+		text.startsWith('谁') ||
+		text.startsWith('是不是') ||
+		text.startsWith('能不能') ||
+		text.startsWith('可不可以')
+
+	// 检查是否已经有标点符号
+	const hasPunctuation = /[。！？，、；：""''（）]$/.test(text)
+
+	if (!hasPunctuation) {
+		if (needsQuestionMark) {
+			text += '？'
+		} else if (
+			shouldAddPeriod &&
+			endPatterns.some((pattern) => pattern.test(text))
+		) {
+			text += '。'
+		} else if (timeSinceLastFinal > 800) {
+			// 如果停顿较长（但不算太长），添加逗号
+			text += '，'
+		}
+	}
+
+	return text
+}
+
+/**
+ * 文本后处理优化
+ * 修正常见的识别错误和格式问题
+ */
+const postProcessText = (text) => {
+	if (!text) return text
+
+	// 常见的口语化转换（可根据实际情况扩展）
+	const replacements = {
+		嗯嗯: '',
+		啊啊: '',
+		呃: '',
+		额: '',
+		// 数字优化
+		一: '1',
+		二: '2',
+		三: '3',
+		四: '4',
+		五: '5',
+		六: '6',
+		七: '7',
+		八: '8',
+		九: '9',
+		十: '10',
+		// 常见技术词汇优化
+		皮埃奇皮: 'PHP',
+		皮埃奇匹: 'PHP',
+		杰斯: 'JS',
+		杰埃斯: 'JS',
+		维优易: 'Vue',
+		瑞阿克特: 'React',
+		艾皮爱: 'API'
+	}
+
+	// 执行替换（仅替换独立的词，避免误替换）
+	let processed = text
+	for (const [key, value] of Object.entries(replacements)) {
+		// 使用词边界匹配，避免误替换
+		const regex = new RegExp(key, 'g')
+		processed = processed.replace(regex, value)
+	}
+
+	// 移除多余的空格
+	processed = processed.replace(/\s+/g, '')
+
+	// 移除重复的标点符号
+	processed = processed.replace(/([。！？，])\1+/g, '$1')
+
+	return processed
+}
+
 const initRecognition = () => {
 	const SR = getSR()
 	if (!SR) return
 	const rec = new SR()
-	rec.lang = 'zh-CN'
-	rec.continuous = true
-	rec.interimResults = true
+
+	// 优化识别参数
+	rec.lang = 'zh-CN' // 中文识别
+	rec.continuous = true // 持续识别
+	rec.interimResults = true // 返回临时结果
+	rec.maxAlternatives = 1 // 只获取最佳结果
+
 	rec.onstart = () => {
 		listening.value = true
+		sessionTranscript.value = '' // 重置会话文本
+		lastFinalTime.value = Date.now()
 	}
+
 	rec.onend = () => {
 		listening.value = false
 	}
-	rec.onerror = () => {
+
+	rec.onerror = (event) => {
+		console.error('语音识别错误:', event.error)
 		listening.value = false
 	}
+
 	rec.onresult = (event) => {
-		let finalText = ''
-		let interimText = ''
-		for (let i = event.resultIndex; i < event.results.length; ++i) {
+		// 收集本次识别的所有结果
+		let currentSessionText = ''
+
+		for (let i = 0; i < event.results.length; ++i) {
 			const result = event.results[i]
 			const text = result[0].transcript
-			if (result.isFinal) finalText += text
-			else interimText += text
+
+			if (result.isFinal) {
+				// 计算距离上次 final 结果的时间间隔
+				const now = Date.now()
+				const timeSinceLastFinal = now - lastFinalTime.value
+				lastFinalTime.value = now
+
+				// 对 final 结果进行后处理
+				let processedText = postProcessText(text)
+				// 智能添加标点符号
+				processedText = addSmartPunctuation(processedText, timeSinceLastFinal)
+
+				// 追加到会话文本
+				sessionTranscript.value += processedText
+
+				// 更新最终的 transcript
+				transcript.value = props.initialText + sessionTranscript.value
+
+				// 实时更新到父组件
+				props.onRealtimeUpdate(transcript.value)
+			} else {
+				// interim 结果，用于实时预览
+				currentSessionText += text
+			}
 		}
 
-		// 更新 transcript（追加模式）
-		// 注意：这里简单实现为累加。如果 SpeechRecognition 是 continuous 的，
-		// 它会在整个 session 中持续返回结果，直到 stop()。
-		// 但是我们这里可能会多次 start/stop，需要处理好追加逻辑。
-		// 实际上，最简单的方式是让 transcript 保持为 "baseText + currentSessionText"
-		// 但为了简化，我们假设每次 onresult 都是增量（配合 event.resultIndex），或者我们手动维护追加。
-
-		// 简单的追加逻辑：这里其实有一种情况，当 continuous=true 时，start() 后会不断输出
-		// 我们应该只在 session 内追加。
-		// 鉴于用户体验，我们直接追加到 transcript ref 中。
-
-		// 由于 transcript 已经是累积的文本，我们需要小心不要重复添加。
-		// 但 SpeechRecognition 的 resultIndex 是递增的，只要 rec 实例不销毁，是否会重置？
-		// 每次 start() 都会开始新的识别会话，resultIndex 重置为 0。
-		// 所以我们需要一个 tempTranscript 来存储当前会话的内容，或者直接追加到 main transcript 并在 stop 时固化？
-
-		// 修正策略：直接将识别到的片段追加到 transcript，并清除 interim 部分（如果需要）。
-		// 但这里 interimText 是会变的。
-
-		// 简化逻辑：
-		// 我们不使用 interimText 来更新最终 transcript，只用于显示（如果 UI 有显示的话）。
-		// 这里 UI 没有显示 interim，所以我们只在 isFinal 为 true 时追加。
-		// 为了实时性，也可以利用 interimText。
-
-		// 更好的做法：
-		// 每次 start() 时，记录当前的 transcript 为 base。
-		// onresult 时，transcript = base + currentSessionText。
-
-		// 由于我们没有地方存 base，我们简单处理：
-		// 忽略 interimText 的即时展示（或者简单追加），只处理 finalText。
-		// 但用户要求“实时展示”，所以 interimText 很重要。
-
-		// 让我们用一个 currentSessionTranscript 变量
-		// 实际上，我们每次 start() 都是新的，所以：
-		if (finalText) {
-			transcript.value += finalText
-		}
-		// interimText 暂时无法完美处理追加显示，除非我们有一个专门的字段。
-		// 但父组件 inputMessage 是单字符串。
-		// 考虑到 inputMessage 的体验，我们这里简单地追加 finalText 即可。
-		// 如果要支持实时预览（interim），需要更复杂的逻辑，暂且只追加 final。
-		// 修正：为了“实时”，我们还是尝试把 interim 也加上，但下次 update 要撤销 interim？
-		// 这在单向数据流给父组件时比较麻烦。
-		// 妥协：只追加 final 结果，或者稍微延迟。
-		// 大多数现代浏览器识别速度很快，final 也可以。
-
-		// 如果非常需要实时看到“正在说的话”，可以：
-		// props.onRealtimeUpdate(transcript.value + interimText)
-		if (interimText) {
-			props.onRealtimeUpdate(transcript.value + interimText)
-		} else {
-			props.onRealtimeUpdate(transcript.value)
+		// 如果有 interim 结果，也实时展示（但不保存）
+		if (currentSessionText) {
+			const tempText =
+				props.initialText +
+				sessionTranscript.value +
+				postProcessText(currentSessionText)
+			props.onRealtimeUpdate(tempText)
 		}
 	}
+
 	recognitionRef.value = rec
 }
 
@@ -158,8 +264,13 @@ const start = () => {
 	if (!recognitionRef.value) initRecognition() // 确保初始化
 	if (!recognitionRef.value) return
 	try {
+		// 重置会话状态
+		sessionTranscript.value = ''
+		lastFinalTime.value = Date.now()
 		recognitionRef.value.start()
-	} catch {}
+	} catch (e) {
+		console.warn('语音识别启动失败:', e)
+	}
 }
 
 const stop = () => {

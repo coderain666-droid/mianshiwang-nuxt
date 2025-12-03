@@ -110,7 +110,7 @@
 			<div class="relative">
 				<UTextarea
 					v-model="inputMessage"
-					placeholder="请输入您的回答..."
+					placeholder="请输入您的回答...（长按空格 语音输入）"
 					:rows="3"
 					:maxrows="6"
 					resize
@@ -119,7 +119,7 @@
 					class="w-full"
 					:ui="{
 						wrapper: 'relative',
-						base: 'pr-24 py-3 pl-4 rounded-xl border-gray-200 focus:ring-primary-500 focus:border-primary-500 bg-gray-50 focus:bg-white transition-colors duration-200',
+						base: 'custom-scrollbar pr-24 py-3 pl-4 pb-10 rounded-xl border-gray-200 focus:ring-primary-500 focus:border-primary-500 bg-gray-50 focus:bg-white transition-colors duration-200',
 						placeholder: 'text-gray-400'
 					}"
 					@keydown.enter.exact.prevent="handleEnterKey"
@@ -128,7 +128,7 @@
 					@focus="onInputFocus"
 					@blur="onInputBlur"
 				/>
-				<div class="absolute bottom-3 right-3 flex items-center gap-2">
+				<div class="absolute bottom-3 right-3 flex items-end gap-2">
 					<span
 						v-if="isSpeechSupported && canSendMessage"
 						class="text-xs text-gray-400 flex items-baseline"
