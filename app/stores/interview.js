@@ -34,6 +34,16 @@ jd: ''
 		// suspend：用户点击了暂停面试的按钮，但并不意味着面试结束
 		// ended：面试已经结束
 		interviewStatus: 'idle',
+
+		/*
+		  START = 'start', // 面试开始
+  QUESTION = 'question', // 面试官提问
+  WAITING = 'waiting', // 等待候选人回答
+  THINKING = 'thinking', // AI正在思考
+  END = 'end', // 面试结束
+  ERROR = 'error', // 发生错误 */
+		// 面试中进度类型
+		interviewEventType: 'start',
 		// 已面试时长（字符串，格式：HH:mm:ss）
 		interviewDuration: '00:00:00',
 		/*
@@ -50,15 +60,6 @@ jd: ''
 		resultId: null,
 		// 面试会话 ID。注意：该 id 保存在内存中，服务器是会清除的
 		sessionId: null,
-		/*
-		  START = 'start', // 面试开始
-  QUESTION = 'question', // 面试官提问
-  WAITING = 'waiting', // 等待候选人回答
-  THINKING = 'thinking', // AI正在思考
-  END = 'end', // 面试结束
-  ERROR = 'error', // 发生错误 */
-		// 面试中进度类型
-		interviewEventType: 'start',
 
 		// 第三步：报告
 		report: null, // 结构化报告数据

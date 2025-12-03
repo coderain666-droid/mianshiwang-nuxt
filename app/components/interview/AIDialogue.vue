@@ -192,6 +192,7 @@
 						继续面试
 					</UButton>
 					<UButton
+						v-if="interviewStore.interviewEventType !== 'end'"
 						color="error"
 						variant="ghost"
 						size="xs"
@@ -480,8 +481,27 @@ const handleSendMessage = async () => {
 					}
 					// 面试结束
 					else if (type === 'end') {
+						// 增加面试结束的内容展示
+						interviewStore.updateLastMessage(content, 'interviewer')
+						scrollToBottom()
+						// 改变标记位置
 						interviewStore.interviewEventType = 'end'
 						interviewStore.interviewStatus = 'ended'
+						// 给用户一个结束面试，点击查看面试报告的提示
+						globalModal.showModal({
+							title: '恭喜！面试完成～',
+							description:
+								'点击查看面试报告（也可以在页面底部，点击「查看报告哦～」）',
+							buttons: [
+								{
+									label: '立刻查看报告',
+									color: 'success',
+									onClick: () => {
+										handleComplete()
+									}
+								}
+							]
+						})
 					}
 					// 发生错误
 					else if (type === 'error') {
@@ -614,10 +634,10 @@ const endInterview = () => {
 											interviewStore.resultId
 										)
 										interviewStore.interviewStatus = 'ended'
-										emit('endInterview', interviewStore.resultId)
+										handleComplete()
 									} catch (error) {
 										interviewStore.interviewStatus = 'ended'
-										emit('endInterview', interviewStore.resultId)
+										handleComplete()
 									}
 								}
 							}
@@ -633,6 +653,13 @@ const endInterview = () => {
 			}
 		]
 	})
+}
+
+/**
+ * 查看报告
+ */
+const handleComplete = () => {
+	emit('endInterview', interviewStore.resultId)
 }
 
 const showAdvice = (message) => {

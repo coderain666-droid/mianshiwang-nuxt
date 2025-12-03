@@ -193,7 +193,11 @@ const isProgressing = computed(() => {
  * 判断是否处于 面试中
  */
 const isInterviewing = computed(() => {
-	return route.query.step === 'interview' && route.query.resultId
+	return (
+		route.query.step === 'interview' &&
+		route.query.resultId &&
+		interviewStore.interviewStatus !== 'ended'
+	)
 })
 
 const onGoHome = () => {
