@@ -135,7 +135,7 @@ const serviceConfig = computed(() => {
 		[SERVICE_TAGS.SPECIAL]: {
 			borderColor: 'border-primary-200',
 			iconColor: 'text-primary-500',
-			buttonText: '开始面试',
+			buttonText: '开始 专项面试',
 			infoItems: [
 				{
 					icon: 'i-heroicons-bolt',
@@ -154,7 +154,7 @@ const serviceConfig = computed(() => {
 		[SERVICE_TAGS.BEHAVIOR]: {
 			borderColor: 'border-purple-200',
 			iconColor: 'text-purple-500',
-			buttonText: '开始面试',
+			buttonText: '开始 行测 + HR 面试',
 			infoItems: [
 				{
 					icon: 'i-heroicons-chat-bubble-left-right',
