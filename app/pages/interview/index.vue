@@ -322,6 +322,7 @@ const handleEndInterview = async (interviewResultId) => {
 		const res = await getMockInterviewQAResultAPI($api, interviewResultId)
 		predictionResults.value = res.questions
 		// 更新到 complete 步骤
+
 		updateQuery({ step: 'complete' })
 	} catch (error) {
 		console.error('获取面试结果失败:', error)
@@ -363,7 +364,8 @@ const handleNextStep = async () => {
 onMounted(async () => {
 	// 判断是否为查看历史记录
 	const historyResultId = route.query.resultId
-	if (historyResultId) {
+	const isHistory = route.query.history
+	if (historyResultId && isHistory) {
 		resultId = historyResultId
 
 		// 根据服务类型加载历史数据

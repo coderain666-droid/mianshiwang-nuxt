@@ -367,7 +367,7 @@ const handleView = (record) => {
 	if (record.resultId) {
 		// 动态传递当前的 serviceType
 		navigateTo(
-			`/interview?serviceType=${activeTab.value}&resultId=${record.resultId}`
+			`/interview?serviceType=${activeTab.value}&history=true&resultId=${record.resultId}`
 		)
 	} else {
 		console.warn('记录缺少 resultId', record)

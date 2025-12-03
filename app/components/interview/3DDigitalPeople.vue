@@ -32,7 +32,9 @@
 				</div>
 
 				<div class="text-xs text-neutral-500">
-					已面试：{{ interviewStore.interviewDuration || '00:00:00' }}
+					{{ isOnline ? '面试中' : '已暂停' }}：{{
+						interviewStore.interviewDuration || '00:00:00'
+					}}
 				</div>
 			</div>
 		</div>
@@ -691,6 +693,7 @@ const startDurationTimer = () => {
 	if (durationInterval) return
 
 	durationInterval = setInterval(() => {
+		if (!isOnline.value) return
 		elapsedSeconds.value += 1
 	}, 1000)
 }
