@@ -19,11 +19,9 @@
 						<UIcon name="i-heroicons-qr-code" class="w-8 h-8 text-green-600" />
 					</div>
 					<h2 class="text-xl font-semibold text-neutral-900 mb-2">
-						微信扫码关注
+						关注更多面试机会
 					</h2>
-					<p class="text-sm text-neutral-500 mb-4">
-						扫描二维码关注更多面试机会
-					</p>
+					<p class="text-sm text-neutral-500 mb-4">微信扫码关注</p>
 					<div
 						class="w-48 h-48 bg-gray-50 rounded-lg border border-gray-200 flex items-center justify-center p-2"
 					>
