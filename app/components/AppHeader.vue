@@ -48,6 +48,16 @@
 					>流程</NuxtLink
 				>
 				<NuxtLink
+					to="/history"
+					:class="[
+						'transition-colors',
+						route.path === '/history'
+							? 'text-neutral-900 font-bold'
+							: 'hover:text-neutral-900'
+					]"
+					>服务记录</NuxtLink
+				>
+				<NuxtLink
 					to="/faq"
 					:class="[
 						'transition-colors',

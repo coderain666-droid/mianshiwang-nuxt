@@ -1,5 +1,5 @@
 <template>
-	<section id="features" class="py-10 md:py-32 bg-neutral-50/50">
+	<section class="py-10 md:py-32 bg-neutral-50/50">
 		<div class="container px-4">
 			<div class="mx-auto max-w-3xl text-center mb-16">
 				<h2
@@ -11,9 +11,8 @@
 					不同于市面上单一的 AI 面试模拟工具，面试汪提供从<span
 						class="font-semibold text-primary-600"
 						>押题预测</span
-					>到<span class="font-semibold text-primary-600">实战模拟</span>再到<span
-						class="font-semibold text-primary-600"
-						>综合评估</span
+					>到<span class="font-semibold text-primary-600">实战模拟</span
+					>再到<span class="font-semibold text-primary-600">综合评估</span
 					>的完整解决方案，全方位提升面试竞争力。
 				</p>
 			</div>
