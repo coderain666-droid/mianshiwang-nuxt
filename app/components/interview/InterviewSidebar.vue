@@ -61,14 +61,14 @@
 							v-if="index !== steps.length - 1"
 							class="absolute top-8 left-4 bottom-0 w-px bg-slate-100 -ml-0.5"
 							:class="{
-								'bg-primary-100': step.id < interviewStore.currentStep
+								'bg-primary-100': isAllowClick(step)
 							}"
 						></div>
 
 						<div
 							class="group w-full text-left relative z-10 flex gap-4 transition-opacity"
 							:class="[
-								step.id <= interviewStore.currentStep
+								isAllowClick(step)
 									? 'cursor-pointer hover:opacity-80'
 									: 'cursor-not-allowed opacity-70'
 							]"
@@ -80,18 +80,18 @@
 								:class="[
 									step.id === interviewStore.currentStep
 										? 'border-primary-600 text-primary-600 shadow-md scale-110'
-										: step.id < interviewStore.currentStep
+										: isAllowClick(step)
 										? 'border-primary-200 bg-primary-50 text-primary-600'
 										: 'border-slate-200 text-slate-300'
 								]"
 							>
 								<UIcon
-									v-if="step.id < interviewStore.currentStep"
+									v-if="isAllowClick(step)"
 									name="i-heroicons-check"
 									class="w-4 h-4"
 								/>
 								<UIcon
-									v-else-if="step.id > interviewStore.currentStep"
+									v-else-if="!isAllowClick(step)"
 									name="i-heroicons-lock-closed"
 									class="w-3.5 h-3.5"
 								/>
@@ -105,7 +105,7 @@
 									:class="[
 										step.id === interviewStore.currentStep
 											? 'text-slate-900'
-											: step.id < interviewStore.currentStep
+											: isAllowClick(step)
 											? 'text-slate-700'
 											: 'text-slate-400'
 									]"
@@ -214,6 +214,16 @@ const toggleSidebar = () => {
 }
 
 /**
+ * 是否允许点击
+ */
+const isAllowClick = (step) => {
+	if (isHistory.value) {
+		return false
+	}
+	return step.id <= interviewStore.currentStep
+}
+
+/**
  * 判断是否处于 押题进度条环节
  */
 const isProgressing = computed(() => {
@@ -232,6 +242,13 @@ const isInterviewing = computed(() => {
 })
 
 /**
+ * 判断是否处于历史记录中
+ */
+const isHistory = computed(() => {
+	return route.query.history
+})
+
+/**
  * 处理步骤点击事件
  * 规则：
  * 1. 只能点击已完成或当前步骤
@@ -240,6 +257,10 @@ const isInterviewing = computed(() => {
  * 4. Step 3: 只有在报告生成后才能访问
  */
 const handleStepClick = (stepId) => {
+	if (isHistory.value) {
+		return
+	}
+
 	// 当前处于押题进度条环节，不允许点击步骤
 	if (isProgressing.value) {
 		toast.add({

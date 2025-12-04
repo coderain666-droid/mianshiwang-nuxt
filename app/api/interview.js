@@ -70,28 +70,7 @@ const ssePost = (path, params, options) => {
 }
 
 /**
- * 处理简历押题 - SSE 流式接口
- *
- * 注意：SSE 流式接口无法使用 $api ($fetch)，因为：
- * 1. $fetch 会等待完整响应，无法处理实时流式数据
- * 2. SSE 需要使用 fetch + ReadableStream 来逐块读取数据
- *
- * @param {Object} params - 请求参数
- * @param {string} params.resumeId - 简历ID
- * @param {string} params.company - 公司名称
- * @param {string} params.positionName - 岗位名称
- * @param {string} params.minSalary - 最低薪资
- * @param {string} params.maxSalary - 最高薪资
- * @param {string} params.jd - 岗位职责
- * @param {string} [params.requestId] - 请求ID（用于幂等性，避免重复提交，UUID v4 格式）
- * @param {Object} options - 配置选项
- * @param {string} options.token - 认证 token（从 userStore 传入）
- * @param {string} options.baseURL - API 基础 URL（从 runtimeConfig 传入）
- * @param {Object} options.callbacks - 回调函数集合
- * @param {Function} options.callbacks.onMessage - 接收到消息时的回调函数
- * @param {Function} options.callbacks.onError - 发生错误时的回调函数
- * @param {Function} options.callbacks.onComplete - 完成时的回调函数
- * @returns {Object} 返回包含 close 方法的控制器对象
+ * 处理简历押题 - 题目 + 答案 + 分析
  */
 export const generateResumeQuizSSE = (params, options) => {
 	return ssePost('/interview/resume/quiz/stream', params, options)

@@ -316,7 +316,6 @@ const filteredPositions = computed(() => {
 })
 
 const canProceed = computed(() => {
-	debugger
 	return (
 		interviewStore.selectedPosition &&
 		interviewStore.resumeType &&

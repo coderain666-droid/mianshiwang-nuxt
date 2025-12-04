@@ -22,7 +22,7 @@
 							@click="onGoStart"
 							class="hover:text-primary-600 transition-colors flex items-center gap-1"
 						>
-							开始专项服务
+							{{ isHistory ? '查看服务记录' : '开始专项服务' }}
 						</NuxtLink>
 						<span class="text-slate-300">/</span>
 						<span class="text-slate-900 font-medium">{{ pageTitle }}</span>
@@ -118,8 +118,8 @@ onMounted(() => {
 
 	// 报告页面守卫
 	if (currentPath === '/interview/report') {
-		// 检查是否已生成报告
-		if (!interviewStore.report || !interviewStore.reportGenerated) {
+		// 检查是否包含 resultId 参数
+		if (!route.query.resultId) {
 			// 根据当前选择的服务跳转到对应的面试页面
 			const serviceTypeMap = {
 				[SERVICE_TAGS.SPECIAL]: `/interview?serviceType=special&step=interview`,
@@ -200,6 +200,13 @@ const isInterviewing = computed(() => {
 	)
 })
 
+/**
+ * 判断是否处于历史记录中
+ */
+const isHistory = computed(() => {
+	return route.query.history
+})
+
 const onGoHome = () => {
 	if (isProgressing.value) {
 		toast.add({
@@ -226,6 +233,11 @@ const onGoHome = () => {
 }
 
 const onGoStart = () => {
+	if (isHistory.value) {
+		navigateTo('/history')
+		return
+	}
+
 	if (isProgressing.value) {
 		toast.add({
 			title: '不要呀～～',

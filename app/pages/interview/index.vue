@@ -232,9 +232,12 @@ const handleSubmit = () => {
 }
 
 // ==================== 简历押题流程 ====================
+const resumeQuizComplete = ref(false)
 const startResumeQuiz = async (requestId) => {
 	// 更新 URL 到 progress 步骤
 	updateQuery({ step: 'progress' })
+	// 重置 押题是否完成的状态
+	resumeQuizComplete.value = false
 
 	// 初始化状态
 	currentProgressStep.value = {
@@ -264,6 +267,7 @@ const startResumeQuiz = async (requestId) => {
 		baseURL: config.public.apiBase,
 		callbacks: {
 			onMessage: (data) => {
+				// 进度中
 				if (data.type === 'progress') {
 					currentProgressStep.value = {
 						progress: data.progress || 0,
@@ -271,15 +275,11 @@ const startResumeQuiz = async (requestId) => {
 						stage: data.stage || 'processing'
 					}
 					progressSteps.value.push(currentProgressStep.value)
-				} else if (data.type === 'complete') {
-					debugger
+				}
+
+				// 简历押题数据获取完成
+				else if (data.type === 'yati-complete') {
 					resultId = data.data.resultId
-					router.replace({
-						query: {
-							...route.query,
-							resultId
-						}
-					})
 					if (data.data?.questions) {
 						predictionResults.value = data.data.questions.map((item) => ({
 							...item,
@@ -290,8 +290,13 @@ const startResumeQuiz = async (requestId) => {
 						predictionSummary.value = data.data.summary
 					}
 					// 更新到 complete 步骤
-					updateQuery({ step: 'complete' })
-				} else if (data.type === 'error') {
+					updateQuery({ step: 'complete', resultId })
+				} else if (data.type === 'complete') {
+					// console.log('所有数据解析完成', data)
+					resumeQuizComplete.value = true
+				}
+				// 报错处理
+				else if (data.type === 'error') {
 					console.error('SSE Error:', data.error)
 					updateQuery({ step: 'error' })
 					toast.add({
@@ -363,8 +368,21 @@ const handleNextStep = async () => {
 			// 即使失败也继续跳转
 		}
 	}
+	// 后续增加的逻辑，简历押题被拆分两部分返还，如果 resumeQuizComplete 为 false，则需要等待押题完成
+	else {
+		if (!resumeQuizComplete.value && !route.query.history) {
+			toast.add({
+				title: '面试评估报告正在努力生成中...预计还需 1 - 2 分钟',
+				description: '先看下押题的题目和报告吧～',
+				color: 'warning'
+			})
+			return
+		}
+	}
 
-	navigateTo(`/interview/report?resultId=${finalResultId}`)
+	navigateTo(
+		`/interview/report?resultId=${finalResultId}&serviceType=${route.query.serviceType}&history=${route.query.history}`
+	)
 }
 
 // ==================== 初始化 ====================

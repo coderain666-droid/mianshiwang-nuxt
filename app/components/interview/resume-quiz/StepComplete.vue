@@ -6,8 +6,9 @@
 		>
 			<div class="flex items-center gap-2 text-sm text-neutral-600">
 				<UIcon name="i-heroicons-check-circle" class="w-5 h-5 text-green-500" />
-				<span v-if="serviceType === 'resume'"
-					>押题完成，共生成 {{ predictionResults.length }} 道预测题</span
+				<span v-if="serviceType === 'resume'">
+					{{ $route.query.history ? '历史押题数据' : '押题完成' }}
+					，共生成 {{ predictionResults.length }} 道预测题</span
 				>
 				<span v-else-if="serviceType === 'special'"
 					>专项面试完成，共提问 {{ predictionResults.length }} 道题目</span
@@ -67,9 +68,8 @@
 						<h3 class="font-bold text-neutral-900">AI 押题分析总结</h3>
 						<p
 							class="text-sm text-neutral-600 leading-relaxed whitespace-pre-wrap"
-						>
-							{{ predictionSummary }}
-						</p>
+							v-html="marked.parse(predictionSummary)"
+						></p>
 					</div>
 				</div>
 			</div>
@@ -191,9 +191,8 @@
 							</div>
 							<div
 								class="pl-6 text-sm text-neutral-700 leading-relaxed whitespace-pre-wrap"
-							>
-								{{ item.answer }}
-							</div>
+								v-html="marked.parse(item.answer)"
+							></div>
 						</div>
 					</div>
 				</div>
@@ -205,6 +204,7 @@
 <script setup>
 import { useInterviewStore } from '@/stores/interview'
 import { navigateTo } from '#imports'
+import { marked } from 'marked'
 
 defineProps({
 	// resume: 面试押题

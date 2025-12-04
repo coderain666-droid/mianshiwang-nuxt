@@ -66,9 +66,10 @@
 									{{ reportData.matchLevel }}
 								</span>
 							</div>
-							<p class="text-neutral-600 leading-relaxed mb-6">
-								{{ reportData.summary }}
-							</p>
+							<p
+								class="text-neutral-600 leading-relaxed mb-6"
+								v-html="marked.parse(reportData.summary)"
+							></p>
 
 							<!-- 私教训练营按钮 -->
 							<div v-if="showTrainingButton" class="mb-6">
@@ -341,6 +342,7 @@ import { getAnalysisReportAPI } from '@/api/interview'
 import { useRoute } from 'vue-router'
 import sundayImg from '@/assets/imgs/sunday.jpg'
 import { useGlobalModal } from '@/composables/useGlobalModal'
+import { marked } from 'marked'
 
 // 引入简单的雷达图组件（如果没有外部组件，我们可以在这里定义一个局部组件）
 import RadarChart from '@/components/interview/RadarChart.vue'
@@ -415,8 +417,6 @@ const reportData = ref({
 const getAnalysisReport = async () => {
 	try {
 		const res = await getAnalysisReportAPI($api, route.query.resultId)
-		console.log('res', res)
-
 		if (res) {
 			reportData.value = res
 		}
