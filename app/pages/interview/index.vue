@@ -252,7 +252,7 @@ const startResumeQuiz = async (requestId) => {
 	const params = {
 		resumeId: interviewStore.resumeId,
 		resumeContent: interviewStore.resumeText,
-		company: interviewStore.selectedPosition.company || '',
+		company: interviewStore.selectedPosition.company || '未指定公司',
 		positionName: interviewStore.selectedPosition.positionName || '',
 		minSalary: interviewStore.selectedPosition.minSalary || '',
 		maxSalary: interviewStore.selectedPosition.maxSalary || '',
@@ -428,10 +428,11 @@ onMounted(async () => {
 
 // 组件卸载时清理 SSE 连接
 onUnmounted(() => {
-	if (sseController.value) {
-		sseController.value.close()
-		sseController.value = null
-	}
+	// 因为简历押题分成了两段获取数据，为防止用户在押题阶段直接跳转，所以不去断链 sse
+	// if (sseController.value) {
+	// 	sseController.value.close()
+	// 	sseController.value = null
+	// }
 })
 </script>
 
