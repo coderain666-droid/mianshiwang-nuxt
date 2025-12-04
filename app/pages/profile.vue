@@ -132,7 +132,12 @@
 													<div
 														class="w-11 h-11 rounded-full bg-white/15 flex items-center justify-center"
 													>
-														<UIcon :name="stat.icon" class="w-5 h-5" />
+														<UIcon
+															:name="
+																stat.icon || 'i-heroicons-question-mark-circle'
+															"
+															class="w-5 h-5"
+														/>
 													</div>
 													<div>
 														<p class="text-sm text-white/90 font-medium">
@@ -343,7 +348,10 @@
 												class="text-xs font-semibold flex gap-2 mb-1"
 												:class="recordMeta.amountClass"
 											>
-												<ww-svg-icon :name="record.channel" class="w-4 h-4" />
+												<ww-svg-icon
+													:name="record.channel || ''"
+													class="w-4 h-4"
+												/>
 												<span>金额：{{ record.amount }} 元</span>
 											</p>
 
