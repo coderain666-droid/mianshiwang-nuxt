@@ -59,7 +59,7 @@ export default defineNuxtConfig({
 			]
 		}
 	},
-
+	plugins: ['~/plugins/analytics.client'],
 	// —— 路由级规则（模板仅预渲染首页）——
 	routeRules: {
 		'/': { prerender: true },
