@@ -27,7 +27,7 @@
 					]"
 					>开启 AI 服务</NuxtLink
 				>
-				<NuxtLink
+				<!-- <NuxtLink
 					to="/#features"
 					:class="[
 						'transition-colors',
@@ -46,7 +46,7 @@
 							: 'hover:text-neutral-900'
 					]"
 					>流程</NuxtLink
-				>
+				> -->
 				<NuxtLink
 					to="/history"
 					:class="[

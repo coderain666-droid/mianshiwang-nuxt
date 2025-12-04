@@ -394,6 +394,15 @@
 												>
 													{{ record.statusName }}
 												</UBadge>
+												<UBadge
+													v-if="record.status !== 'success'"
+													size="xs"
+													color="success"
+													variant="subtle"
+													class="font-normal"
+												>
+													消费已返还
+												</UBadge>
 												<p
 													class="text-xs text-gray-500 truncate"
 													:title="record.description"
