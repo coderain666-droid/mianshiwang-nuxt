@@ -174,28 +174,28 @@
 										<!-- 快捷操作 -->
 										<div class="flex flex-wrap gap-3 pt-1">
 											<UButton
-												color="warning"
 												variant="solid"
+												color="warning"
 												class="flex-1 min-w-[120px] justify-center shadow-lg shadow-white/20 hover:shadow-white/30"
-												@click="rechargeModal = true"
-											>
-												<UIcon
-													name="i-heroicons-plus-circle"
-													class="w-4 h-4 mr-1"
-												/>
-												充值旺旺币
-											</UButton>
-											<UButton
-												variant="ghost"
-												color="white"
-												class="flex-1 min-w-[120px] justify-center text-white/90 border border-white/30 bg-white/5 hover:bg-white/15"
-												@click="rechargeModal = true"
+												@click="redeemServiceModal = true"
 											>
 												<UIcon
 													name="i-heroicons-arrow-path-rounded-square"
 													class="w-4 h-4 mr-1"
 												/>
-												套餐兑换
+												旺旺币兑换
+											</UButton>
+											<UButton
+												variant="ghost"
+												color="white"
+												class="flex-4 min-w-[120px] justify-center text-white/90 border border-white/30 bg-white/5 hover:bg-white/15"
+												@click="rechargeModal = true"
+											>
+												<UIcon
+													name="i-heroicons-sparkles"
+													class="w-4 h-4 mr-1"
+												/>
+												优惠充值
 											</UButton>
 										</div>
 									</div>
@@ -457,6 +457,13 @@
 			:balance="userStore.walletBalance"
 			@recharge="handleRecharge"
 		/>
+
+		<!-- 旺旺币兑换服务弹窗 -->
+		<RedeemServiceModal
+			v-model="redeemServiceModal"
+			@redeem-success="handleRedeemSuccess"
+			@go-to-recharge="handleGoToRecharge"
+		/>
 	</div>
 </template>
 
@@ -469,6 +476,7 @@ import EditProfileModal from '@/components/profile/EditProfileModal.vue'
 import UploadResumeModal from '@/components/profile/UploadResumeModal.vue'
 import ResumeList from '@/components/profile/ResumeList.vue'
 import RechargeModal from '@/components/profile/RechargeModal.vue'
+import RedeemServiceModal from '@/components/profile/RedeemServiceModal.vue'
 import { getResumeListAPI } from '@/api/resume'
 import {
 	getUserInfoAPI,
@@ -499,6 +507,7 @@ const { $api } = useNuxtApp()
 const editProfileModal = ref(false)
 const isUploadResumeModalVisible = ref(false)
 const rechargeModal = ref(false)
+const redeemServiceModal = ref(false)
 const activeRecordTab = ref('recharge')
 
 /**
@@ -555,6 +564,30 @@ const handleResumeDelete = (index) => {
 const handleRecharge = async () => {
 	initUserInfo()
 	getPaymentRecords()
+}
+
+/**
+ * 处理旺旺币兑换服务
+ */
+const handleRedeemSuccess = (data) => {
+	// 这里只是 UI 展示，实际兑换逻辑由后续实现
+	toast.add({
+		title: '兑换成功',
+		description: `已成功兑换 ${data.serviceType}，消耗 ${data.cost} 旺旺币`,
+		color: 'success'
+	})
+	redeemServiceModal.value = false
+	// 刷新用户信息
+	initUserInfo()
+	// 获取充值记录
+	getPaymentRecords()
+}
+
+/**
+ * 从兑换弹窗跳转到充值
+ */
+const handleGoToRecharge = () => {
+	rechargeModal.value = true
 }
 
 /**

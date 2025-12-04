@@ -213,3 +213,16 @@ export const getMockInterviewSessionHistoryAPI = ($api, resultId) => {
 		method: 'GET'
 	})
 }
+
+/**
+ * 使用旺旺币兑换套餐
+ * body: {
+ * 	packageType: resume_quiz || special_interview || behavior_interview,
+ * }
+ */
+export const exchangePackageAPI = ($api, body) => {
+	return $api(`/interview/exchange-package`, {
+		method: 'POST',
+		body
+	})
+}
