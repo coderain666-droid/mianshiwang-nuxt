@@ -13,76 +13,55 @@
 							<h2 class="text-xl font-semibold text-gray-900">个人信息</h2>
 						</template>
 						<div class="space-y-6">
-							<div class="flex">
+							<div class="flex flex-col items-center">
 								<!-- 头像 -->
-								<div class="relative flex flex-col items-center justify-center">
-									<div class="relative group">
+								<div class="relative group mb-3">
+									<div
+										class="p-1 bg-white rounded-full shadow-sm ring-1 ring-gray-100"
+									>
 										<UAvatar
 											:src="userStore.userInfo.avatar"
 											:alt="userStore.userInfo.username || '用户头像'"
 											size="3xl"
-											class="cursor-pointer"
+											:ui="{ rounded: 'rounded-full' }"
 										/>
-										<!-- hover 遮罩 -->
-										<div
-											class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition-opacity"
-											@click="editProfileModal = true"
-										>
-											<UIcon name="i-heroicons-camera" class="w-5 h-5" />
-										</div>
 									</div>
-									<UButton
-										color="primary"
-										variant="ghost"
-										size="sm"
-										class="gap-2"
+									<!-- hover 遮罩 -->
+									<div
+										class="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-all cursor-pointer"
 										@click="editProfileModal = true"
 									>
-										<UIcon name="i-heroicons-pencil-square" class="w-4 h-4" />
-										编辑资料
-									</UButton>
-								</div>
-
-								<!-- 用户信息 -->
-								<div class="space-y-3">
-									<div
-										class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
-									>
-										<div
-											class="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0 group-hover:bg-primary-200 transition-colors"
-										>
-											<UIcon
-												name="i-heroicons-user"
-												class="w-5 h-5 text-primary-600"
-											/>
-										</div>
-										<div class="flex-1 min-w-0">
-											<p class="text-xs text-gray-500 mb-1">用户名</p>
-											<p class="text-sm font-semibold text-gray-900 truncate">
-												{{ userStore.userInfo.username || '未设置' }}
-											</p>
-										</div>
-									</div>
-
-									<div
-										class="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
-									>
-										<div
-											class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center shrink-0 group-hover:bg-blue-200 transition-colors"
-										>
-											<UIcon
-												name="i-heroicons-envelope"
-												class="w-5 h-5 text-blue-600"
-											/>
-										</div>
-										<div class="flex-1 min-w-0">
-											<p class="text-xs text-gray-500 mb-1">邮箱</p>
-											<p class="text-sm font-semibold text-gray-900 truncate">
-												{{ userStore.userInfo.email || '未设置' }}
-											</p>
-										</div>
+										<UIcon name="i-heroicons-camera" class="w-6 h-6" />
 									</div>
 								</div>
+
+								<!-- 用户名与 ID -->
+								<div class="text-center mb-5 w-full px-4">
+									<h3 class="text-lg font-bold text-gray-900 mb-1 truncate">
+										{{ userStore.userInfo.username || '未设置昵称' }}
+									</h3>
+									<div
+										class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-md bg-gray-100 text-xs text-gray-500 font-mono select-all hover:bg-gray-200 transition-colors"
+										title="用户 ID"
+									>
+										<span>ID: {{ userStore.userInfo._id || '-' }}</span>
+									</div>
+								</div>
+
+								<!-- 编辑按钮 -->
+								<UButton
+									block
+									color="gray"
+									variant="solid"
+									class="w-full bg-gray-50 hover:bg-gray-100 border-0 text-gray-700 font-medium"
+									@click="editProfileModal = true"
+								>
+									<UIcon
+										name="i-heroicons-pencil-square"
+										class="w-4 h-4 mr-1.5"
+									/>
+									编辑资料
+								</UButton>
 							</div>
 
 							<!-- 旺旺币 与 套餐余额 -->
@@ -118,7 +97,7 @@
 												{{ userStore.userInfo.wwCoinBalance }}
 											</span>
 											<p class="mt-1 text-[11px] text-white/70">
-												20 旺旺币可兑换一次 {{ serviceHighlights[0].title }} /
+												20 旺旺币兑换一次 {{ serviceHighlights[0].title }} /
 												{{ serviceHighlights[1].title }} /
 												{{ serviceHighlights[2].title }}
 											</p>
