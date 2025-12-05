@@ -3,7 +3,7 @@
 		class="card relative overflow-hidden border border-gray-200 bg-white p-8 shadow-lg"
 	>
 		<!-- 增加一个测试登录的按钮，只在测试环境下展示 -->
-		<UButton v-if="import.meta.env.DEV" @click="testLogin">测试登录</UButton>
+		<UButton v-if="isDev" @click="testLogin">测试登录</UButton>
 		<div
 			class="absolute -top-24 right-10 h-40 w-40 rounded-full bg-emerald-500/5 blur-3xl"
 		></div>
@@ -136,6 +136,9 @@ import {
 } from '@/api/login'
 import { useUserStore } from '@/stores/user'
 import { handleLoginSuccess } from '@/permission'
+
+// 判断是否是开发环境
+const isDev = process.dev
 
 // 组件向父级抛出的事件：微信快速登录请求、二维码刷新提示
 const emit = defineEmits(['refreshQr'])
