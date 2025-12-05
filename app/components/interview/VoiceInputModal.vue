@@ -70,6 +70,7 @@ const listening = ref(false)
 const recognitionRef = ref(null)
 const lastFinalTime = ref(0) // 记录上次 final 结果的时间
 const sessionTranscript = ref('') // 当前会话的临时文本
+const lastProcessedIndex = ref(0) // 记录已处理的结果索引，避免重复处理
 
 const getSR = () => {
 	if (typeof window === 'undefined') return null
@@ -203,6 +204,7 @@ const initRecognition = () => {
 		listening.value = true
 		sessionTranscript.value = '' // 重置会话文本
 		lastFinalTime.value = Date.now()
+		lastProcessedIndex.value = 0 // 重置处理索引
 	}
 
 	rec.onend = () => {
@@ -215,14 +217,18 @@ const initRecognition = () => {
 	}
 
 	rec.onresult = (event) => {
-		// 收集本次识别的所有结果
-		let currentSessionText = ''
+		// 只处理新的结果，避免重复处理
+		// event.results 是累积的，包含从开始到现在的所有结果
+		// 我们只需要处理 lastProcessedIndex 之后的新结果
 
-		for (let i = 0; i < event.results.length; ++i) {
+		let interimText = '' // 临时的中间结果
+
+		for (let i = lastProcessedIndex.value; i < event.results.length; ++i) {
 			const result = event.results[i]
 			const text = result[0].transcript
 
 			if (result.isFinal) {
+				// 这是一个最终确定的结果
 				// 计算距离上次 final 结果的时间间隔
 				const now = Date.now()
 				const timeSinceLastFinal = now - lastFinalTime.value
@@ -236,23 +242,27 @@ const initRecognition = () => {
 				// 追加到会话文本
 				sessionTranscript.value += processedText
 
+				// 更新已处理的索引（final 结果已处理）
+				lastProcessedIndex.value = i + 1
+
 				// 更新最终的 transcript
 				transcript.value = props.initialText + sessionTranscript.value
 
 				// 实时更新到父组件
 				props.onRealtimeUpdate(transcript.value)
 			} else {
-				// interim 结果，用于实时预览
-				currentSessionText += text
+				// interim 结果（临时的、未确定的结果）
+				// 用于实时预览，但不保存
+				interimText += text
 			}
 		}
 
 		// 如果有 interim 结果，也实时展示（但不保存）
-		if (currentSessionText) {
+		if (interimText) {
 			const tempText =
 				props.initialText +
 				sessionTranscript.value +
-				postProcessText(currentSessionText)
+				postProcessText(interimText)
 			props.onRealtimeUpdate(tempText)
 		}
 	}
@@ -267,6 +277,7 @@ const start = () => {
 		// 重置会话状态
 		sessionTranscript.value = ''
 		lastFinalTime.value = Date.now()
+		lastProcessedIndex.value = 0 // 重置处理索引
 		recognitionRef.value.start()
 	} catch (e) {
 		console.warn('语音识别启动失败:', e)

@@ -78,9 +78,10 @@
 							: 'bg-white border border-gray-100 text-neutral-800 rounded-tl-none'
 					]"
 				>
-					<div class="whitespace-pre-wrap wrap-break-word">
-						{{ message.content }}
-					</div>
+					<div
+						class="whitespace-pre-wrap wrap-break-word"
+						v-html="marked.parse(message.content)"
+					></div>
 					<div v-if="message.role === 'interviewer'" class="mt-2 flex">
 						<UButton
 							color="info"
@@ -250,6 +251,7 @@ import EndingProgressModal from '@/components/interview/EndingProgressModal.vue'
 import AnswerAdviceModal from '@/components/interview/AnswerAdviceModal.vue'
 import VoiceInputModal from '@/components/interview/VoiceInputModal.vue'
 import { useSpeechSynthesis } from '@/composables/useSpeechSynthesis'
+import { marked } from 'marked'
 
 const props = defineProps({
 	serviceType: {
@@ -342,6 +344,11 @@ const handleGlobalKeydown = (e) => {
 		isSpacePressed.value = true
 		showVoiceModal(true) // 传入 true 表示 PTT (Push-To-Talk) 模式
 	}
+
+	// 如果按了回车键，并且输入框中是有内容的，则执行 发送操作
+	if (e.code === 'Enter' && inputMessage.value.trim()) {
+		handleSendMessage()
+	}
 }
 
 /**
@@ -382,9 +389,13 @@ onMounted(async () => {
 		interviewStore.interviewerName = sessionInfo.interviewerName
 		// 设置岗位类型
 		interviewStore.selectedPosition.positionName = sessionInfo.position
-
-		// 重新进入，设置为 waiting 状态
-		interviewStore.interviewEventType = 'waiting'
+		// 判断当前面试状态是否为 in_progress（进行中）
+		if (sessionInfo.status === 'in_progress') {
+			// 改变状态标记
+			interviewStore.interviewStatus = 'in_progress'
+			// 重新进入，设置为 waiting 状态
+			interviewStore.interviewEventType = 'waiting'
+		}
 	}
 
 	// 语音识别能力检测（仅浏览器）
