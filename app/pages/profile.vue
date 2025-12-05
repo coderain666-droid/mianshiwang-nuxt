@@ -352,7 +352,10 @@
 													:name="record.channel || ''"
 													class="w-4 h-4"
 												/>
-												<span>金额：{{ record.amount }} 元</span>
+												<span
+													>金额：{{ record.amount }}
+													{{ record.channel === 'wwb' ? '币' : '元' }}</span
+												>
 											</p>
 
 											<p
