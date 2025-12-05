@@ -20,7 +20,7 @@
 						>准备阶段</span
 					>到<span class="font-semibold text-primary-600">实战训练</span
 					>再到<span class="font-semibold text-primary-600">综合评估</span
-					>的完整服务链条
+					>的完整服务链
 				</p>
 			</div>
 
