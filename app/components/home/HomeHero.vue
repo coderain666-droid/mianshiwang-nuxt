@@ -8,7 +8,7 @@
 				class="absolute top-[20%] -left-[10%] h-[400px] w-[400px] rounded-full bg-gradient-to-tr from-emerald-400/20 to-sky-400/20 blur-3xl opacity-60"
 			></div>
 		</div>
-		<div class="container px-4 py-10 md:py-32 relative">
+		<div class="container px-4 py-10 md:py-22 relative">
 			<div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 				<div class="max-w-2xl">
 					<div

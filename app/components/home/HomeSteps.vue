@@ -1,5 +1,5 @@
 <template>
-	<section id="steps" class="py-10 md:py-32 overflow-hidden">
+	<section id="steps" class="py-10 md:py-22 overflow-hidden">
 		<div class="container px-4">
 			<div class="mx-auto max-w-2xl text-center mb-16">
 				<h2

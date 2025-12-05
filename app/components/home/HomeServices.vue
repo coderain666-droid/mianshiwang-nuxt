@@ -1,5 +1,5 @@
 <template>
-	<section id="features" class="py-10 md:py-32 bg-white">
+	<section id="features" class="py-10 md:py-22 bg-white">
 		<div class="container px-4">
 			<!-- 标题 -->
 			<div class="mx-auto max-w-3xl text-center mb-16">
