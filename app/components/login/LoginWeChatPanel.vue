@@ -2,8 +2,8 @@
 	<div
 		class="card relative overflow-hidden border border-gray-200 bg-white p-8 shadow-lg"
 	>
-		<!-- 增加一个测试登录的按钮 -->
-		<UButton @click="testLogin">测试登录</UButton>
+		<!-- 增加一个测试登录的按钮，只在测试环境下展示 -->
+		<UButton v-if="import.meta.env.DEV" @click="testLogin">测试登录</UButton>
 		<div
 			class="absolute -top-24 right-10 h-40 w-40 rounded-full bg-emerald-500/5 blur-3xl"
 		></div>
