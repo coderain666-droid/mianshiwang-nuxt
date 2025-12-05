@@ -32,6 +32,14 @@
 					返回首页
 				</UButton>
 				<UButton
+					color="info"
+					variant="outline"
+					icon="i-heroicons-arrow-left-on-rectangle-solid"
+					@click="handleBackToQuestion"
+				>
+					上一步，查看详情问题
+				</UButton>
+				<UButton
 					color="primary"
 					icon="i-heroicons-arrow-path"
 					@click="handleRestart"
@@ -339,7 +347,7 @@ import { SEO } from '@/constants/seo'
 import { ref, computed } from 'vue'
 import { useToast } from '#imports'
 import { getAnalysisReportAPI } from '@/api/interview'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import sundayImg from '@/assets/imgs/sunday.jpg'
 import { useGlobalModal } from '@/composables/useGlobalModal'
 import { marked } from 'marked'
@@ -365,6 +373,7 @@ useHead({
 
 const { $api } = useNuxtApp()
 const route = useRoute()
+const router = useRouter()
 const interviewStore = useInterviewStore()
 interviewStore.currentStep = 3
 const toast = useToast()
@@ -449,5 +458,9 @@ const handleBackHome = () => {
 			}
 		]
 	})
+}
+
+const handleBackToQuestion = () => {
+	router.back()
 }
 </script>

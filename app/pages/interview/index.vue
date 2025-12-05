@@ -134,10 +134,13 @@ interviewStore.currentStep = 2
 
 // 更新 URL query 参数的辅助函数
 const updateQuery = (updates) => {
+	// 如果进度完成，那么自动标记为 历史查询
+	const isComplete = updates.step === 'complete'
 	router.push({
 		query: {
 			...route.query,
-			...updates
+			...updates,
+			history: isComplete ? true : route.query.history
 		}
 	})
 }
@@ -365,7 +368,8 @@ const handleNextStep = async () => {
 			await getAnalysisReportAPI($api, finalResultId)
 		} catch (error) {
 			console.error('获取报告失败:', error)
-			// 即使失败也继续跳转
+			// 失败了，则不进行跳转
+			return
 		}
 	}
 	// 后续增加的逻辑，简历押题被拆分两部分返还，如果 resumeQuizComplete 为 false，则需要等待押题完成
