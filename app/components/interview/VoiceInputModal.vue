@@ -45,6 +45,7 @@
 
 <script setup>
 import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
+import { SpeechRecognitionOptimizer } from '@/utils/speechRecognitionOptimizer'
 
 const props = defineProps({
 	initialText: {
@@ -62,6 +63,16 @@ const props = defineProps({
 	onRealtimeUpdate: {
 		type: Function,
 		default: () => {}
+	},
+	// 新增：职业类型，用于优化器
+	profession: {
+		type: String,
+		default: 'programmer' // programmer, designer, pm, general
+	},
+	// 新增：上下文类型
+	context: {
+		type: String,
+		default: 'interview' // interview, general, tech
 	}
 })
 
@@ -72,122 +83,20 @@ const lastFinalTime = ref(0) // 记录上次 final 结果的时间
 const sessionTranscript = ref('') // 当前会话的临时文本
 const lastProcessedIndex = ref(0) // 记录已处理的结果索引，避免重复处理
 
+// 创建语音识别优化器实例
+const optimizer = new SpeechRecognitionOptimizer({
+	context: props.context,
+	profession: props.profession,
+	maxHistoryLength: 10
+})
+
 const getSR = () => {
 	if (typeof window === 'undefined') return null
 	return window.SpeechRecognition || window.webkitSpeechRecognition || null
 }
 
-/**
- * 智能添加标点符号
- * 根据停顿时间和语义规则添加标点
- */
-const addSmartPunctuation = (text, timeSinceLastFinal) => {
-	if (!text) return text
-
-	// 移除文本首尾空格
-	text = text.trim()
-
-	// 如果文本为空，直接返回
-	if (!text) return text
-
-	// 如果上次结果距离现在超过 1.5 秒，认为是新的句子，前面加句号
-	const shouldAddPeriod = timeSinceLastFinal > 1500
-
-	// 常见的句子结尾词（可根据实际情况扩展）
-	const endPatterns = [
-		/[吗呢吧啊呀哇哎]$/, // 语气词结尾
-		/[了的地得]$/, // 助词结尾
-		/好$/, // 简短回答
-		/是$/,
-		/对$/,
-		/没有$/,
-		/可以$/,
-		/不是$/
-	]
-
-	// 检查是否需要添加问号
-	const needsQuestionMark =
-		text.includes('吗') ||
-		text.includes('呢') ||
-		text.startsWith('为什么') ||
-		text.startsWith('怎么') ||
-		text.startsWith('什么') ||
-		text.startsWith('哪') ||
-		text.startsWith('谁') ||
-		text.startsWith('是不是') ||
-		text.startsWith('能不能') ||
-		text.startsWith('可不可以')
-
-	// 检查是否已经有标点符号
-	const hasPunctuation = /[。！？，、；：""''（）]$/.test(text)
-
-	if (!hasPunctuation) {
-		if (needsQuestionMark) {
-			text += '？'
-		} else if (
-			shouldAddPeriod &&
-			endPatterns.some((pattern) => pattern.test(text))
-		) {
-			text += '。'
-		} else if (timeSinceLastFinal > 800) {
-			// 如果停顿较长（但不算太长），添加逗号
-			text += '，'
-		}
-	}
-
-	return text
-}
-
-/**
- * 文本后处理优化
- * 修正常见的识别错误和格式问题
- */
-const postProcessText = (text) => {
-	if (!text) return text
-
-	// 常见的口语化转换（可根据实际情况扩展）
-	const replacements = {
-		嗯嗯: '',
-		啊啊: '',
-		呃: '',
-		额: '',
-		// 数字优化
-		一: '1',
-		二: '2',
-		三: '3',
-		四: '4',
-		五: '5',
-		六: '6',
-		七: '7',
-		八: '8',
-		九: '9',
-		十: '10',
-		// 常见技术词汇优化
-		皮埃奇皮: 'PHP',
-		皮埃奇匹: 'PHP',
-		杰斯: 'JS',
-		杰埃斯: 'JS',
-		维优易: 'Vue',
-		瑞阿克特: 'React',
-		艾皮爱: 'API'
-	}
-
-	// 执行替换（仅替换独立的词，避免误替换）
-	let processed = text
-	for (const [key, value] of Object.entries(replacements)) {
-		// 使用词边界匹配，避免误替换
-		const regex = new RegExp(key, 'g')
-		processed = processed.replace(regex, value)
-	}
-
-	// 移除多余的空格
-	processed = processed.replace(/\s+/g, '')
-
-	// 移除重复的标点符号
-	processed = processed.replace(/([。！？，])\1+/g, '$1')
-
-	return processed
-}
+// 注意：文本优化功能已迁移到 @/utils/speechRecognitionOptimizer.js
+// 现在使用优化器实例进行所有文本处理
 
 const initRecognition = () => {
 	const SR = getSR()
@@ -205,6 +114,7 @@ const initRecognition = () => {
 		sessionTranscript.value = '' // 重置会话文本
 		lastFinalTime.value = Date.now()
 		lastProcessedIndex.value = 0 // 重置处理索引
+		optimizer.clearHistory() // 清除优化器历史记录，开始新会话
 	}
 
 	rec.onend = () => {
@@ -234,10 +144,17 @@ const initRecognition = () => {
 				const timeSinceLastFinal = now - lastFinalTime.value
 				lastFinalTime.value = now
 
-				// 对 final 结果进行后处理
-				let processedText = postProcessText(text)
-				// 智能添加标点符号
-				processedText = addSmartPunctuation(processedText, timeSinceLastFinal)
+				// 使用优化器进行文本处理
+				// 优化器会自动处理：
+				// 1. 移除口语化词汇
+				// 2. 同音字纠错
+				// 3. 技术词汇识别
+				// 4. 上下文感知优化
+				// 5. 智能标点符号
+				const processedText = optimizer.optimize(text, {
+					addPunctuation: true,
+					timeSinceLastFinal
+				})
 
 				// 追加到会话文本
 				sessionTranscript.value += processedText
@@ -259,10 +176,13 @@ const initRecognition = () => {
 
 		// 如果有 interim 结果，也实时展示（但不保存）
 		if (interimText) {
+			// 对 interim 结果也进行优化（不添加标点）
+			const optimizedInterim = optimizer.optimize(interimText, {
+				addPunctuation: false
+			})
+
 			const tempText =
-				props.initialText +
-				sessionTranscript.value +
-				postProcessText(interimText)
+				props.initialText + sessionTranscript.value + optimizedInterim
 			props.onRealtimeUpdate(tempText)
 		}
 	}
@@ -278,6 +198,7 @@ const start = () => {
 		sessionTranscript.value = ''
 		lastFinalTime.value = Date.now()
 		lastProcessedIndex.value = 0 // 重置处理索引
+		optimizer.clearHistory() // 清除优化器历史记录
 		recognitionRef.value.start()
 	} catch (e) {
 		console.warn('语音识别启动失败:', e)
@@ -311,6 +232,26 @@ const handleKeydown = (e) => {
 		}
 	}
 }
+
+// 监听职业类型变化，动态更新优化器
+watch(
+	() => props.profession,
+	(newProfession) => {
+		if (newProfession) {
+			optimizer.setProfession(newProfession)
+		}
+	}
+)
+
+// 监听上下文类型变化，动态更新优化器
+watch(
+	() => props.context,
+	(newContext) => {
+		if (newContext) {
+			optimizer.setContext(newContext)
+		}
+	}
+)
 
 onMounted(() => {
 	initRecognition()
