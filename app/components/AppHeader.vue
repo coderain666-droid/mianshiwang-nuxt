@@ -58,6 +58,16 @@
 					>服务记录</NuxtLink
 				>
 				<NuxtLink
+					to="/profile?tab=redeem"
+					:class="[
+						'transition-colors',
+						route.path === '/profile?tab=redeem'
+							? 'text-neutral-900 font-bold'
+							: 'hover:text-neutral-900'
+					]"
+					>兑换服务</NuxtLink
+				>
+				<NuxtLink
 					to="/faq"
 					:class="[
 						'transition-colors',

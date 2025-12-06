@@ -24,6 +24,14 @@
 						</span>
 						押题 · 模拟 · 行测 · 三大服务全覆盖
 					</div>
+
+					<!-- 新用户福利提示 -->
+					<div
+						class="mb-4 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-semibold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/40 transition-all"
+					>
+						<UIcon name="i-heroicons-gift" class="w-5 h-5" />
+						<span>新用户送 20 旺旺币，可兑换任意服务</span>
+					</div>
 					<h1
 						class="text-4xl md:text-6xl font-extrabold tracking-tight text-neutral-900 leading-[1.15]"
 					>

@@ -493,6 +493,13 @@ useSeoMeta({
 	description: '管理您的个人信息、旺旺币和简历'
 })
 
+// onMounted(() => {
+// 	const tab = route.query.tab
+// 	if (tab === 'redeem') {
+// 		activeRecordTab.value = 'redeem'
+// 	}
+// })
+
 const userStore = useUserStore()
 const toast = useToast()
 const { $api } = useNuxtApp()
