@@ -94,10 +94,13 @@
 											<span
 												class="ml-2 text-3xl font-bold text-white tracking-tight"
 											>
-												{{ userStore.userInfo.wwCoinBalance }}
+												{{ userStore.userInfo.wwCoinBalance.toFixed(2) }}
 											</span>
 											<p class="mt-1 text-[11px] text-white/70">
-												20 旺旺币兑换一次 {{ serviceHighlights[0].title }} /
+												<span class="text-[#f3ea8e] font-bold text-sm"
+													>20 旺旺币兑换一次</span
+												>
+												{{ serviceHighlights[0].title }} /
 												{{ serviceHighlights[1].title }} /
 												{{ serviceHighlights[2].title }}
 											</p>

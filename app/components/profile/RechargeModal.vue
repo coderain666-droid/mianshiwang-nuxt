@@ -15,7 +15,7 @@
 							<div>
 								<span class="text-sm text-gray-600 mr-2">当前余额</span>
 								<span class="text-2xl font-bold text-primary-600">
-									{{ userStore.userInfo.wwCoinBalance }} 旺旺币
+									{{ userStore.userInfo.wwCoinBalance.toFixed(2) }} 旺旺币
 								</span>
 								<p class="text-xs text-gray-500 mt-1">
 									充值成功后即时到账，

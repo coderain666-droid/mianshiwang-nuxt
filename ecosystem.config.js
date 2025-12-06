@@ -1,4 +1,5 @@
 // 启动指令：pm2 start /sunday/resume/mian-shi-wang/ecosystem.config.js
+// 启动指令：pm2 start ecosystem.config.js
 const path = require('path')
 module.exports = {
 	apps: [
