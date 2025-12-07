@@ -9,7 +9,7 @@ module.exports = {
 			exec_mode: 'fork',
 			script: path.join(__dirname, './.output/server', 'index.mjs'),
 			env_production: {
-				VITE_RESUME_PREVIEW_URL: 'https://mianshiwangoffer.com/'
+				VITE_RESUME_PREVIEW_URL: 'https://lgdsunday.club/'
 			}
 		}
 	]

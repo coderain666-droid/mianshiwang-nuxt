@@ -235,7 +235,7 @@ const handlePreview = (resume) => {
 
 	previewResume.value = {
 		...resume,
-		resumeUrl: `${config.public.resumePreviewUrl}edit?id=${resume.resumeId}&template=${resume.templateName}`
+		resumeUrl: `${config.public.resumePreviewUrl}edit?id=${resume.resumeId}&template=${resume.templateName}&token=${userStore.token}`
 	}
 	previewModal.value = true
 }

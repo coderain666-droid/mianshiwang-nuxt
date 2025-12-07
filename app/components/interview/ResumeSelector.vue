@@ -272,7 +272,7 @@ const handlePreview = (resume) => {
 	// 简历汪简历：拼接预览地址
 	previewResume.value = {
 		...resume,
-		resumeUrl: `${config.public.resumePreviewUrl}edit?id=${resume.resumeId}&template=${resume.templateName}`
+		resumeUrl: `${config.public.resumePreviewUrl}edit?id=${resume.resumeId}&template=${resume.templateName}&token=${userStore.token}`
 	}
 	previewModal.value = true
 }
