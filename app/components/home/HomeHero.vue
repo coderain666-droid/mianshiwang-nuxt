@@ -8,7 +8,11 @@
 				class="absolute top-[20%] -left-[10%] h-[400px] w-[400px] rounded-full bg-gradient-to-tr from-emerald-400/20 to-sky-400/20 blur-3xl opacity-60"
 			></div>
 		</div>
-		<div class="container px-4 py-10 md:py-22 relative">
+		<div class="container px-4 py-10 md:pb-22 relative">
+			<!-- 实时面试人数展示卡片 -->
+			<div class="w-full max-w-sm">
+				<LiveInterviewCount />
+			</div>
 			<div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 				<div class="max-w-2xl">
 					<div
@@ -103,7 +107,9 @@
 						</div>
 					</div>
 				</div>
-				<div class="relative lg:h-[600px] flex items-center justify-center">
+				<div
+					class="relative lg:h-[600px] flex flex-col items-center justify-center gap-6"
+				>
 					<!-- Decorative background elements -->
 					<div
 						class="absolute inset-0 bg-gradient-to-tr from-gray-50 to-white rounded-[2rem] transform rotate-3 scale-95 border border-gray-100"
@@ -203,6 +209,8 @@
 	</section>
 </template>
 
-<script setup></script>
+<script setup>
+import LiveInterviewCount from './LiveInterviewCount.vue'
+</script>
 
 <style scoped></style>
