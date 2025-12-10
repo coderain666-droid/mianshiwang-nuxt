@@ -50,12 +50,11 @@ export const SEO = {
 
 	// 百度相关
 	baiduSiteId: '', // 百度统计站点ID
-	baiduVerification: '', // 百度站长验证码
-
+	baiduVerification: 'codeva-AZTtb6K3UD', // 百度站长验证码
 	// 其他搜索引擎验证
-	googleVerification: '', // Google Search Console 验证码
-	bingVerification: '', // Bing Webmaster 验证码
-	so360Verification: '' // 360搜索站长验证码
+	googleVerification: 'AGuYDOPXYXlsuFtFtW-AoibR4JrW8AnoRGmvoD2Gb_w', // Google Search Console 验证码
+	bingVerification: 'B30BA2B4BE274FC862D5D489A48B7EC0', // Bing Webmaster 验证码
+	so360Verification: '1b6bde730184c0dedaf3b609bf7742b3' // 360搜索站长验证码
 }
 
 // ==================== 辅助函数 ====================
