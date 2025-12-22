@@ -38,7 +38,7 @@ export const SEO = {
 	contactEmail: 'contact@mianshiwangoffer.com',
 
 	// 备案信息（中国网站必需）
-	icp: '鲁 ICP 备 18025459 号-1', // 如：京ICP备12345678号-1
+	icp: '鲁 ICP 备 2025206060 号-1', // 如：京ICP备12345678号-1
 
 	// 公司信息
 	companyName: '济南于思信息技术有限公司',

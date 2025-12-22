@@ -188,7 +188,7 @@
 									rel="noopener noreferrer"
 									class="hover:text-neutral-700 transition-colors"
 								>
-									鲁 ICP 备 18025459 号-1
+									鲁 ICP 备 2025206060 号-1
 								</a>
 							</div>
 							<div class="flex items-center gap-4">
