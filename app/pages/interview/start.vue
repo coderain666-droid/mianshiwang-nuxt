@@ -305,9 +305,11 @@ const filteredPositions = computed(() => {
 	// 按搜索关键词过滤
 	if (searchQuery.value.trim()) {
 		const query = searchQuery.value.toLowerCase().trim()
+		console.log('result', result)
+
 		result = result.filter(
 			(p) =>
-				p.name.toLowerCase().includes(query) ||
+				p.positionName.toLowerCase().includes(query) ||
 				p.description.toLowerCase().includes(query)
 		)
 	}
