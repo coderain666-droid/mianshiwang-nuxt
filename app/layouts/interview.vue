@@ -41,8 +41,8 @@
 				</header>
 
 				<!-- Content Area -->
-				<div class="flex-1 overflow-hidden relative w-full flex flex-col">
-					<div class="flex-1 overflow-hidden px-4 py-2 lg:px-8 lg:py-2">
+				<div class="flex-1 overflow-auto relative w-full flex flex-col">
+					<div class="flex-1 px-4 py-2 lg:px-8 lg:py-2">
 						<div class="max-w-[1600px] mx-auto h-full w-full">
 							<slot />
 						</div>
