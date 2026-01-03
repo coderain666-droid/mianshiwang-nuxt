@@ -390,7 +390,11 @@ const handleNextStep = async () => {
 }
 
 // ==================== 初始化 ====================
-onMounted(async () => {
+onMounted(() => {
+	initInterView()
+})
+
+const initInterView = async () => {
 	// 判断是否为查看历史记录
 	const historyResultId = route.query.resultId
 	const isHistory = route.query.history
@@ -428,7 +432,7 @@ onMounted(async () => {
 			updateQuery({ step: 'input' })
 		}
 	}
-})
+}
 
 // 组件卸载时清理 SSE 连接
 onUnmounted(() => {

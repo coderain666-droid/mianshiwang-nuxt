@@ -242,7 +242,7 @@ import {
 	endInterviewAPI,
 	getMockInterviewSessionHistoryAPI
 } from '@/api/interview'
-import { onMounted, onUnmounted, ref, computed } from 'vue'
+import { onMounted, onUnmounted, ref, computed, nextTick } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useToast } from '#imports'
 import { useGlobalModal } from '@/composables/useGlobalModal'
@@ -252,6 +252,7 @@ import AnswerAdviceModal from '@/components/interview/AnswerAdviceModal.vue'
 import VoiceInputModal from '@/components/interview/VoiceInputModal.vue'
 import { useSpeechSynthesis } from '@/composables/useSpeechSynthesis'
 import { marked } from 'marked'
+import { navigateTo } from 'nuxt/app'
 
 const props = defineProps({
 	serviceType: {
@@ -373,6 +374,18 @@ onMounted(async () => {
 	window.addEventListener('keydown', handleGlobalKeydown)
 	window.addEventListener('keyup', handleGlobalKeyup)
 	// 如果面试已开始，获取历史数据
+	loadHistoryData()
+	// 语音识别能力检测（仅浏览器）
+	if (typeof window !== 'undefined') {
+		isSpeechSupported.value =
+			'webkitSpeechRecognition' in window || 'SpeechRecognition' in window
+	}
+})
+
+/**
+ * 获取历史数据
+ */
+const loadHistoryData = async () => {
 	const resultId = route.query.resultId
 	if (resultId) {
 		const { conversationHistory, sessionInfo } =
@@ -396,14 +409,23 @@ onMounted(async () => {
 			// 重新进入，设置为 waiting 状态
 			interviewStore.interviewEventType = 'waiting'
 		}
+		// 面试已经结束了，当前查看的应该是面试历史记录。避免 历史记录重新查询
+		else if (sessionInfo.status === 'completed' && !route.query.history) {
+			// 改变状态标记
+			interviewStore.interviewStatus = 'ended'
+			// 重新进入，设置为 waiting 状态
+			interviewStore.interviewEventType = 'end'
+			// 处理路由跳转
+			router.replace({
+				query: { ...route.query, history: true, step: 'complete' }
+			})
+			// 延迟 500 ms 重新加载页面，以重新获取历史记录的数据
+			setTimeout(() => {
+				window.location.reload()
+			}, 500)
+		}
 	}
-
-	// 语音识别能力检测（仅浏览器）
-	if (typeof window !== 'undefined') {
-		isSpeechSupported.value =
-			'webkitSpeechRecognition' in window || 'SpeechRecognition' in window
-	}
-})
+}
 
 // 开始面试
 const startInterview = async () => {

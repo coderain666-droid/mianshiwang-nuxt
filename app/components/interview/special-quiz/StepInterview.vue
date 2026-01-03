@@ -43,7 +43,7 @@ defineProps({
 	}
 })
 
-const emit = defineEmits(['handleEndInterview'])
+const emit = defineEmits(['handleEndInterview', 'interviewCompleted'])
 
 const interviewStore = useInterviewStore()
 
