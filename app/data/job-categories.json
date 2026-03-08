@@ -266,11 +266,25 @@
 	],
 	"positions": [
 		{
+			"positionId": "data-analyst",
+			"positionName": "数据分析师",
+			"category": "data",
+			"level": "初级-高级",
+			"description": "构建指标体系，洞察业务数据并产出分析报告"
+		},
+		{
 			"positionId": "tech-frontend-mid",
 			"positionName": "前端开发工程师",
 			"category": "tech",
 			"level": "初级-高级",
 			"description": "负责 Web / 跨端界面开发、组件工程和性能优化"
+		},
+		{
+			"positionId": "tech-agent-engineer",
+			"positionName": "Agent开发工程师",
+			"category": "tech",
+			"level": "中级-高级",
+			"description": "负责 LLM Agent、工具调用编排、工作流设计与 AI 应用落地"
 		},
 		{
 			"positionId": "tech-backend-mid",
@@ -320,13 +334,6 @@
 			"category": "tech",
 			"level": "中级",
 			"description": "负责硬件方案、驱动开发与板级调试"
-		},
-		{
-			"positionId": "data-analyst",
-			"positionName": "数据分析师",
-			"category": "data",
-			"level": "初级-高级",
-			"description": "构建指标体系，洞察业务数据并产出分析报告"
 		},
 		{
 			"positionId": "data-bi",

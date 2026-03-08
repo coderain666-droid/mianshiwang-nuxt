@@ -95,7 +95,7 @@ import { ref, watch, computed } from 'vue'
 import { useToast } from '#imports'
 import { getOSSClient } from '@/utils/sts'
 import { useUserStore } from '@/stores/user'
-import { uploadResumeAPI } from '@/api/resume'
+import { uploadResumeAPI, uploadResumeFileAPI } from '@/api/resume'
 import { createActionGuard } from '@/utils/actionGuard'
 import { MAX_RESUME_COUNT, FILE_SIZE_LIMIT } from '@/constants'
 
@@ -249,6 +249,20 @@ const handleUpload = async () => {
 
 	uploading.value = true
 
+	const directUpload = async () => {
+		const formData = new FormData()
+		formData.append('file', selectedFile.value)
+		formData.append('resumeName', selectedFile.value.name)
+		await uploadResumeFileAPI($api, formData)
+		toast.add({
+			title: '上传成功',
+			description: '简历上传成功',
+			color: 'success'
+		})
+		isOpen.value = false
+		emit('uploaded')
+	}
+
 	let ossClient = null
 	const updateAvatar = async (file) => {
 		if (!ossClient) {
@@ -285,13 +299,33 @@ const handleUpload = async () => {
 			toast.add({
 				title: '上传失败',
 				description: e.message,
+								color: 'error'
+							})
+						} finally {
+							uploading.value = false
+						}
+					}
+	try {
+		await directUpload()
+	} catch (error) {
+		const message = error?.message || ''
+		const shouldFallbackToOSS =
+			error?.statusCode === 404 ||
+			error?.statusCode === 405 ||
+			/not found|cannot post|network/i.test(message)
+
+		if (!shouldFallbackToOSS) {
+			uploading.value = false
+			toast.add({
+				title: '上传失败',
+				description: message || '请稍后再试',
 				color: 'error'
 			})
-		} finally {
-			uploading.value = false
+			return
 		}
+
+		updateAvatar(selectedFile.value)
 	}
-	updateAvatar(selectedFile.value)
 }
 
 // 处理取消

@@ -22,6 +22,13 @@ export const uploadResumeAPI = ($api, body) => {
 	})
 }
 
+export const uploadResumeFileAPI = ($api, formData) => {
+	return $api(`/resume/uploadResumeFile`, {
+		method: 'POST',
+		body: formData
+	})
+}
+
 /**
  * 删除简历
  * @param {*} resumeId

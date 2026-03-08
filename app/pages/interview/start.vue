@@ -189,7 +189,7 @@
 								<span
 									class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
 								>
-									{{ userStore.resumes.length }}/5
+									{{ userStore.allResumes.length }}/5
 								</span>
 							</h2>
 						</template>
@@ -254,6 +254,7 @@ const globalModal = useGlobalModal()
 const searchQuery = ref('')
 const activeCategory = ref('all')
 const showAllCategories = ref(false)
+const DEFAULT_POSITION_ID = 'data-analyst'
 
 const catalogCategories = jobCatalog.categories ?? []
 
@@ -270,7 +271,32 @@ const positions = ref(
 		...position,
 		id: position.positionId || `position-${index}`
 	}))
+		.sort((a, b) => {
+			if (a.positionId === DEFAULT_POSITION_ID) return -1
+			if (b.positionId === DEFAULT_POSITION_ID) return 1
+			return 0
+		})
 )
+
+// 默认岗位：数据分析师；默认简历：第一份（有 content 则填入手动输入框）
+const applyStep1Defaults = () => {
+	const defaultPosition = positions.value.find(
+		(p) => p.positionId === DEFAULT_POSITION_ID
+	)
+	if (defaultPosition) {
+		interviewStore.setSelectedPosition(defaultPosition)
+	}
+	const first = userStore.allResumes[0]
+	if (first) {
+		if (first.isManual && first.content) {
+			interviewStore.resumeText = first.content
+			interviewStore.resumeId = null
+		} else {
+			interviewStore.resumeId = first.resumeId
+			interviewStore.resumeText = ''
+		}
+	}
+}
 
 const selectPosition = (position) => {
 	interviewStore.setSelectedPosition(position)
@@ -398,6 +424,10 @@ const presentServiceSelection = () => {
 		buttons: []
 	})
 }
+
+onMounted(() => {
+	applyStep1Defaults()
+})
 
 const handleNext = async () => {
 	if (!canProceed.value) {

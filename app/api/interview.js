@@ -3,8 +3,16 @@ const ssePost = (path, params, options) => {
 		return { close: () => {} }
 	}
 
-	const { token, baseURL = '', callbacks = {} } = options || {}
+	const {
+		token,
+		baseURL = '',
+		callbacks = {},
+		headers: extraHeaders = {}
+	} = options || {}
 	const { onMessage, onError, onComplete } = callbacks
+	const log = (msg, obj) => {
+		if (typeof window !== 'undefined' && console?.log) console.log(msg, obj ?? '')
+	}
 
 	const url = `${baseURL}${path.startsWith('/') ? path : `/${path}`}`
 	let controller = null
@@ -17,6 +25,7 @@ const ssePost = (path, params, options) => {
 				Accept: 'text/event-stream'
 			}
 			if (token) headers.Authorization = `Bearer ${token}`
+			Object.assign(headers, extraHeaders)
 			const response = await fetch(url, {
 				method: 'POST',
 				headers,
@@ -26,16 +35,19 @@ const ssePost = (path, params, options) => {
 			})
 			if (!response.ok) {
 				const errorText = await response.text()
+				log('[面试押题 SSE] 连接失败', { status: response.status, errorText })
 				throw new Error(
 					`HTTP ${response.status}: ${errorText || response.statusText}`
 				)
 			}
+			log('[面试押题 SSE] 连接成功，开始接收事件')
 			const reader = response.body.getReader()
 			const decoder = new TextDecoder()
 			let buffer = ''
 			while (true) {
 				const { done, value } = await reader.read()
 				if (done) {
+					log('[面试押题 SSE] 流结束 (done)')
 					onComplete?.()
 					break
 				}
@@ -46,11 +58,13 @@ const ssePost = (path, params, options) => {
 					if (line.startsWith('data: ')) {
 						const data = line.slice(6).trim()
 						if (data === '[DONE]') {
+							log('[面试押题 SSE] 收到 [DONE]')
 							onComplete?.()
 							return
 						}
 						try {
 							const parsed = JSON.parse(data)
+							log('[面试押题 SSE]', parsed?.type ?? 'data', parsed)
 							onMessage?.(parsed)
 						} catch {
 							onMessage?.({ content: data })

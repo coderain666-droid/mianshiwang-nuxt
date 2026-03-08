@@ -181,17 +181,18 @@ export default defineNuxtConfig({
 			buildTime: new Date().toISOString(),
 			apiBase: process.env.VITE_API_BASE_URL || '/dev-api',
 			resumePreviewUrl:
-				process.env.VITE_RESUME_PREVIEW_URL || 'https://lgdsunday.club/'
+				process.env.VITE_RESUME_PREVIEW_URL || 'https://lgdsunday.club/',
+			localLlmProvider: process.env.VITE_LOCAL_LLM_PROVIDER || '',
+			localDeepseekApiKey: process.env.VITE_LOCAL_DEEPSEEK_API_KEY || '',
+			localOpenaiApiKey: process.env.VITE_LOCAL_OPENAI_API_KEY || '',
+			localDeepseekModel: process.env.VITE_LOCAL_DEEPSEEK_MODEL || '',
+			localOpenaiModel: process.env.VITE_LOCAL_OPENAI_MODEL || ''
 		}
 	},
 
 	nitro: {
+		// 与后端 ww-server 默认端口一致（main.ts 默认 8888）
 		devProxy: {
-			// '/dev-api/': {
-			// 	target: 'https://test.api.lgdsunday.club',
-			// 	changeOrigin: true,
-			// 	rewrite: (p) => p.replace(/^\/dev-api/, '')
-			// }
 			'/dev-api/': {
 				target: 'http://localhost:8888',
 				changeOrigin: true,

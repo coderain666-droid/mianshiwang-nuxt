@@ -2,7 +2,7 @@
 	<div class="space-y-3">
 		<!-- 空状态：仅展示空 -->
 		<div
-			v-if="userStore.resumes.length === 0"
+			v-if="userStore.allResumes.length === 0"
 			class="flex flex-col justify-center items-center py-12 text-gray-500"
 		>
 			<UIcon
@@ -14,8 +14,8 @@
 
 		<div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3">
 			<div
-				v-for="(resume, index) in userStore.resumes"
-				:key="resume.id"
+				v-for="(resume, index) in userStore.allResumes"
+				:key="resume.resumeId || resume.id"
 				class="group relative flex items-center gap-3 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:border-primary-300 hover:shadow-md transition-all cursor-pointer"
 				@click="handlePreview(resume)"
 			>
@@ -31,9 +31,27 @@
 
 				<!-- 简历信息 -->
 				<div class="flex-1 min-w-0">
-					<p class="font-semibold text-gray-900 truncate text-sm mb-1">
-						{{ resume.resumeName }}
-					</p>
+					<div class="flex items-center gap-2 mb-1">
+						<p class="font-semibold text-gray-900 truncate text-sm">
+							{{ resume.resumeName }}
+						</p>
+						<UBadge
+							v-if="resume.isManual"
+							size="xs"
+							color="primary"
+							variant="subtle"
+						>
+							手动
+						</UBadge>
+						<UBadge
+							v-else-if="isResumeUnavailable(resume)"
+							size="xs"
+							color="warning"
+							variant="subtle"
+						>
+							需重传
+						</UBadge>
+					</div>
 					<div class="flex flex-wrap items-center gap-2 text-xs text-gray-500">
 						<!-- TODO：暂时隐藏 -->
 						<!-- <span
@@ -49,7 +67,7 @@
 							{{ resume.jobInfo?.cityIntention }}
 						</span> -->
 						<span class="text-gray-400">{{
-							formatDate(resume.createTime)
+							formatDate(resume.createTime || resume.uploadTime)
 						}}</span>
 					</div>
 				</div>
@@ -65,7 +83,7 @@
 						size="sm"
 						icon="i-heroicons-pencil"
 						class="!p-2"
-						@click="handleEditName(index, resume)"
+						@click="handleEdit(index, resume)"
 					/>
 					<UButton
 						color="neutral"
@@ -96,11 +114,17 @@
 			<template #body>
 				<div class="border rounded-lg overflow-hidden">
 					<iframe
-						v-if="previewResume?.resumeUrl"
+						v-if="previewResume?.resumeUrl && !previewResume?.isManual"
 						:src="previewResume?.resumeUrl"
 						class="w-full h-[600px]"
 						frameborder="0"
 					/>
+					<div
+						v-else-if="previewResume?.content"
+						class="p-6 max-h-[600px] overflow-y-auto whitespace-pre-wrap text-sm text-gray-700"
+					>
+						{{ previewResume.content }}
+					</div>
 					<div v-else class="p-12 text-center text-gray-500">
 						<p>无法预览此文件</p>
 					</div>
@@ -185,7 +209,12 @@ import {
 } from '@/api/resume'
 import dayjs from 'dayjs'
 import { useUserStore } from '@/stores/user'
+import {
+	getResumeReuploadMessage,
+	isResumeReuploadRequired
+} from '@/utils/resumeAvailability'
 
+const emit = defineEmits(['edit-manual'])
 const toast = useToast()
 const userStore = useUserStore()
 const { $api } = useNuxtApp()
@@ -216,23 +245,33 @@ const formatDate = (date) => {
 	return dayjs(date).format('YYYY-MM-DD HH:mm')
 }
 
+const isResumeUnavailable = (resume) => isResumeReuploadRequired(resume)
+
 // 移除拖拽相关逻辑
 
 // 预览简历
 const handlePreview = (resume) => {
-	// 判断是否为用户单独上传的简历
+	if (isResumeUnavailable(resume)) {
+		toast.add({
+			title: '这份简历需要重新上传',
+			description: getResumeReuploadMessage(resume),
+			color: 'warning'
+		})
+		return
+	}
+	// 手动填写的简历：直接展示 content
+	if (resume.isManual) {
+		previewResume.value = resume
+		previewModal.value = true
+		return
+	}
+	// 用户上传的简历（非简历汪）
 	if (!resume.isJianLiWang) {
 		previewResume.value = resume
 		previewModal.value = true
 		return
 	}
-	console.log('resume', resume)
-
-	// 环境变量的预览地址
-	// 测试环境使用：http://192.168.0.102:3001/
-	// 生成环境使用：https://www.lgdsunday.club/
 	const config = useRuntimeConfig()
-
 	previewResume.value = {
 		...resume,
 		resumeUrl: `${config.public.resumePreviewUrl}edit?id=${resume.resumeId}&template=${resume.templateName}&token=${userStore.token}`
@@ -249,6 +288,14 @@ const handleDelete = (index, resume) => {
 
 // 确认删除
 const confirmDelete = async () => {
+	if (deleteResume.value?.isManual) {
+		userStore.removeManualResume(deleteResume.value.resumeId)
+		toast.add({ title: '删除成功', color: 'success' })
+		deleteConfirmModal.value = false
+		deleteIndex.value = -1
+		deleteResume.value = null
+		return
+	}
 	const res = await deleteResumeAPI($api, deleteResume.value.resumeId)
 	if (res) {
 		toast.add({
@@ -260,6 +307,15 @@ const confirmDelete = async () => {
 		deleteIndex.value = -1
 		deleteResume.value = null
 	}
+}
+
+// 编辑：手动简历打开填写弹窗，否则打开改名校验
+const handleEdit = (index, resume) => {
+	if (resume.isManual) {
+		emit('edit-manual', resume)
+		return
+	}
+	handleEditName(index, resume)
 }
 
 const handleEditName = (index, resume) => {
@@ -301,8 +357,10 @@ const confirmEditName = async () => {
 			resumeId: editingResume.value.resumeId,
 			resumeName: value
 		})
-
-		userStore.resumes[editingIndex.value].resumeName = value
+		const idx = userStore.resumes.findIndex(
+			(r) => r.resumeId === editingResume.value.resumeId
+		)
+		if (idx !== -1) userStore.resumes[idx].resumeName = value
 		toast.add({
 			title: '修改成功',
 			color: 'success'
@@ -321,11 +379,12 @@ const confirmEditName = async () => {
 
 const previewTitle = computed(() => {
 	if (!previewResume.value) return '简历预览'
-
+	if (previewResume.value.isManual) {
+		return previewResume.value?.resumeName + '（手动填写）'
+	}
 	if (!previewResume.value.isJianLiWang) {
 		return previewResume.value?.resumeName
 	}
-
 	return previewResume.value?.resumeName + '（支持在线修改，可同步生效）'
 })
 </script>

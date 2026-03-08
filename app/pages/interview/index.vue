@@ -55,6 +55,11 @@ import {
 } from '@/api/interview'
 import { useToast } from '#imports'
 import { v4 as uuidv4 } from 'uuid'
+import {
+	getLocalResumeQuizRecord,
+	saveLocalResumeQuizRecord
+} from '@/utils/localResumeQuizStorage'
+import { buildLocalLLMHeaders } from '@/utils/localLLMConfig'
 
 // 导入步骤组件
 import StepInput from '@/components/interview/resume-quiz/StepInput.vue'
@@ -76,6 +81,8 @@ const interviewStore = useInterviewStore()
 const userStore = useUserStore()
 const toast = useToast()
 const { $api } = useNuxtApp()
+const getStorageUserId = () =>
+	userStore.userInfo?._id || userStore.userInfo?.userId || 'anonymous'
 
 // 从 URL query 中获取参数
 const currentServiceType = computed(() => {
@@ -268,8 +275,12 @@ const startResumeQuiz = async (requestId) => {
 	sseController.value = generateResumeQuizSSE(params, {
 		token: userStore.token,
 		baseURL: config.public.apiBase,
+		headers: buildLocalLLMHeaders(config),
 		callbacks: {
 			onMessage: (data) => {
+				// 调试：控制台实时打印 SSE 事件，便于排查「一直加载」
+				console.log('[面试押题 SSE]', data?.type ?? 'message', data)
+
 				// 进度中
 				if (data.type === 'progress') {
 					currentProgressStep.value = {
@@ -292,6 +303,19 @@ const startResumeQuiz = async (requestId) => {
 					if (data.data?.summary) {
 						predictionSummary.value = data.data.summary
 					}
+					saveLocalResumeQuizRecord(getStorageUserId(), {
+						resultId,
+						createdAt: new Date().toISOString(),
+						inputData: {
+							company: params.company,
+							positionName: params.positionName,
+							minSalary: params.minSalary,
+							maxSalary: params.maxSalary,
+							jd: params.jd
+						},
+						questions: data.data?.questions || [],
+						summary: data.data?.summary || ''
+					})
 					// 更新到 complete 步骤
 					updateQuery({ step: 'complete', resultId })
 				} else if (data.type === 'complete') {
@@ -304,17 +328,23 @@ const startResumeQuiz = async (requestId) => {
 					updateQuery({ step: 'error' })
 					toast.add({
 						title: '押题失败',
-						description: data.error.message || '网络错误，请稍后重试',
+						description:
+							typeof data.error === 'string'
+								? data.error
+								: data.error?.message || '网络错误，请稍后重试',
 						color: 'error'
 					})
 				}
 			},
 			onError: (error) => {
-				console.error('SSE Error:', error)
+				console.error('[面试押题 SSE] onError', error)
 				updateQuery({ step: 'error' })
 				toast.add({
 					title: '押题失败',
-					description: error.message || '网络错误，请稍后重试',
+					description:
+						typeof error === 'string'
+							? error
+							: error?.message || '网络错误，请稍后重试',
 					color: 'error'
 				})
 			}
@@ -404,12 +434,36 @@ const initInterView = async () => {
 		// 根据服务类型加载历史数据
 		try {
 			if (currentServiceType.value === SERVICE_TAGS.RESUME) {
-				const res = await getInterviewResultDetailAPI($api, historyResultId)
-				predictionResults.value = res.questions.map((item) => ({
-					...item,
-					isOpen: true
-				}))
-				predictionSummary.value = res.summary
+				const localRecord = getLocalResumeQuizRecord(
+					getStorageUserId(),
+					historyResultId
+				)
+
+				if (localRecord) {
+					predictionResults.value = (localRecord.questions || []).map((item) => ({
+						...item,
+						isOpen: true
+					}))
+					predictionSummary.value = localRecord.summary || ''
+				} else {
+					const res = await getInterviewResultDetailAPI($api, historyResultId)
+					predictionResults.value = res.questions.map((item) => ({
+						...item,
+						isOpen: true
+					}))
+					predictionSummary.value = res.summary
+					saveLocalResumeQuizRecord(getStorageUserId(), {
+						resultId: historyResultId,
+						createdAt: res.createdAt || new Date().toISOString(),
+						inputData: {
+							company: res.company,
+							positionName: res.position,
+							jd: res.jobDescription
+						},
+						questions: res.questions || [],
+						summary: res.summary || ''
+					})
+				}
 			} else {
 				const res = await getMockInterviewQAResultAPI($api, historyResultId)
 				predictionResults.value = res.questions

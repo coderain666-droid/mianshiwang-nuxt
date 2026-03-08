@@ -64,8 +64,14 @@ const { $api } = useNuxtApp()
 const count = ref(null)
 const countUpdated = ref(false)
 
-// 获取数据
+const isDev = typeof process !== 'undefined' && process.dev
+
+// 获取数据（本地开发不请求管理端接口，避免超时）
 const fetchData = async () => {
+	if (isDev) {
+		count.value = 0
+		return
+	}
 	try {
 		const response = await getMockInterviewCountAPI($api)
 		const newCount = response.count
@@ -80,7 +86,8 @@ const fetchData = async () => {
 
 		count.value = newCount
 	} catch (err) {
-		console.error('获取模拟面试人数失败:', err)
+		// 超时或失败时显示占位，不打断页面
+		count.value = 0
 	}
 }
 

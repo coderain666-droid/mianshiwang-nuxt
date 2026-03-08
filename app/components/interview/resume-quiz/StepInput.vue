@@ -259,10 +259,17 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useInterviewStore } from '@/stores/interview'
+import { useUserStore } from '@/stores/user'
 import { useToast } from '#imports'
 import { MIN_JD_LENGTH, MAX_JD_LENGTH } from '@/constants'
+import { isEmpty } from '@/utils'
+import { getDefaultResumeQuizInput } from '@/constants/default-resume-quiz-input'
+import {
+	getResumeReuploadMessage,
+	isResumeReuploadRequired
+} from '@/utils/resumeAvailability'
 
 const props = defineProps({
 	serviceType: {
@@ -275,6 +282,7 @@ const props = defineProps({
 const emit = defineEmits(['submit'])
 
 const interviewStore = useInterviewStore()
+const userStore = useUserStore()
 
 const toast = useToast()
 
@@ -350,10 +358,40 @@ const serviceConfig = computed(() => {
 	return SERVICE_CONFIGS[props.serviceType] || SERVICE_CONFIGS.resume
 })
 
+// 面试押题步骤：进入时若未选岗位，则填充默认值（腾讯-数据分析师-30~60K-视频号加热 JD）
+onMounted(() => {
+	if (props.serviceType === 'resume' && isEmpty(interviewStore.selectedPosition)) {
+		interviewStore.setSelectedPosition(getDefaultResumeQuizInput())
+	}
+})
+
 /**
  * 提交押题
  */
 const handleSubmit = () => {
+	if (props.serviceType === 'resume') {
+		if (!interviewStore.resumeId && !interviewStore.resumeText?.trim()) {
+			toast.add({
+				title: '请先提供简历',
+				description: '上传简历文件或粘贴简历内容后再开始押题',
+				color: 'error'
+			})
+			return
+		}
+
+		const selectedResume = userStore.allResumes.find(
+			(item) => item.resumeId === interviewStore.resumeId
+		)
+		if (isResumeReuploadRequired(selectedResume)) {
+			toast.add({
+				title: '这份简历需要重新上传',
+				description: getResumeReuploadMessage(selectedResume),
+				color: 'warning'
+			})
+			return
+		}
+	}
+
 	// 薪资范围也是必填的
 	if (
 		!interviewStore.selectedPosition.minSalary ||

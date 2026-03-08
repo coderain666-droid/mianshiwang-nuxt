@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { navigateTo } from '#app'
 import { MAX_RESUME_COUNT } from '@/constants'
+import { getDefaultManualResume } from '@/constants/default-manual-resume'
 
 export const useUserStore = defineStore('user', {
 	state: () => ({
@@ -35,19 +36,44 @@ export const useUserStore = defineStore('user', {
 		userInfo: {},
 		isLogin: false,
 		token: '',
-		resumes: []
+		resumes: [],
+		/** 手动填写的简历（仅前端存储）；默认带一条本地写死的简历「秦源-数据科学」 */
+		manualResumes: [getDefaultManualResume()]
 	}),
 	getters: {
-		// 是否可以添加更多简历
-		canAddResume: (state) => state.resumes.length < MAX_RESUME_COUNT
+		// 是否可以添加更多简历（上传 + 手动填写合计不超过 MAX_RESUME_COUNT）
+		canAddResume: (state) =>
+			state.resumes.length + state.manualResumes.length < MAX_RESUME_COUNT,
+		// 所有简历（上传 + 手动），用于列表展示与选择
+		allResumes: (state) => [...state.resumes, ...state.manualResumes]
 	},
 	actions: {
+		syncDefaultManualResume() {
+			const defaultResume = getDefaultManualResume()
+			const defaultIndex = this.manualResumes.findIndex(
+				(resume) => resume.resumeId === defaultResume.resumeId
+			)
+
+			if (defaultIndex !== -1) {
+				this.manualResumes[defaultIndex] = {
+					...this.manualResumes[defaultIndex],
+					resumeName: defaultResume.resumeName,
+					content: defaultResume.content
+				}
+				return
+			}
+
+			if (this.manualResumes.length === 0) {
+				this.manualResumes = [defaultResume]
+			}
+		},
 		// 登出
 		logout() {
 			this.isLogin = false
 			this.token = ''
 			this.userInfo = {}
 			this.resumes = []
+			this.manualResumes = []
 			// navigateTo('/login')
 		},
 		// 更新用户信息
@@ -79,7 +105,30 @@ export const useUserStore = defineStore('user', {
 		// 更新简历列表（用于拖拽排序）
 		updateResumes(resumes) {
 			this.resumes = resumes
+		},
+		// 添加手动填写的简历
+		addManualResume(resume) {
+			if (this.resumes.length + this.manualResumes.length < MAX_RESUME_COUNT) {
+				this.manualResumes.push(resume)
+			}
+		},
+		// 删除手动简历（按 resumeId）
+		removeManualResume(resumeId) {
+			const i = this.manualResumes.findIndex((r) => r.resumeId === resumeId)
+			if (i !== -1) this.manualResumes.splice(i, 1)
+		},
+		// 更新手动简历
+		updateManualResume(resumeId, payload) {
+			const r = this.manualResumes.find((x) => x.resumeId === resumeId)
+			if (r) {
+				if (payload.resumeName != null) r.resumeName = payload.resumeName
+				if (payload.content != null) r.content = payload.content
+			}
 		}
 	},
-	persist: true
+	persist: {
+		afterHydrate: ({ store }) => {
+			store.syncDefaultManualResume()
+		}
+	}
 })

@@ -23,15 +23,19 @@
 
 			<!-- 简历列表 -->
 			<div
-				v-if="userStore.resumes.length > 0"
+				v-if="userStore.allResumes.length > 0"
 				class="space-y-2 max-h-[300px] overflow-y-auto pr-1"
 			>
 				<div
-					v-for="(resume, index) in userStore.resumes"
+					v-for="(resume, index) in userStore.allResumes"
 					:key="resume.resumeId"
 					:class="[
 						'group flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all',
-						interviewStore.resumeId === resume.resumeId
+						isResumeUnavailable(resume)
+							? 'border-amber-200 bg-amber-50/40'
+							: resume.isManual
+								? interviewStore.resumeText === resume.content
+								: interviewStore.resumeId === resume.resumeId
 							? 'border-primary-300 bg-primary-50/50'
 							: 'border-gray-200 hover:border-primary-200 hover:bg-gray-50'
 					]"
@@ -46,11 +50,29 @@
 						/>
 					</div>
 					<div class="flex-1 min-w-0">
-						<p class="font-medium text-neutral-900 truncate text-sm">
-							{{ resume.resumeName }}
-						</p>
+						<div class="flex items-center gap-2">
+							<p class="font-medium text-neutral-900 truncate text-sm">
+								{{ resume.resumeName }}
+							</p>
+							<UBadge
+								v-if="resume.isManual"
+								size="xs"
+								color="primary"
+								variant="subtle"
+							>
+								手动
+							</UBadge>
+							<UBadge
+								v-else-if="isResumeUnavailable(resume)"
+								size="xs"
+								color="warning"
+								variant="subtle"
+							>
+								需重传
+							</UBadge>
+						</div>
 						<p class="text-xs text-neutral-500 mt-0.5">
-							{{ formatDate(resume.createTime) }}
+							{{ formatDate(resume.createTime || resume.uploadTime) }}
 						</p>
 					</div>
 
@@ -74,7 +96,7 @@
 					/>
 
 					<UIcon
-						v-if="interviewStore.resumeId === resume.resumeId"
+						v-if="(resume.isManual && interviewStore.resumeText === resume.content) || (!resume.isManual && interviewStore.resumeId === resume.resumeId)"
 						name="i-heroicons-check-circle"
 						class="w-5 h-5 text-primary-500 shrink-0"
 					/>
@@ -146,6 +168,12 @@
 						class="w-full h-[600px]"
 						frameborder="0"
 					/>
+					<div
+						v-else-if="previewResume?.content"
+						class="p-6 max-h-[600px] overflow-y-auto whitespace-pre-wrap text-sm text-neutral-700"
+					>
+						{{ previewResume.content }}
+					</div>
 					<div v-else class="p-12 text-center text-gray-500">
 						<p>无法预览此文件</p>
 					</div>
@@ -165,6 +193,10 @@ import { useInterviewStore } from '@/stores/interview'
 import { useGlobalModal } from '@/composables/useGlobalModal'
 import { useToast } from '#imports'
 import { MAX_RESUME_COUNT } from '@/constants'
+import {
+	getResumeReuploadMessage,
+	isResumeReuploadRequired
+} from '@/utils/resumeAvailability'
 
 const props = defineProps({
 	modelValue: {
@@ -188,10 +220,20 @@ const isUploadResumeModalVisible = ref(false)
 const previewModal = ref(false)
 const previewResume = ref(null)
 
-// 初始化时加载简历列表
+// 初始化时加载简历列表（仅更新上传的简历，manualResumes 已在 store 中）
 onMounted(async () => {
-	const res = await getResumeListAPI($api)
-	userStore.resumes = res || []
+	try {
+		const res = await getResumeListAPI($api)
+		userStore.resumes = res || []
+		const selectedResume = userStore.resumes.find(
+			(item) => item.resumeId === interviewStore.resumeId
+		)
+		if (isResumeReuploadRequired(selectedResume)) {
+			interviewStore.resumeId = null
+		}
+	} catch {
+		userStore.resumes = []
+	}
 })
 
 // 格式化日期
@@ -200,10 +242,28 @@ const formatDate = (date) => {
 	return dayjs(date).format('YYYY-MM-DD')
 }
 
-// 选择简历
+const isResumeUnavailable = (resume) => isResumeReuploadRequired(resume)
+
+// 选择简历（手动填写的简历用 content 作为 resumeText，不传 resumeId）
 const selectResume = (resume) => {
+	if (isResumeUnavailable(resume)) {
+		interviewStore.resumeId = null
+		toast.add({
+			title: '请重新上传这份简历',
+			description: getResumeReuploadMessage(resume),
+			color: 'warning'
+		})
+		isUploadResumeModalVisible.value = true
+		return
+	}
+	if (resume.isManual && resume.content) {
+		interviewStore.resumeId = null
+		interviewStore.resumeText = resume.content
+		emit('update:modelValue', { type: 'text', text: resume.content })
+		return
+	}
 	interviewStore.resumeId = resume.resumeId
-	interviewStore.resumeText = '' // 清空手动输入
+	interviewStore.resumeText = ''
 	emit('update:modelValue', {
 		type: 'resume',
 		resumeId: resume.resumeId,
@@ -248,13 +308,23 @@ const handleDelete = (index, resume) => {
 
 // 确认删除
 const confirmDelete = async () => {
+	if (deleteResume.value?.isManual) {
+		userStore.removeManualResume(deleteResume.value.resumeId)
+		toast.add({ title: '删除成功', color: 'success' })
+		deleteIndex.value = -1
+		deleteResume.value = null
+		return
+	}
 	const res = await deleteResumeAPI($api, deleteResume.value.resumeId)
 	if (res) {
 		toast.add({
 			title: '删除成功',
 			color: 'success'
 		})
-		userStore.resumes.splice(deleteIndex.value, 1)
+		const idx = userStore.resumes.findIndex(
+			(r) => r.resumeId === deleteResume.value.resumeId
+		)
+		if (idx !== -1) userStore.resumes.splice(idx, 1)
 		deleteIndex.value = -1
 		deleteResume.value = null
 	}
@@ -262,14 +332,25 @@ const confirmDelete = async () => {
 
 // 预览简历
 const handlePreview = (resume) => {
-	// 判断是否为用户单独上传的简历
+	if (isResumeUnavailable(resume)) {
+		toast.add({
+			title: '这份简历需要重新上传',
+			description: getResumeReuploadMessage(resume),
+			color: 'warning'
+		})
+		return
+	}
+	// 手动填写的简历：无 URL，仅可在弹窗中展示文本
+	if (resume.isManual) {
+		previewResume.value = { ...resume, resumeUrl: null }
+		previewModal.value = true
+		return
+	}
 	if (!resume.isJianLiWang) {
 		previewResume.value = resume
 		previewModal.value = true
 		return
 	}
-
-	// 简历汪简历：拼接预览地址
 	previewResume.value = {
 		...resume,
 		resumeUrl: `${config.public.resumePreviewUrl}edit?id=${resume.resumeId}&template=${resume.templateName}&token=${userStore.token}`
@@ -280,18 +361,23 @@ const handlePreview = (resume) => {
 // 预览标题
 const previewTitle = computed(() => {
 	if (!previewResume.value) return '简历预览'
-
+	if (previewResume.value.isManual) {
+		return previewResume.value?.resumeName + '（手动填写）'
+	}
 	if (!previewResume.value.isJianLiWang) {
 		return previewResume.value?.resumeName
 	}
-
 	return previewResume.value?.resumeName + '（支持在线修改，可同步生效）'
 })
 
 // 简历上传成功
 const handleResumeUploaded = async () => {
-	const res = await getResumeListAPI($api)
-	userStore.resumes = res || []
+	try {
+		const res = await getResumeListAPI($api)
+		userStore.resumes = res || []
+	} catch {
+		userStore.resumes = []
+	}
 	isUploadResumeModalVisible.value = false
 }
 

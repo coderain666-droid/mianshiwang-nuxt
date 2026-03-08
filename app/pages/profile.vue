@@ -238,10 +238,10 @@
 									<span
 										class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full"
 									>
-										{{ userStore.resumes.length }}/5
+										{{ userStore.allResumes.length }}/5
 									</span>
 								</div>
-								<div class="flex items-center">
+								<div class="flex items-center gap-2">
 									<UButton
 										v-if="userStore.canAddResume"
 										color="primary"
@@ -251,15 +251,24 @@
 										<UIcon name="i-heroicons-plus" class="w-4 h-4 mr-1" />
 										上传简历
 									</UButton>
+									<UButton
+										v-if="userStore.canAddResume"
+										color="gray"
+										variant="outline"
+										@click="isManualResumeModalVisible = true"
+									>
+										<UIcon name="i-heroicons-pencil-square" class="w-4 h-4 mr-1" />
+										手动填写
+									</UButton>
 									<span v-else class="text-sm text-gray-500">
-										最多上传 {{ MAX_RESUME_COUNT }} 份简历
+										最多 {{ MAX_RESUME_COUNT }} 份简历
 									</span>
 								</div>
 							</div>
 						</template>
 
 						<!-- 简历列表 -->
-						<ResumeList />
+						<ResumeList @edit-manual="openEditManualResume" />
 					</UCard>
 
 					<!-- 消费与充值记录 -->
@@ -444,6 +453,13 @@
 			@uploaded="handleResumeUploaded"
 		/>
 
+		<!-- 手动填写简历弹窗 -->
+		<ManualResumeModal
+			v-model:open="isManualResumeModalVisible"
+			:edit-resume="editManualResume"
+			@saved="handleManualResumeSaved"
+		/>
+
 		<!-- 充值弹窗 -->
 		<RechargeModal
 			v-model:open="rechargeModal"
@@ -461,12 +477,13 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { serviceHighlights } from '@/constants/vip'
 import { useUserStore } from '@/stores/user'
 import { useToast } from '#imports'
 import EditProfileModal from '@/components/profile/EditProfileModal.vue'
 import UploadResumeModal from '@/components/profile/UploadResumeModal.vue'
+import ManualResumeModal from '@/components/profile/ManualResumeModal.vue'
 import ResumeList from '@/components/profile/ResumeList.vue'
 import RechargeModal from '@/components/profile/RechargeModal.vue'
 import RedeemServiceModal from '@/components/profile/RedeemServiceModal.vue'
@@ -478,6 +495,11 @@ import {
 } from '@/api/user'
 import dayjs from 'dayjs'
 import { MAX_RESUME_COUNT } from '@/constants'
+import {
+	listLocalResumeQuizRecords,
+	mapLocalResumeQuizToConsumptionRecord,
+	mergeRecordsByResultId
+} from '@/utils/localResumeQuizStorage'
 
 definePageMeta({
 	requiresAuth: true,
@@ -506,9 +528,13 @@ const { $api } = useNuxtApp()
 
 const editProfileModal = ref(false)
 const isUploadResumeModalVisible = ref(false)
+const isManualResumeModalVisible = ref(false)
+const editManualResume = ref(null)
 const rechargeModal = ref(false)
 const redeemServiceModal = ref(false)
 const activeRecordTab = ref('recharge')
+const getStorageUserId = () =>
+	userStore.userInfo?._id || userStore.userInfo?.userId || 'anonymous'
 
 /**
  * 获取用户信息
@@ -523,6 +549,26 @@ const formatDate = (date) => {
 	if (!date) return ''
 	return dayjs(date).format('YYYY-MM-DD HH:mm')
 }
+
+const typeNameMap = {
+	resume_quiz: '面试押题',
+	special_interview: '专项面试',
+	behavior_interview: '行测 + HR 面试',
+	ai_interview: 'AI 模拟面试'
+}
+
+const statusNameMap = {
+	pending: '处理中',
+	success: '已完成',
+	failed: '失败',
+	cancelled: '已取消'
+}
+
+const normalizeConsumptionRecord = (record) => ({
+	...record,
+	typeName: record.typeName || typeNameMap[record.type] || '消费',
+	statusName: record.statusName || statusNameMap[record.status] || '未知状态'
+})
 
 // 处理个人信息更新
 const handleProfileUpdate = async (updatedInfo) => {
@@ -545,9 +591,25 @@ const handleProfileUpdate = async (updatedInfo) => {
 // 简历上传成功之后的回调
 const handleResumeUploaded = async () => {
 	const res = await getResumeListAPI($api)
-
 	userStore.resumes = res || []
 }
+
+// 手动填写简历保存后（列表由 store.allResumes 自动更新，无需额外请求）
+const handleManualResumeSaved = () => {
+	isManualResumeModalVisible.value = false
+	editManualResume.value = null
+}
+
+// 编辑手动填写的简历
+const openEditManualResume = (resume) => {
+	editManualResume.value = resume
+	isManualResumeModalVisible.value = true
+}
+
+// 关闭手动简历弹窗时清空编辑态，下次打开为“新增”
+watch(isManualResumeModalVisible, (open) => {
+	if (!open) editManualResume.value = null
+})
 
 // 处理简历删除
 const handleResumeDelete = (index) => {
@@ -630,15 +692,32 @@ getPaymentRecords()
  * 获取消费记录
  */
 const getConsumptionRecords = async () => {
+	let remoteRecords = []
+
 	try {
 		const res = await getConsumptionRecordsAPI($api)
-		consumptionRecords.value = res.records
+		remoteRecords = Array.isArray(res.records)
+			? res.records.map(normalizeConsumptionRecord)
+			: []
 	} catch (error) {
-		consumptionRecords.value = []
 		console.error('获取消费记录失败', error)
 	}
+
+	const localRecords = listLocalResumeQuizRecords(getStorageUserId()).map((record) =>
+		normalizeConsumptionRecord(mapLocalResumeQuizToConsumptionRecord(record))
+	)
+	consumptionRecords.value = mergeRecordsByResultId(remoteRecords, localRecords)
 }
 getConsumptionRecords()
+
+watch(
+	() => userStore.userInfo?._id || userStore.userInfo?.userId,
+	(newUserId, oldUserId) => {
+		if (newUserId && newUserId !== oldUserId) {
+			getConsumptionRecords()
+		}
+	}
+)
 </script>
 
 <style scoped></style>

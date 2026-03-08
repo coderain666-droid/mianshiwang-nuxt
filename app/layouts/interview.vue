@@ -62,6 +62,7 @@ import { SERVICE_TAGS, serviceHighlights } from '@/constants/vip'
 import InterviewSidebar from '@/components/interview/InterviewSidebar.vue'
 import { getUserInfoAPI } from '@/api/user'
 import { isEmpty } from '@/utils'
+import { MOCK_TOKEN } from '@/constants/mock-user'
 
 const route = useRoute()
 const toast = useToast()
@@ -98,14 +99,21 @@ const serviceRouteMap = {
 	'/interview': null // 统一页面，从 query 参数获取
 }
 
-// 获取用户信息
+// 获取用户信息。Mock 登录时不请求，直接用 store，避免 /user/info 超时影响押题等大模型流程
 const fetchUserInfo = async () => {
+	if (userStore.token === MOCK_TOKEN) return
 	try {
 		const userInfo = await getUserInfoAPI($api)
 		userStore.updateUserInfo(userInfo)
-		console.log('用户信息已更新:', userInfo)
 	} catch (error) {
 		console.error('获取用户信息失败:', error)
+		if (process.client && error?.message?.includes('timeout')) {
+			toast.add({
+				title: '请求超时',
+				description: '请确认后端已启动（如 ww-server）且 dev-api 代理地址正确',
+				color: 'warning'
+			})
+		}
 	}
 }
 

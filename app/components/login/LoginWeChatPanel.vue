@@ -2,8 +2,10 @@
 	<div
 		class="card relative overflow-hidden border border-gray-200 bg-white p-8 shadow-lg"
 	>
-		<!-- 增加一个测试登录的按钮，只在测试环境下展示 -->
-		<UButton v-if="isDev" @click="testLogin">测试登录</UButton>
+		<!-- 本地 Mock 登录：不请求后端，写死账户视为已登录（仅开发环境） -->
+		<UButton v-if="isDev" color="neutral" variant="soft" @click="mockLogin">
+			Mock 登录
+		</UButton>
 		<div
 			class="absolute -top-24 right-10 h-40 w-40 rounded-full bg-emerald-500/5 blur-3xl"
 		></div>
@@ -131,11 +133,11 @@ import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import { useNuxtApp, useToast } from '#imports'
 import {
 	generateWechatQRCodeAPI,
-	checkWechatQRCodeStatusAPI,
-	testLogin as testLoginAPI
+	checkWechatQRCodeStatusAPI
 } from '@/api/login'
 import { useUserStore } from '@/stores/user'
 import { handleLoginSuccess } from '@/permission'
+import { MOCK_TOKEN, MOCK_USER_INFO } from '@/constants/mock-user'
 
 // 判断是否是开发环境
 const isDev = process.dev
@@ -186,11 +188,20 @@ const startTimer = () => {
 const { $api } = useNuxtApp()
 
 // 拉取二维码地址（后端可能返回不同字段名，做兼容处理）
+// 本地开发可不请求，避免 wechat/qrcode 超时；直接使用 Mock 登录
 const loadQrCode = async () => {
-	const response = await generateWechatQRCodeAPI($api)
-	qrCodeUrl.value = response.qrCodeUrl
-	qrCodeId.value = response.qrCodeId
-	startQRCodeCheck()
+	try {
+		const response = await generateWechatQRCodeAPI($api)
+		qrCodeUrl.value = response.qrCodeUrl
+		qrCodeId.value = response.qrCodeId
+		startQRCodeCheck()
+	} catch (error) {
+		if (isDev) {
+			qrCodeUrl.value = ''
+			qrCodeId.value = ''
+		}
+		throw error
+	}
 }
 
 // 检查二维码状态
@@ -245,14 +256,20 @@ function startQRCodeCheck() {
 const refreshQr = async () => {
 	qrSeed.value = Date.now()
 	startTimer()
-	await loadQrCode()
+	if (isDev) return
+	try {
+		await loadQrCode()
+	} catch {
+		// 忽略
+	}
 	emit('refreshQr')
 }
 
-// 组件挂载后，启动倒计时并立即拉取一次二维码
-onMounted(async () => {
+// 组件挂载后：本地开发不请求二维码；其他环境也 try/catch 避免未捕获导致控制台报错
+onMounted(() => {
 	startTimer()
-	await loadQrCode()
+	if (isDev) return
+	loadQrCode().catch(() => {})
 })
 
 // 组件卸载前清理计时器
@@ -262,12 +279,21 @@ onBeforeUnmount(() => {
 	}
 })
 
-/**
- * 本地测试登录
- */
-const testLogin = async () => {
-	const response = await testLoginAPI($api)
-	loginHandle(response)
+/** 本地 Mock 登录：写死 mock 账户 + 固定 token，后端会特判为已登录 */
+const mockLogin = () => {
+	userStore.isLogin = true
+	userStore.userInfo = { ...MOCK_USER_INFO }
+	userStore.token = MOCK_TOKEN
+	scanSuccess.value = true
+	if (qrCodeCheckTimer) {
+		clearInterval(qrCodeCheckTimer)
+		qrCodeCheckTimer = null
+	}
+	if (timer) {
+		window.clearInterval(timer)
+		timer = null
+	}
+	setTimeout(() => handleLoginSuccess(), 300)
 }
 </script>
 

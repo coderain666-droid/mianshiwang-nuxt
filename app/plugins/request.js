@@ -1,13 +1,21 @@
 import { useUserStore } from '~/stores/user'
 import { useToast } from '#imports'
+import { buildLocalLLMHeaders } from '~/utils/localLLMConfig'
 
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin((nuxtApp) => {
 	const config = useRuntimeConfig()
+	const pushToast = (payload) => {
+		if (!process.client) return
+		nuxtApp.runWithContext(() => {
+			useToast().add(payload)
+		})
+	}
 
 	// 创建全局 ofetch 实例（同构：SSR/CSR 都可用）
+	// 超时 60s：本地/代理下后端冷启或网络慢时，避免 user/info、wechat/qrcode 等请求过早超时
 	const api = $fetch.create({
 		baseURL: config.public.apiBase, // 例如：/dev-api 或 https://api.example.com
-		timeout: 15_000,
+		timeout: 60_000,
 		credentials: 'include',
 
 		// ===== 请求拦截 =====
@@ -18,6 +26,9 @@ export default defineNuxtPlugin(() => {
 			if (userStore.isLogin && userStore.token) {
 				headers.set('Authorization', `Bearer ${userStore.token}`)
 			}
+			Object.entries(buildLocalLLMHeaders(config)).forEach(([key, value]) => {
+				headers.set(key, value)
+			})
 
 			options.headers = headers
 		},
@@ -33,13 +44,12 @@ export default defineNuxtPlugin(() => {
 				}
 				// 业务错误：提示 + 抛错
 				if (process.client) {
-					const toast = useToast()
 					if (body.code === 401) {
-						toast.add({ title: '登录已过期，请重新登录', color: 'warning' })
+						pushToast({ title: '登录已过期，请重新登录', color: 'warning' })
 						const userStore = useUserStore()
 						userStore.logout()
 					} else if (body.code === 500) {
-						toast.add({ title: body.message || '请求失败', color: 'error' })
+						pushToast({ title: body.message || '请求失败', color: 'error' })
 					}
 				}
 				throw createError({
@@ -55,19 +65,19 @@ export default defineNuxtPlugin(() => {
 
 			if (status === 401) {
 				if (process.client) {
-					const toast = useToast()
-					toast.add({ title: '登录已过期，请重新登录', color: 'warning' })
+					pushToast({ title: '登录已过期，请重新登录', color: 'warning' })
 					const userStore = useUserStore()
 					userStore.logout?.()
-					navigateTo({ path: '/login', replace: true })
+					nuxtApp.runWithContext(() =>
+						navigateTo({ path: '/login', replace: true })
+					)
 				}
 				// 服务端场景直接抛错即可
 				throw createError({ statusCode: 401, statusMessage: 'Unauthorized' })
 			}
 
 			if (process.client) {
-				const toast = useToast()
-				toast.add({
+				pushToast({
 					title: response?._data?.message || '网络错误',
 					color: 'error'
 				})

@@ -248,8 +248,14 @@ import {
 	getInterviewBehaviorHistoryAPI
 } from '@/api/interview'
 import { SERVICE_TAGS } from '@/constants/vip'
+import { useUserStore } from '@/stores/user'
 import dayjs from 'dayjs'
 import { navigateTo } from '#imports'
+import {
+	listLocalResumeQuizRecords,
+	mapLocalResumeQuizToHistoryRecord,
+	mergeRecordsByResultId
+} from '@/utils/localResumeQuizStorage'
 
 definePageMeta({
 	middleware: 'auth'
@@ -260,6 +266,9 @@ useHead({
 })
 
 const { $api } = useNuxtApp()
+const userStore = useUserStore()
+const getStorageUserId = () =>
+	userStore.userInfo?._id || userStore.userInfo?.userId || 'anonymous'
 
 // 标签页配置
 const tabs = [
@@ -317,6 +326,9 @@ const handlePageChange = (newPage) => {
  */
 const loadData = async () => {
 	isLoading.value = true
+	let remoteRecords = []
+	let remoteTotal = 0
+
 	try {
 		let res = null
 
@@ -337,20 +349,39 @@ const loadData = async () => {
 		}
 
 		if (res) {
-			list.value = res.records || []
-			total.value = res.total || 0
+			remoteRecords = res.records || []
+			remoteTotal = res.total || remoteRecords.length
 		}
 	} catch (error) {
 		console.error('获取历史记录失败', error)
-		list.value = []
-		total.value = 0
+		remoteRecords = []
+		remoteTotal = 0
 	} finally {
+		if (activeTab.value === SERVICE_TAGS.RESUME) {
+			const localRecords = listLocalResumeQuizRecords(getStorageUserId()).map(
+				mapLocalResumeQuizToHistoryRecord
+			)
+			list.value = mergeRecordsByResultId(remoteRecords, localRecords)
+			total.value = Math.max(remoteTotal, list.value.length)
+		} else {
+			list.value = remoteRecords
+			total.value = remoteTotal
+		}
 		isLoading.value = false
 	}
 }
 
 // 初始加载
 loadData()
+
+watch(
+	() => userStore.userInfo?._id || userStore.userInfo?.userId,
+	(newUserId, oldUserId) => {
+		if (newUserId && newUserId !== oldUserId && activeTab.value === SERVICE_TAGS.RESUME) {
+			loadData()
+		}
+	}
+)
 
 /**
  * 格式化日期

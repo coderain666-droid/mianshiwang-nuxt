@@ -251,6 +251,7 @@ import EndingProgressModal from '@/components/interview/EndingProgressModal.vue'
 import AnswerAdviceModal from '@/components/interview/AnswerAdviceModal.vue'
 import VoiceInputModal from '@/components/interview/VoiceInputModal.vue'
 import { useSpeechSynthesis } from '@/composables/useSpeechSynthesis'
+import { buildLocalLLMHeaders } from '@/utils/localLLMConfig'
 import { marked } from 'marked'
 import { navigateTo } from 'nuxt/app'
 
@@ -456,6 +457,7 @@ const startInterview = async () => {
 		const { close } = startMockInterviewAPI(params, {
 			token: userStore.token,
 			baseURL: config.public.apiBase,
+			headers: buildLocalLLMHeaders(config),
 			callbacks: {
 				onMessage: (data) => {
 					const { type, content } = data
@@ -609,6 +611,7 @@ const handleSendMessage = async () => {
 		answerInterviewQuestionAPI(params, {
 			token: userStore.token,
 			baseURL: config.public.apiBase,
+			headers: buildLocalLLMHeaders(config),
 			callbacks: {
 				onMessage: (data) => {
 					const { type, content } = data
